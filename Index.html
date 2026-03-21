@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>عقار وعَمار — منصة العمران والعقار الخليجي</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy:   #0A2540;
+  --navy2:  #1652A1;
+  --navy3:  #E8F0FB;
+  --up:     #0A7A4F;
+  --up-bg:  #E8F5EF;
+  --dn:     #C0392B;
+  --dn-bg:  #FDECEA;
+  --amb:    #92600A;
+  --amb-bg: #FEF3C7;
+  --white:  #FFFFFF;
+  --f0:     #F7F8FA;
+  --f1:     #F0F2F6;
+  --ink:    #0A1929;
+  --ink2:   #3D5166;
+  --ink3:   #7A8EA0;
+  --b:      #DDE3EC;
+  --b2:     #C5CDD8;
+  --mono:   'IBM Plex Mono', monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Tajawal',sans-serif;background:var(--f0);color:var(--ink);font-size:13px;line-height:1.5;overflow-x:hidden}
+a{text-decoration:none;color:inherit}
+
+/* ════ HEADER ════ */
+.hdr{background:var(--white);border-bottom:1px solid var(--b);position:sticky;top:0;z-index:300}
+.hdr-top{display:flex;align-items:center;padding:0 16px;height:44px;gap:14px;border-bottom:1px solid var(--b)}
+.brand{display:flex;align-items:baseline;gap:0;font-size:19px;font-weight:900;color:var(--ink);white-space:nowrap;letter-spacing:-.3px;padding-left:16px;border-left:1px solid var(--b);margin-left:10px}
+.brand b{color:var(--navy2);font-weight:900}
+.brand-tag{font-size:11px;font-weight:400;color:var(--ink3);margin-right:8px;letter-spacing:.2px}
+.sbox{flex:1;max-width:340px;display:flex;align-items:center;background:var(--f1);border:1px solid var(--b);border-radius:4px;padding:0 10px;height:28px;gap:6px}
+.sbox input{flex:1;border:none;background:transparent;font-family:'Tajawal',sans-serif;font-size:12px;color:var(--ink);outline:none}
+.sbox input::placeholder{color:var(--ink3)}
+.si{width:12px;height:12px;stroke:var(--ink3);fill:none;flex-shrink:0}
+.hdr-r{display:flex;align-items:center;gap:8px;margin-right:auto}
+.hdr-date{font-size:10px;color:var(--ink3);font-family:var(--mono);white-space:nowrap}
+.csw{position:relative}
+.csel{appearance:none;-webkit-appearance:none;padding:0 20px 0 8px;height:26px;background:var(--f1);border:1px solid var(--b);border-radius:3px;color:var(--ink2);font-family:'Tajawal',sans-serif;font-size:11px;font-weight:500;cursor:pointer;outline:none}
+.csel:hover{border-color:var(--navy2)}
+.ca{position:absolute;left:5px;top:50%;transform:translateY(-50%);pointer-events:none;width:8px;height:8px;stroke:var(--ink3);fill:none;stroke-width:2}
+.hbtn{padding:0 11px;height:26px;border-radius:3px;font-size:11px;font-weight:500;font-family:'Tajawal',sans-serif;cursor:pointer;transition:all .15s;white-space:nowrap}
+.hb-g{background:transparent;border:1px solid var(--b2);color:var(--ink2)}
+.hb-g:hover{background:var(--f1)}
+.hb-b{background:var(--navy2);border:1px solid var(--navy2);color:#fff}
+.hb-b:hover{background:var(--navy)}
+.hb-a{background:var(--amb-bg);border:1px solid rgba(146,96,10,.3);color:var(--amb)}
+.hb-a:hover{background:#FEE9A0}
+.nav{display:flex;align-items:center;height:36px;padding:0 0 0 4px;background:var(--navy)}
+.nav::-webkit-scrollbar{display:none}
+.nav-logo{font-size:14px;font-weight:900;color:rgba(255,255,255,.65);padding:0 16px;height:100%;display:flex;align-items:center;border-left:1px solid rgba(255,255,255,.12);margin-left:4px;white-space:nowrap}
+.nav-logo b{color:#fff}
+
+/* القائمة الرئيسية الخمسة */
+.nav-item{position:relative;height:100%}
+.nav-item:hover .nav-drop{display:block}
+
+.ntab{
+  padding:0 18px;height:100%;
+  display:flex;align-items:center;gap:5px;
+  font-size:12px;font-weight:600;color:rgba(255,255,255,.65);
+  white-space:nowrap;border-bottom:2px solid transparent;
+  transition:all .15s;cursor:pointer;user-select:none;
+}
+.ntab:hover,.nav-item:hover .ntab{color:#fff}
+.ntab.on{color:#38BDF8;border-bottom-color:#38BDF8}
+.ntab-arr{
+  width:12px;height:12px;stroke:rgba(255,255,255,.35);fill:none;stroke-width:2.5;
+  flex-shrink:0;transition:transform .15s;
+}
+.nav-item:hover .ntab-arr{transform:rotate(180deg);stroke:rgba(255,255,255,.7)}
+
+/* القائمة المنسدلة */
+.nav-drop{
+  display:none;
+  position:absolute;top:100%;right:0;
+  background:var(--navy);
+  border:1px solid rgba(255,255,255,.1);
+  border-top:2px solid #38BDF8;
+  border-radius:0 0 6px 6px;
+  min-width:200px;
+  box-shadow:0 8px 24px rgba(0,0,0,.35);
+  z-index:500;
+  padding:6px 0;
+}
+.nav-drop-item{
+  display:flex;align-items:center;gap:8px;
+  padding:8px 16px;
+  font-size:12px;font-weight:500;color:rgba(255,255,255,.65);
+  cursor:pointer;transition:all .12s;white-space:nowrap;
+  text-decoration:none;
+}
+.nav-drop-item:hover{background:rgba(255,255,255,.07);color:#fff}
+.nav-drop-item-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;opacity:.6}
+.nav-drop-sep{height:1px;background:rgba(255,255,255,.08);margin:4px 0}
+
+/* ════ TICKER — فاتح ════ */
+.ticker{background:var(--f1);height:26px;display:flex;align-items:center;overflow:hidden;border-bottom:1px solid var(--b)}
+.tkr-lbl{background:var(--navy2);color:#fff;font-size:9px;font-weight:700;letter-spacing:1.2px;padding:0 10px;height:100%;display:flex;align-items:center;white-space:nowrap;flex-shrink:0;font-family:var(--mono)}
+.tkr-sc{flex:1;overflow:hidden}
+.tkr-in{display:inline-flex;white-space:nowrap}
+/* فاصل الدولة */
+.ti-sep{
+  display:inline-flex;align-items:center;
+  font-size:9px;font-weight:700;color:var(--up);
+  letter-spacing:.5px;padding:0 8px 0 14px;
+  border-right:1px solid var(--b);
+  white-space:nowrap;
+}
+.ti-sep::after{content:' ·';color:var(--b2);margin-right:2px}
+/* فاصل فرعي REIT */
+.ti-sub{
+  display:inline-flex;align-items:center;
+  font-size:8px;color:var(--ink3);
+  padding:0 6px;border-right:1px solid var(--b);
+  letter-spacing:.4px;
+}
+.ti{display:inline-flex;align-items:center;gap:5px;padding:0 14px;border-right:1px solid var(--b);font-size:10px;flex-shrink:0;font-family:var(--mono)}
+.ti-n{color:var(--ink3)}.ti-v{color:var(--ink);font-weight:700}
+.uc{color:var(--up);font-size:10px;font-weight:700}
+.dc{color:var(--dn);font-size:10px;font-weight:700}
+.fc{color:var(--ink3);font-size:10px}
+
+/* ════ LAYOUT — عمودان: محتوى يمين + شريط يسار ════ */
+.page{display:grid;grid-template-columns:1fr 200px;min-height:calc(100vh - 100px);max-width:1540px;margin:0 auto;border-left:1px solid var(--b);border-right:1px solid var(--b);background:var(--white)}
+
+/* ════ LEFT SIDEBAR ════ */
+.sb-l{border-right:1px solid var(--b);background:var(--white);overflow-y:auto}
+.sb-l::-webkit-scrollbar{width:2px}
+.sb-l::-webkit-scrollbar-thumb{background:var(--b)}
+.lhd{padding:5px 10px;font-size:9px;font-weight:700;color:var(--ink3);letter-spacing:.8px;text-transform:uppercase;background:var(--f1);border-bottom:1px solid var(--b);border-top:1px solid var(--b)}
+.lhd:first-child{border-top:none}
+.mat{display:flex;justify-content:space-between;align-items:center;padding:5px 10px;border-bottom:1px solid var(--b);cursor:pointer;transition:background .1s}
+.mat:hover{background:var(--navy3)}
+.mat:last-child{border-bottom:none}
+.mat-n{font-size:11px;color:var(--ink2);font-weight:500}
+.mat-r{display:flex;align-items:center;gap:5px}
+.mat-v{font-size:11px;font-weight:700;color:var(--ink);font-family:var(--mono)}
+.chg{font-size:9px;font-weight:700;padding:1px 4px;border-radius:2px;font-family:var(--mono)}
+.cu{background:var(--up-bg);color:var(--up)}.cd{background:var(--dn-bg);color:var(--dn)}.cn{background:var(--f1);color:var(--ink3);border:1px solid var(--b)}
+.slnk{display:flex;align-items:center;gap:7px;padding:6px 10px;font-size:11px;color:var(--ink2);border-bottom:1px solid var(--b);transition:all .1s;cursor:pointer}
+.slnk:hover{background:var(--navy3);color:var(--navy2)}
+.slnk:last-child{border-bottom:none}
+.sdot{width:4px;height:4px;border-radius:50%;flex-shrink:0}
+
+/* ════ CENTER MAIN ════ */
+.main{border-right:1px solid var(--b);display:flex;flex-direction:column}
+
+/* ── DATA BOARD: أرقام كبيرة، خلفية بيضاء، حد أزرق علوي ── */
+.data-board{background:var(--white);border-bottom:1px solid var(--b)}
+.db-hdr{display:flex;align-items:center;justify-content:space-between;padding:7px 14px;background:var(--f1);border-bottom:1px solid var(--b)}
+.db-hdr-l{display:flex;align-items:center;gap:8px}
+.live-dot{width:7px;height:7px;border-radius:50%;background:var(--up);flex-shrink:0;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+.db-title{font-size:11px;font-weight:700;color:var(--ink);letter-spacing:.2px}
+.db-sub{font-size:10px;color:var(--ink3)}
+.db-link{font-size:10px;color:var(--navy2);font-weight:600}
+.db-link:hover{text-decoration:underline}
+
+/* Grid 2×3 — القيم الكبيرة */
+.data-grid{display:grid;grid-template-columns:repeat(3,1fr)}
+.dg-cell{padding:13px 14px 11px;border-left:1px solid var(--b);border-bottom:1px solid var(--b);cursor:pointer;transition:background .12s;background:var(--white)}
+.dg-cell:nth-child(3n+1){border-left:none}
+.dg-cell:nth-child(n+4){border-bottom:none}
+.dg-cell:hover{background:var(--navy3)}
+.dg-lbl{font-size:9px;color:var(--ink3);letter-spacing:.3px;margin-bottom:5px;text-transform:uppercase}
+/* أزرار فلتر المدن */
+.city-btn{
+  padding:2px 10px;border-radius:12px;font-size:10px;font-weight:600;
+  font-family:'Tajawal',sans-serif;cursor:pointer;transition:all .15s;
+  border:1px solid var(--b2);background:transparent;color:var(--ink3);
+}
+.city-btn:hover{border-color:var(--navy2);color:var(--navy2)}
+.city-on{background:var(--navy);border-color:var(--navy);color:#fff!important}
+/* 20px mono — الرقم يقود */
+.dg-val{font-size:20px;font-weight:700;color:var(--ink);line-height:1;font-family:var(--mono);letter-spacing:-.5px;margin-bottom:3px}
+.dg-unit{font-size:9px;font-weight:400;color:var(--ink3);font-family:'Tajawal',sans-serif}
+.dg-svg{display:block;width:100%;height:24px;margin:5px 0 4px}
+.dg-chg{display:inline-flex;align-items:center;font-size:9px;font-weight:700;padding:2px 6px;border-radius:2px;font-family:var(--mono)}
+.dg-u{background:var(--up-bg);color:var(--up)}.dg-d{background:var(--dn-bg);color:var(--dn)}
+.dg-per{font-size:9px;color:var(--ink3);margin-right:5px}
+
+.tools-block{
+  background:var(--navy);
+  border-top:2px solid var(--navy2);
+  border-bottom:1px solid rgba(255,255,255,.08);
+  padding:0;
+}
+.tools-block-hdr{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:8px 14px;
+  background:var(--f1);
+  border-bottom:1px solid var(--b);
+}
+.tbh-l{display:flex;align-items:center;gap:8px}
+.tbh-icon{width:22px;height:22px;border-radius:4px;background:var(--navy3);display:flex;align-items:center;justify-content:center;flex-shrink:0;border:1px solid var(--navy2)}
+.tbh-icon svg{width:12px;height:12px;stroke:var(--navy2);fill:none;stroke-width:2}
+.tbh-title{font-size:12px;font-weight:700;color:var(--ink);letter-spacing:.2px}
+.tbh-sub{font-size:10px;color:var(--ink3)}
+.tbh-link{font-size:10px;color:var(--navy2);font-weight:600}
+.tbh-link:hover{text-decoration:underline}
+
+/* الأدوات الخمسة في صف واحد */
+.tools-row{display:grid;grid-template-columns:repeat(5,1fr);gap:0}
+.tool-card{
+  padding:12px 12px 11px;
+  border-left:1px solid rgba(255,255,255,.07);
+  cursor:pointer;transition:background .15s;
+  display:flex;flex-direction:column;align-items:flex-start;gap:0;
+  background:transparent;
+}
+.tool-card:first-child{border-left:none}
+.tool-card:hover{background:rgba(255,255,255,.06)}
+.tc-ico{
+  width:32px;height:32px;border-radius:8px;
+  background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.12);
+  display:flex;align-items:center;justify-content:center;
+  margin-bottom:8px;transition:background .15s;
+}
+.tool-card:hover .tc-ico{background:rgba(56,189,248,.15);border-color:rgba(56,189,248,.3)}
+.tc-ico svg{width:16px;height:16px;stroke:rgba(255,255,255,.7);fill:none;stroke-width:1.5;transition:stroke .15s}
+.tool-card:hover .tc-ico svg{stroke:#38BDF8}
+.tc-name{font-size:12px;font-weight:600;color:#fff;margin-bottom:2px}
+.tc-desc{font-size:10px;color:rgba(255,255,255,.4);line-height:1.4}
+
+/* ── HERO NEWS ── */
+.hero{display:grid;grid-template-columns:1.85fr 1fr;border-bottom:1px solid var(--b)}
+.hero-main{padding:16px 16px 14px;border-left:1px solid var(--b);cursor:pointer;transition:background .12s;display:flex;flex-direction:column;justify-content:space-between;min-height:120px}
+.hero-main:hover{background:var(--f0)}
+.pill{display:inline-flex;align-items:center;gap:4px;font-size:9px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;padding:2px 7px;border-radius:2px;margin-bottom:9px}
+.pill-dot{width:5px;height:5px;border-radius:50%}
+.p-urg{background:var(--dn-bg);color:var(--dn)}.p-urg .pill-dot{background:var(--dn);animation:pulse 1s infinite}
+.p-prj{background:var(--up-bg);color:var(--up)}.p-prj .pill-dot{background:var(--up)}
+.p-mkt{background:var(--amb-bg);color:var(--amb)}.p-mkt .pill-dot{background:var(--amb)}
+.p-arc{background:#EDE9FE;color:#6D28D9}.p-arc .pill-dot{background:#6D28D9}
+.hero-title{font-size:17px;font-weight:900;color:var(--ink);line-height:1.32;flex:1;margin-bottom:10px;letter-spacing:-.2px}
+.hero-meta{font-size:10px;color:var(--ink3);display:flex;align-items:center;gap:5px;font-family:var(--mono)}
+.ms{color:var(--b2)}
+.hero-side{display:flex;flex-direction:column}
+.hs{flex:1;padding:9px 12px;border-bottom:1px solid var(--b);cursor:pointer;transition:background .12s;display:flex;flex-direction:column;justify-content:space-between}
+.hs:last-child{border-bottom:none}
+.hs:hover{background:var(--f0)}
+.hs-t{font-size:12px;font-weight:500;color:var(--ink2);line-height:1.4;margin-bottom:4px}
+.hs-m{font-size:10px;color:var(--ink3);font-family:var(--mono)}
+
+/* ── NEWS LIST ── */
+.sbar{display:flex;align-items:center;justify-content:space-between;padding:5px 12px;border-bottom:1px solid var(--b);background:var(--f1)}
+.sbar-t{font-size:9px;font-weight:700;color:var(--ink3);letter-spacing:.7px;text-transform:uppercase}
+.sbar-l{font-size:10px;color:var(--navy2);font-weight:600}
+.sbar-l:hover{text-decoration:underline}
+.nitem{display:grid;grid-template-columns:1fr 56px;gap:8px;align-items:start;padding:7px 12px;border-bottom:1px solid var(--b);cursor:pointer;transition:background .1s}
+.nitem:hover{background:var(--f0)}
+.ntags{display:flex;align-items:center;gap:4px;margin-bottom:2px}
+.ntag{font-size:9px;font-weight:700;color:var(--navy2)}
+.ncty{font-size:9px;color:var(--ink3);background:var(--f1);padding:0 4px;border-radius:2px}
+.n-t{font-size:12px;font-weight:500;color:var(--ink2);line-height:1.38;margin-bottom:2px}
+.n-m{font-size:10px;color:var(--ink3);font-family:var(--mono)}
+.n-img{width:56px;height:40px;border-radius:3px;overflow:hidden;flex-shrink:0;background:var(--f1);border:1px solid var(--b)}
+
+/* ── LOWER GRID ── */
+.lower{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--b)}
+.lcol{border-left:1px solid var(--b)}.lcol:first-child{border-left:none}
+.pitem{display:flex;align-items:center;gap:9px;padding:7px 12px;border-bottom:1px solid var(--b);cursor:pointer;transition:background .1s}
+.pitem:hover{background:var(--f0)}.pitem:last-child{border-bottom:none}
+.pthumb{width:46px;height:34px;border-radius:3px;flex-shrink:0;overflow:hidden;border:1px solid var(--b)}
+.pst{font-size:9px;font-weight:700;color:var(--up);margin-bottom:2px;display:flex;align-items:center;gap:3px;font-family:var(--mono)}
+.pdot{width:4px;height:4px;border-radius:50%;background:var(--up);animation:pulse 2s infinite}
+.pnm{font-size:11px;font-weight:600;color:var(--ink);line-height:1.3;margin-bottom:2px}
+.pnu{font-size:10px;color:var(--ink3);font-family:var(--mono)}
+.pnu b{color:var(--navy2)}
+.ait{display:grid;grid-template-columns:1fr 46px;gap:8px;padding:7px 12px;border-bottom:1px solid var(--b);cursor:pointer;transition:background .1s}
+.ait:hover{background:var(--f0)}.ait:last-child{border-bottom:none}
+.atag{font-size:9px;font-weight:700;color:#6D28D9;margin-bottom:2px}
+.at{font-size:11px;font-weight:500;color:var(--ink2);line-height:1.35;margin-bottom:2px}
+.am{font-size:10px;color:var(--ink3);font-family:var(--mono)}
+.aimg{width:46px;height:34px;border-radius:3px;overflow:hidden;border:1px solid var(--b)}
+
+/* ════ RIGHT SIDEBAR ════ */
+.sb-r{background:var(--white);border-right:1px solid var(--b);overflow-y:auto}
+.sb-r::-webkit-scrollbar{width:2px}.sb-r::-webkit-scrollbar-thumb{background:var(--b)}
+.rhd{padding:6px 12px;font-size:9px;font-weight:700;color:var(--white);letter-spacing:.7px;text-transform:uppercase;background:var(--navy);display:flex;align-items:center;justify-content:space-between}
+.rhd a{font-size:9px;color:#38BDF8;font-weight:500;letter-spacing:0}
+.rhd-w{padding:6px 12px;font-size:9px;font-weight:700;color:var(--ink3);letter-spacing:.7px;text-transform:uppercase;background:var(--f1);border-bottom:1px solid var(--b);border-top:1px solid var(--b);display:flex;align-items:center;justify-content:space-between}
+.rhd-w a{font-size:9px;color:var(--navy2);font-weight:500;letter-spacing:0}
+.mcard{padding:10px 12px;border-bottom:1px solid var(--b);cursor:pointer;transition:background .1s}
+.mcard:hover{background:var(--navy3)}
+.mc-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:2px}
+.mc-nm{font-size:10px;color:var(--ink3);font-weight:600}
+.mbdg{font-size:9px;font-weight:700;padding:2px 5px;border-radius:2px;font-family:var(--mono)}
+.mb-u{background:var(--up-bg);color:var(--up)}.mb-d{background:var(--dn-bg);color:var(--dn)}
+.mc-val{font-size:19px;font-weight:700;color:var(--ink);line-height:1;font-family:var(--mono);letter-spacing:-.5px;margin-bottom:1px}
+.mc-unit{font-size:9px;font-weight:400;color:var(--ink3);font-family:'Tajawal',sans-serif}
+.mc-ch{display:block;width:100%;height:34px;margin:4px 0 3px}
+.mc-pr{font-size:9px;color:var(--ink3);font-family:var(--mono)}
+.job{padding:8px 12px;border-bottom:1px solid var(--b);cursor:pointer;transition:background .1s}
+.job:hover{background:var(--f0)}.job:last-child{border-bottom:none}
+.j-co{font-size:10px;color:var(--ink3);margin-bottom:2px;display:flex;align-items:center;gap:4px}
+.j-ft{background:var(--amb-bg);color:var(--amb);font-size:8px;font-weight:700;padding:1px 4px;border-radius:2px;border:1px solid rgba(146,96,10,.2)}
+.j-t{font-size:11px;font-weight:600;color:var(--ink);line-height:1.3;margin-bottom:3px}
+.j-m{display:flex;flex-wrap:wrap;gap:4px}
+.j-tp{font-size:9px;padding:1px 5px;border-radius:2px;background:var(--up-bg);color:var(--up);font-weight:600}
+.j-l{font-size:9px;color:var(--ink3);font-family:var(--mono)}
+.j-s{font-size:9px;font-weight:700;color:var(--navy2);font-family:var(--mono)}
+.ev{padding:7px 12px;border-bottom:1px solid var(--b);cursor:pointer;transition:background .1s}
+.ev:hover{background:var(--f0)}.ev:last-child{border-bottom:none}
+.ev-d{display:inline-block;font-size:9px;font-weight:700;background:var(--navy2);color:#fff;padding:1px 7px;border-radius:2px;margin-bottom:3px;font-family:var(--mono)}
+.ev-t{font-size:11px;font-weight:500;color:var(--ink2);line-height:1.3;margin-bottom:2px}
+.ev-l{font-size:9px;color:var(--ink3);font-family:var(--mono)}
+.nl-box{padding:12px;background:var(--navy3);border-top:2px solid var(--navy2)}
+.nl-t{font-size:12px;font-weight:700;color:var(--navy);margin-bottom:3px}
+.nl-s{font-size:10px;color:var(--ink2);margin-bottom:7px;line-height:1.5}
+.nl-i{width:100%;padding:6px 8px;border:1px solid var(--b2);border-radius:3px;font-family:'Tajawal',sans-serif;font-size:11px;background:var(--white);margin-bottom:5px;outline:none;direction:rtl}
+.nl-i:focus{border-color:var(--navy2)}
+.nl-b{width:100%;padding:7px;border:none;border-radius:3px;background:var(--navy);color:#fff;font-family:'Tajawal',sans-serif;font-size:12px;font-weight:700;cursor:pointer}
+.nl-b:hover{background:var(--navy2)}
+.foot{background:var(--navy);padding:9px 16px;display:flex;align-items:center;justify-content:space-between;font-size:10px;color:rgba(255,255,255,.3);flex-wrap:wrap;gap:6px;font-family:var(--mono)}
+.foot a{color:rgba(255,255,255,.3);margin-left:14px}.foot a:hover{color:rgba(255,255,255,.65)}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="hdr-top">
+    <div class="brand">عقار و<b>عمار</b><span class="brand-tag">مؤشرات · تصميم · أخبار</span></div>
+    <div class="sbox">
+      <svg class="si" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      <input type="text" placeholder="ابحث في المشاريع والمؤشرات والأخبار...">
+    </div>
+    <div class="hdr-r">
+      <span class="hdr-date">19 مارس 2026</span>
+      <div class="csw">
+        <select class="csel">
+          <option>🇸🇦 السعودية</option><option>🌐 كل الخليج</option><option>🇦🇪 الإمارات</option>
+          <option>🇶🇦 قطر</option><option>🇰🇼 الكويت</option><option>🇧🇭 البحرين</option><option>🇴🇲 عُمان</option>
+        </select>
+        <svg class="ca" viewBox="0 0 10 10"><path d="M2 3.5L5 6.5L8 3.5"/></svg>
+      </div>
+      <button class="hbtn hb-g">دخول</button>
+      <button class="hbtn hb-b">انضم مجاناً</button>
+      <button class="hbtn hb-a">⭐ Premium</button>
+    </div>
+  </div>
+  <div class="nav">
+
+    <!-- 1. الأخبار -->
+    <div class="nav-item">
+      <div class="ntab on">
+        الأخبار
+        <svg class="ntab-arr" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="nav-drop">
+        <a class="nav-drop-item" href="#"><span class="nav-drop-item-dot" style="background:#F87171"></span>الأخبار العاجلة</a>
+        <a class="nav-drop-item" href="#"><span class="nav-drop-item-dot" style="background:#38BDF8"></span>رؤية 2030</a>
+        <div class="nav-drop-sep"></div>
+        <a class="nav-drop-item" href="#"><span class="nav-drop-item-dot" style="background:rgba(255,255,255,.3)"></span>أخبار السعودية</a>
+        <a class="nav-drop-item" href="#"><span class="nav-drop-item-dot" style="background:rgba(255,255,255,.3)"></span>أخبار الإمارات</a>
+        <a class="nav-drop-item" href="#"><span class="nav-drop-item-dot" style="background:rgba(255,255,255,.3)"></span>أخبار قطر</a>
+        <a class="nav-drop-item" href="#"><span class="nav-drop-item-dot" style="background:rgba(255,255,255,.3)"></span>أخبار الكويت</a>
+        <a class="nav-drop-item" href="#"><span class="nav-drop-item-dot" style="background:rgba(255,255,255,.3)"></span>أخبار البحرين</a>
+        <a class="nav-drop-item" href="#"><span class="nav-drop-item-dot" style="background:rgba(255,255,255,.3)"></span>أخبار عُمان</a>
+        <div class="nav-drop-sep"></div>
+        <a class="nav-drop-item" href="#"><span class="nav-drop-item-dot" style="background:#A78BFA"></span>آراء وتحليلات</a>
+        <a class="nav-drop-item" href="#"><span class="nav-drop-item-dot" style="background:#A78BFA"></span>النشرة الأسبوعية</a>
+      </div>
+    </div>
+
+    <!-- 2. المشاريع -->
+    <div class="nav-item">
+      <div class="ntab">
+        المشاريع
+        <svg class="ntab-arr" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="nav-drop">
+        <a class="nav-drop-item" href="#"><span class="nav-drop-item-dot" style="background:#34D399"></span>قاعدة المشاريع</a>
+        <a class="nav-drop-item" href="#"><span class="nav-drop-item-dot" style="background:#34D399"></span>المشاريع الضخمة</a>
+        <a class="nav-drop-item" href="#"><span class="nav-drop-item-dot" style="background:#34D399"></span>مشاريع سكنية</a>
+        <a class="nav-drop-item" href="#"><span class="nav-drop-item-dot" style="background:#34D399"></span>مشاريع تجارية</a>
+        <div class="nav-drop-sep"></div>
+        <a class="nav-drop-item" href="#"><span class="nav-drop-item-dot" style="background:#38BDF8"></span>خريطة المشاريع</a>
+        <a class="nav-drop-item" href="#"><span class="nav-drop-item-dot" style="background:#38BDF8"></span>مناقصات وعقود</a>
+      </div>
+    </div>
+
+    <!-- 3. السوق -->
+    <div class="nav-item">
+      <div class="ntab">
+        السوق
+        <svg class="ntab-arr" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="nav-drop">
+        <a class="nav-drop-item" href="#"><span class="nav-drop-item-dot" style="background:#FFB020"></span>لوحة المؤشرات</a>
+        <a class="nav-drop-item" href="#"><span class="nav-drop-item-dot" style="background:#FFB020"></span>أسعار العقارات</a>
+        <a class="nav-drop-item" href="#"><span class="nav-drop-item-dot" style="background:#FFB020"></span>عقود الإنشاء</a>
+        <a class="nav-drop-item" href="#"><span class="nav-drop-item-dot" style="background:#FFB020"></span>أسعار مواد البناء</a>
+        <div class="nav-drop-sep"></div>
+        <a class="nav-drop-item" href="#"><span class="nav-drop-item-dot" style="background:#34D399"></span>الشركات المدرجة</a>
+        <a class="nav-drop-item" href="#"><span class="nav-drop-item-dot" style="background:#A78BFA"></span>تقارير السوق</a>
+      </div>
+    </div>
+
+    <!-- 4. المعمار -->
+    <div class="nav-item">
+      <div class="ntab">
+        المعمار
+        <svg class="ntab-arr" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="nav-drop">
+        <a class="nav-drop-item" href="#"><span class="nav-drop-item-dot" style="background:#A78BFA"></span>مشاريع التصميم</a>
+        <a class="nav-drop-item" href="#"><span class="nav-drop-item-dot" style="background:#A78BFA"></span>مكاتب ومعماريون</a>
+        <a class="nav-drop-item" href="#"><span class="nav-drop-item-dot" style="background:#A78BFA"></span>مسابقات ومعارض</a>
+        <a class="nav-drop-item" href="#"><span class="nav-drop-item-dot" style="background:#A78BFA"></span>التراث والهوية</a>
+        <div class="nav-drop-sep"></div>
+        <a class="nav-drop-item" href="#"><span class="nav-drop-item-dot" style="background:#34D399"></span>الاستدامة والبيئة</a>
+        <div class="nav-drop-sep"></div>
+        <a class="nav-drop-item" href="#"><span class="nav-drop-item-dot" style="background:#FFB020"></span>اختبار الطراز</a>
+        <a class="nav-drop-item" href="#"><span class="nav-drop-item-dot" style="background:#FFB020"></span>حاسبة التكلفة</a>
+        <a class="nav-drop-item" href="#"><span class="nav-drop-item-dot" style="background:#FFB020"></span>حاسبة الكميات</a>
+        <a class="nav-drop-item" href="#"><span class="nav-drop-item-dot" style="background:#FFB020"></span>مراحل البناء</a>
+      </div>
+    </div>
+
+    <!-- 5. المجتمع -->
+    <div class="nav-item">
+      <div class="ntab">
+        المجتمع
+        <svg class="ntab-arr" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="nav-drop">
+        <a class="nav-drop-item" href="#"><span class="nav-drop-item-dot" style="background:#38BDF8"></span>دليل المهندسين</a>
+        <a class="nav-drop-item" href="#"><span class="nav-drop-item-dot" style="background:#38BDF8"></span>الوظائف</a>
+        <a class="nav-drop-item" href="#"><span class="nav-drop-item-dot" style="background:#38BDF8"></span>الفعاليات والمؤتمرات</a>
+        <a class="nav-drop-item" href="#"><span class="nav-drop-item-dot" style="background:#38BDF8"></span>جوائز عقار وعَمار</a>
+        <div class="nav-drop-sep"></div>
+        <a class="nav-drop-item" href="#"><span class="nav-drop-item-dot" style="background:#A78BFA"></span>برامج الإرشاد</a>
+        <a class="nav-drop-item" href="#"><span class="nav-drop-item-dot" style="background:#A78BFA"></span>بورصة الشراكات</a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- TICKER — شركات عقارية مدرجة من دول الخليج، مباشر -->
+<div class="ticker" style="overflow:hidden">
+  <div class="tkr-lbl">مباشر</div>
+  <div style="flex:1;overflow:hidden">
+    <div id="tkr-outer" style="display:inline-flex;white-space:nowrap;align-items:center">
+
+      <!-- نسخة 1 -->
+      <div id="tkr-c1" style="display:inline-flex;align-items:center;white-space:nowrap">
+        <span class="ti-sep">🇸🇦 السعودية</span>
+        <span class="ti"><span class="ti-n">دار الأركان</span><span class="ti-v">11.42</span><span class="uc">▲2.1%</span></span>
+        <span class="ti"><span class="ti-n">جبل عمر</span><span class="ti-v">21.30</span><span class="uc">▲0.8%</span></span>
+        <span class="ti"><span class="ti-n">الأكارية</span><span class="ti-v">9.12</span><span class="dc">▼1.1%</span></span>
+        <span class="ti"><span class="ti-n">ريتال</span><span class="ti-v">14.80</span><span class="uc">▲0.5%</span></span>
+        <span class="ti"><span class="ti-n">إعمار المدينة</span><span class="ti-v">8.76</span><span class="dc">▼0.8%</span></span>
+        <span class="ti"><span class="ti-n">مكة للإنشاء</span><span class="ti-v">81.10</span><span class="uc">▲1.1%</span></span>
+        <span class="ti"><span class="ti-n">سمو</span><span class="ti-v">12.44</span><span class="fc">—</span></span>
+        <span class="ti-sub">REIT</span>
+        <span class="ti"><span class="ti-n">مشاركة ريت</span><span class="ti-v">9.30</span><span class="uc">▲0.3%</span></span>
+        <span class="ti"><span class="ti-n">الراجحي ريت</span><span class="ti-v">8.55</span><span class="fc">—</span></span>
+        <span class="ti"><span class="ti-n">جدوى ريت</span><span class="ti-v">7.24</span><span class="dc">▼0.4%</span></span>
+        <span class="ti"><span class="ti-n">سيدكو ريت</span><span class="ti-v">9.60</span><span class="uc">▲0.2%</span></span>
+        <span class="ti"><span class="ti-n">الإنماء ريت</span><span class="ti-v">5.88</span><span class="uc">▲0.5%</span></span>
+        <span class="ti-sep">🇦🇪 الإمارات</span>
+        <span class="ti"><span class="ti-n">EMAAR</span><span class="ti-v">9.34</span><span class="uc">▲1.4%</span></span>
+        <span class="ti"><span class="ti-n">EMAAR DEV</span><span class="ti-v">12.65</span><span class="dc">▼1.2%</span></span>
+        <span class="ti"><span class="ti-n">DAMAC</span><span class="ti-v">2.82</span><span class="uc">▲0.7%</span></span>
+        <span class="ti"><span class="ti-n">DEYAAR</span><span class="ti-v">0.64</span><span class="fc">—</span></span>
+        <span class="ti"><span class="ti-n">ALDAR</span><span class="ti-v">7.18</span><span class="uc">▲1.8%</span></span>
+        <span class="ti"><span class="ti-n">NAKHEEL</span><span class="ti-v">3.45</span><span class="uc">▲0.6%</span></span>
+        <span class="ti"><span class="ti-n">RAK PROP</span><span class="ti-v">1.22</span><span class="dc">▼0.5%</span></span>
+        <span class="ti-sep">🇶🇦 قطر</span>
+        <span class="ti"><span class="ti-n">بروة</span><span class="ti-v">2.62</span><span class="uc">▲0.2%</span></span>
+        <span class="ti"><span class="ti-n">مزايا</span><span class="ti-v">0.95</span><span class="dc">▼0.3%</span></span>
+        <span class="ti"><span class="ti-n">عزدان</span><span class="ti-v">1.47</span><span class="fc">—</span></span>
+        <span class="ti"><span class="ti-n">الخليجية</span><span class="ti-v">3.10</span><span class="uc">▲0.4%</span></span>
+        <span class="ti-sep">🇰🇼 الكويت</span>
+        <span class="ti"><span class="ti-n">الكويت للعقار</span><span class="ti-v">0.188</span><span class="uc">▲1.6%</span></span>
+        <span class="ti"><span class="ti-n">عقارات</span><span class="ti-v">0.144</span><span class="fc">—</span></span>
+        <span class="ti"><span class="ti-n">الوطنية</span><span class="ti-v">0.215</span><span class="dc">▼0.5%</span></span>
+        <span class="ti"><span class="ti-n">الصالحية</span><span class="ti-v">0.940</span><span class="uc">▲0.3%</span></span>
+        <span class="ti-sep">🇧🇭 البحرين</span>
+        <span class="ti"><span class="ti-n">بنان</span><span class="ti-v">0.112</span><span class="fc">—</span></span>
+        <span class="ti"><span class="ti-n">البحرينية</span><span class="ti-v">0.083</span><span class="dc">▼0.2%</span></span>
+        <span class="ti-sep">🇴🇲 عُمان</span>
+        <span class="ti"><span class="ti-n">عمان للإسكان</span><span class="ti-v">0.167</span><span class="uc">▲0.6%</span></span>
+        <span class="ti"><span class="ti-n">الرؤية</span><span class="ti-v">0.094</span><span class="fc">—</span></span>
+        <span class="ti"><span class="ti-n">الإنماء العقاري</span><span class="ti-v">0.131</span><span class="dc">▼0.8%</span></span>
+      </div><!-- /نسخة 1 -->
+
+    </div><!-- /outer -->
+  </div>
+</div>
+
+<script>
+(function(){
+  function init(){
+    var c1 = document.getElementById('tkr-c1');
+    var outer = document.getElementById('tkr-outer');
+    if(!c1 || !outer) return;
+
+    // انسخ نسخة ثانية مطابقة
+    var c2 = c1.cloneNode(true);
+    c2.id = 'tkr-c2';
+    outer.appendChild(c2);
+
+    var half = c1.scrollWidth;
+    var pos = 0;
+
+    function run(){
+      pos += 1.6;
+      if(pos >= half) pos -= half;
+      outer.style.transform = 'translateX(' + pos + 'px)';
+      requestAnimationFrame(run);
+    }
+    requestAnimationFrame(run);
+  }
+
+  if(document.readyState === 'complete'){
+    setTimeout(init, 80);
+  } else {
+    window.addEventListener('load', function(){ setTimeout(init, 80); });
+  }
+})();
+</script>
+
+<div class="page">
+
+  <!-- ═══ CENTER MAIN ═══ -->
+  <main class="main">
+
+    <!-- ① DATA BOARD — أبيض، أرقام كبيرة تقود -->
+    <div class="data-board">
+      <div class="db-hdr">
+        <div class="db-hdr-l" style="flex-wrap:wrap;gap:6px">
+          <div style="display:flex;align-items:center;gap:6px">
+            <div class="live-dot"></div>
+            <span class="db-title">المؤشرات العقارية</span>
+            <span class="db-sub"> · تحديث أسبوعي · المصدر: وزارة العدل</span>
+          </div>
+          <!-- فلتر المدن -->
+          <div style="display:flex;gap:4px">
+            <button onclick="setCity(this,'الرياض')" class="city-btn city-on">الرياض</button>
+            <button onclick="setCity(this,'جدة')" class="city-btn">جدة</button>
+            <button onclick="setCity(this,'الدمام')" class="city-btn">الدمام</button>
+          </div>
+        </div>
+        <a href="#" class="db-link">لوحة السوق الكاملة ←</a>
+      </div>
+      <div class="data-grid">
+
+        <div class="dg-cell">
+          <div class="dg-lbl">إيجار سكني · الرياض</div>
+          <div class="dg-val">44,000 <span class="dg-unit">ر / سنة</span></div>
+          <svg class="dg-svg" viewBox="0 0 200 24" preserveAspectRatio="none">
+            <polyline points="0,22 33,20 66,17 100,13 133,9 166,5 200,2" fill="none" stroke="var(--up)" stroke-width="1.5" stroke-linecap="round"/>
+            <polyline points="0,22 33,20 66,17 100,13 133,9 166,5 200,2 200,24 0,24" fill="var(--up)" fill-opacity=".1"/>
+            <circle cx="200" cy="2" r="2.5" fill="var(--up)"/>
+          </svg>
+          <span class="dg-chg dg-u">▲ 6%</span><span class="dg-per">سنوياً · Q1 2026</span>
+        </div>
+
+        <div class="dg-cell">
+          <div class="dg-lbl">مكاتب A · الرياض / م²</div>
+          <div class="dg-val">1,840 <span class="dg-unit">ر / م²</span></div>
+          <svg class="dg-svg" viewBox="0 0 200 24" preserveAspectRatio="none">
+            <polyline points="0,21 33,19 66,17 100,14 133,11 166,8 200,5" fill="none" stroke="var(--up)" stroke-width="1.5" stroke-linecap="round"/>
+            <polyline points="0,21 33,19 66,17 100,14 133,11 166,8 200,5 200,24 0,24" fill="var(--up)" fill-opacity=".1"/>
+            <circle cx="200" cy="5" r="2.5" fill="var(--up)"/>
+          </svg>
+          <span class="dg-chg dg-u">▲ 1.2%</span><span class="dg-per">شهرياً</span>
+        </div>
+
+        <div class="dg-cell">
+          <div class="dg-lbl">سعر فيلا متوسطة · الرياض</div>
+          <div class="dg-val">2.8M <span class="dg-unit">ريال</span></div>
+          <svg class="dg-svg" viewBox="0 0 200 24" preserveAspectRatio="none">
+            <polyline points="0,22 33,20 66,18 100,15 133,12 166,9 200,6" fill="none" stroke="var(--up)" stroke-width="1.5" stroke-linecap="round"/>
+            <polyline points="0,22 33,20 66,18 100,15 133,12 166,9 200,6 200,24 0,24" fill="var(--up)" fill-opacity=".1"/>
+            <circle cx="200" cy="6" r="2.5" fill="var(--up)"/>
+          </svg>
+          <span class="dg-chg dg-u">▲ 4%</span><span class="dg-per">ربعياً</span>
+        </div>
+
+        <div class="dg-cell">
+          <div class="dg-lbl">عقود الإنشاء · مارس 2026</div>
+          <div class="dg-val">7.3B <span class="dg-unit">ريال</span></div>
+          <svg class="dg-svg" viewBox="0 0 200 24" preserveAspectRatio="none">
+            <rect x="2" y="16" width="26" height="8" rx="1" fill="var(--navy2)" fill-opacity=".35"/>
+            <rect x="36" y="19" width="26" height="5" rx="1" fill="var(--navy2)" fill-opacity=".35"/>
+            <rect x="70" y="12" width="26" height="12" rx="1" fill="var(--navy2)" fill-opacity=".5"/>
+            <rect x="104" y="9" width="26" height="15" rx="1" fill="var(--navy2)" fill-opacity=".62"/>
+            <rect x="138" y="5" width="26" height="19" rx="1" fill="var(--navy2)" fill-opacity=".75"/>
+            <rect x="172" y="1" width="26" height="23" rx="1" fill="var(--navy2)" fill-opacity=".9"/>
+          </svg>
+          <span class="dg-chg dg-u">▲ 12%</span><span class="dg-per">سنوياً</span>
+        </div>
+
+        <div class="dg-cell">
+          <div class="dg-lbl">إشغال مكاتب · دبي</div>
+          <div class="dg-val">91% <span class="dg-unit">إشغال</span></div>
+          <svg class="dg-svg" viewBox="0 0 200 24" preserveAspectRatio="none">
+            <polyline points="0,7 33,5 66,9 100,7 133,11 166,9 200,15" fill="none" stroke="var(--dn)" stroke-width="1.5" stroke-linecap="round"/>
+            <polyline points="0,7 33,5 66,9 100,7 133,11 166,9 200,15 200,24 0,24" fill="var(--dn)" fill-opacity=".08"/>
+            <circle cx="200" cy="15" r="2.5" fill="var(--dn)"/>
+          </svg>
+          <span class="dg-chg dg-d">▼ 0.5%</span><span class="dg-per">ربعياً</span>
+        </div>
+
+        <div class="dg-cell">
+          <div class="dg-lbl">RevPAR فنادق · الرياض</div>
+          <div class="dg-val">680 <span class="dg-unit">ر / ليلة</span></div>
+          <svg class="dg-svg" viewBox="0 0 200 24" preserveAspectRatio="none">
+            <polyline points="0,22 33,20 66,21 100,17 133,14 166,11 200,7" fill="none" stroke="var(--up)" stroke-width="1.5" stroke-linecap="round"/>
+            <polyline points="0,22 33,20 66,21 100,17 133,14 166,11 200,7 200,24 0,24" fill="var(--up)" fill-opacity=".1"/>
+            <circle cx="200" cy="7" r="2.5" fill="var(--up)"/>
+          </svg>
+          <span class="dg-chg dg-u">▲ 8%</span><span class="dg-per">سنوياً</span>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ② BUILDER TOOLS — ثلاث أدوات، بلوك navy مستقل، بارز -->
+    <div class="tools-block">
+      <div class="tools-block-hdr">
+        <div class="tbh-l">
+          <div class="tbh-icon">
+            <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          </div>
+          <div>
+            <div class="tbh-title">تريد تبني؟ ابدأ من هنا</div>
+            <div class="tbh-sub">أدوات مجانية لكل من يخطط لمشروع بناء</div>
+          </div>
+        </div>
+        <a href="#" class="tbh-link">كل أدوات المنشئ ←</a>
+      </div>
+
+      <!-- ثلاث بطاقات أكبر وأوضح -->
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0">
+
+        <a href="#" style="display:flex;flex-direction:column;padding:18px 18px 16px;border-left:1px solid rgba(255,255,255,.08);cursor:pointer;transition:background .15s;text-decoration:none" onmouseenter="this.style.background='rgba(255,255,255,.06)'" onmouseleave="this.style.background=''">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+            <div style="width:40px;height:40px;border-radius:10px;background:rgba(56,189,248,.15);border:1px solid rgba(56,189,248,.25);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#38BDF8" stroke-width="1.8" stroke-linecap="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+            </div>
+            <div>
+              <div style="font-size:14px;font-weight:700;color:#fff;margin-bottom:1px">اختبار الطراز</div>
+              <div style="font-size:10px;color:rgba(255,255,255,.4)">6 أسئلة · نتيجة فورية</div>
+            </div>
+          </div>
+          <div style="font-size:11px;color:rgba(255,255,255,.55);line-height:1.6;margin-bottom:14px;flex:1">
+            اكتشف الطراز المعماري المناسب لمنزلك — خليجي، عصري، كلاسيكي، أو معاصر.
+          </div>
+          <div style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:#38BDF8">
+            ابدأ الاختبار
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#38BDF8" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </div>
+        </a>
+
+        <a href="#" style="display:flex;flex-direction:column;padding:18px 18px 16px;border-left:1px solid rgba(255,255,255,.08);cursor:pointer;transition:background .15s;text-decoration:none" onmouseenter="this.style.background='rgba(255,255,255,.06)'" onmouseleave="this.style.background=''">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+            <div style="width:40px;height:40px;border-radius:10px;background:rgba(0,201,122,.12);border:1px solid rgba(0,201,122,.25);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#00C97A" stroke-width="1.8" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+            </div>
+            <div>
+              <div style="font-size:14px;font-weight:700;color:#fff;margin-bottom:1px">حاسبة التكلفة</div>
+              <div style="font-size:10px;color:rgba(255,255,255,.4)">تقدير مبدئي دقيق</div>
+            </div>
+          </div>
+          <div style="font-size:11px;color:rgba(255,255,255,.55);line-height:1.6;margin-bottom:14px;flex:1">
+            أدخل مساحة مشروعك ونوعه وتشطيبه — واحصل على تقدير التكلفة بالريال فوراً.
+          </div>
+          <div style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:#00C97A">
+            احسب التكلفة
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#00C97A" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </div>
+        </a>
+
+        <a href="#" style="display:flex;flex-direction:column;padding:18px 18px 16px;border-left:1px solid rgba(255,255,255,.08);cursor:pointer;transition:background .15s;text-decoration:none" onmouseenter="this.style.background='rgba(255,255,255,.06)'" onmouseleave="this.style.background=''">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+            <div style="width:40px;height:40px;border-radius:10px;background:rgba(255,176,32,.12);border:1px solid rgba(255,176,32,.25);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFB020" stroke-width="1.8" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+            </div>
+            <div>
+              <div style="font-size:14px;font-weight:700;color:#fff;margin-bottom:1px">حاسبة الكميات</div>
+              <div style="font-size:10px;color:rgba(255,255,255,.4)">BOQ تلقائي</div>
+            </div>
+          </div>
+          <div style="font-size:11px;color:rgba(255,255,255,.55);line-height:1.6;margin-bottom:14px;flex:1">
+            كميات الحديد والخرسانة والبلوك والتشطيبات — كلها محسوبة تلقائياً بناءً على مساحتك.
+          </div>
+          <div style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:#FFB020">
+            احسب الكميات
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#FFB020" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </div>
+        </a>
+
+      </div>
+    </div>
+
+    <!-- ③ HERO NEWS -->
+    <div class="hero">
+      <div class="hero-main">
+        <div>
+          <div class="pill p-urg"><span class="pill-dot"></span>عاجل</div>
+          <div class="hero-title">وزارة الإسكان تُطلق مرحلة جديدة من مشروع سكني تاريخي في الرياض بتكلفة 12 مليار ريال</div>
+        </div>
+        <div class="hero-meta">
+          <span>02:14 م</span><span class="ms"> · </span>
+          <span>الرياض</span><span class="ms"> · </span>
+          <span>وزارة الإسكان</span>
+        </div>
+      </div>
+      <div class="hero-side">
+        <div class="hs">
+          <div>
+            <div class="pill p-prj" style="margin-bottom:5px"><span class="pill-dot"></span>مشاريع</div>
+            <div class="hs-t">إعمار تُعلن أضخم تطوير متكامل في الإمارات بقيمة 8 مليارات درهم</div>
+          </div>
+          <div class="hs-m">10:18 ص · دبي</div>
+        </div>
+        <div class="hs">
+          <div>
+            <div class="pill p-mkt" style="margin-bottom:5px"><span class="pill-dot"></span>السوق</div>
+            <div class="hs-t">إيجارات المكاتب الفاخرة في الرياض ترتفع 18% في الربع الأول</div>
+          </div>
+          <div class="hs-m">08:45 ص · تقارير السوق</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ④ NEWS -->
+    <div class="sbar"><span class="sbar-t">آخر الأخبار</span><a href="#" class="sbar-l">كل الأخبار ←</a></div>
+    <div class="nitem">
+      <div>
+        <div class="ntags"><span class="ntag">المعمار</span><span class="ncty">السعودية</span></div>
+        <div class="n-t">مشروع إثراء يحصد جائزة آغا خان الدولية للعمارة للمرة الثانية خلال 7 سنوات</div>
+        <div class="n-m">أمس · 09:30 · الظهران</div>
+      </div>
+      <div class="n-img"><svg width="56" height="40" viewBox="0 0 56 40"><rect width="56" height="40" fill="#0A1929"/><ellipse cx="28" cy="22" rx="14" ry="8" fill="none" stroke="rgba(22,82,161,.5)" stroke-width="1"/><rect x="25" y="12" width="6" height="14" rx="1" fill="rgba(22,82,161,.35)"/></svg></div>
+    </div>
+    <div class="nitem">
+      <div>
+        <div class="ntags"><span class="ntag">الاستدامة</span><span class="ncty">السعودية</span></div>
+        <div class="n-t">أول مبنى سكني يحصل على LEED Platinum في المملكة العربية السعودية بالأحساء</div>
+        <div class="n-m">أمس · 07:15 · الأحساء</div>
+      </div>
+      <div class="n-img"><svg width="56" height="40" viewBox="0 0 56 40"><rect width="56" height="40" fill="#062216"/><rect x="16" y="8" width="24" height="32" rx="1" fill="rgba(10,122,79,.45)" stroke="rgba(10,122,79,.5)" stroke-width=".5"/></svg></div>
+    </div>
+    <div class="nitem" style="border-bottom:none">
+      <div>
+        <div class="ntags"><span class="ntag">البنية التحتية</span><span class="ncty">قطر</span></div>
+        <div class="n-t">قطر تُعلن توسعة مطار حمد بتكلفة 6 مليارات دولار لرفع الطاقة إلى 70 مليون مسافر</div>
+        <div class="n-m">18 مارس · 14:22 · الدوحة</div>
+      </div>
+      <div class="n-img"><svg width="56" height="40" viewBox="0 0 56 40"><rect width="56" height="40" fill="#050D1A"/><path d="M6 33 Q28 15 50 33" fill="none" stroke="rgba(22,82,161,.55)" stroke-width="1.5"/></svg></div>
+    </div>
+
+    <!-- ⑤ LOWER: PROJECTS + ARCH -->
+    <div class="lower">
+      <div class="lcol">
+        <div class="sbar"><span class="sbar-t">أبرز المشاريع</span><a href="#" class="sbar-l">الكل ←</a></div>
+        <div class="pitem">
+          <div class="pthumb"><svg width="46" height="34" viewBox="0 0 46 34"><rect width="46" height="34" fill="#062216"/><rect x="14" y="4" width="18" height="30" rx="1" fill="rgba(10,122,79,.45)" stroke="rgba(10,122,79,.55)" stroke-width=".5"/><rect x="2" y="13" width="11" height="21" rx="1" fill="rgba(10,122,79,.25)"/><rect x="33" y="8" width="11" height="26" rx="1" fill="rgba(10,122,79,.3)"/></svg></div>
+          <div><div class="pst"><span class="pdot"></span>تحت الإنشاء</div><div class="pnm">القدية — مدينة الترفيه</div><div class="pnu"><b>50B $</b> · الرياض · <b>2030</b></div></div>
+        </div>
+        <div class="pitem">
+          <div class="pthumb"><svg width="46" height="34" viewBox="0 0 46 34"><rect width="46" height="34" fill="#050D1A"/><rect x="0" y="17" width="46" height="3" fill="rgba(22,82,161,.5)"/><rect x="15" y="0" width="16" height="17" fill="rgba(22,82,161,.3)"/><rect x="3" y="7" width="11" height="21" fill="rgba(22,82,161,.2)"/><rect x="32" y="4" width="11" height="24" fill="rgba(22,82,161,.25)"/></svg></div>
+          <div><div class="pst"><span class="pdot"></span>تحت الإنشاء</div><div class="pnm">مطار الملك سلمان الجديد</div><div class="pnu"><b>120M</b> مسافر · <b>57km²</b></div></div>
+        </div>
+        <div class="pitem" style="border-bottom:none">
+          <div class="pthumb"><svg width="46" height="34" viewBox="0 0 46 34"><rect width="46" height="34" fill="#050D1A"/><rect x="10" y="4" width="26" height="30" rx="10" fill="rgba(22,82,161,.1)" stroke="rgba(22,82,161,.3)" stroke-width=".5"/><rect x="19" y="0" width="8" height="7" rx="4" fill="rgba(22,82,161,.5)"/></svg></div>
+          <div><div class="pst" style="color:var(--navy2)">منجز</div><div class="pnm">مركز إثراء — الظهران</div><div class="pnu"><b>93K م²</b> · LEED Platinum</div></div>
+        </div>
+      </div>
+      <div class="lcol">
+        <div class="sbar"><span class="sbar-t">المعمار والتصميم</span><a href="#" class="sbar-l">الكل ←</a></div>
+        <div class="ait">
+          <div><div class="atag">مسابقة · أبوظبي</div><div class="at">مكتب Adjaye يفوز بتصميم المسجد الكبير في أبوظبي</div><div class="am">18 مارس · 3 أيام</div></div>
+          <div class="aimg"><svg width="46" height="34" viewBox="0 0 46 34"><rect width="46" height="34" fill="#0D0520"/><rect x="13" y="13" width="20" height="21" rx="1" fill="rgba(109,40,217,.22)"/><ellipse cx="23" cy="13" rx="10" ry="7" fill="rgba(109,40,217,.28)" stroke="rgba(109,40,217,.45)" stroke-width=".5"/><rect x="20" y="2" width="6" height="11" rx="3" fill="rgba(109,40,217,.55)"/></svg></div>
+        </div>
+        <div class="ait">
+          <div><div class="atag">تراث · السعودية</div><div class="at">العُلا تُطلق ترميم 400 منزل تاريخي بشراكة معماريين سعوديين</div><div class="am">17 مارس · 4 أيام</div></div>
+          <div class="aimg"><svg width="46" height="34" viewBox="0 0 46 34"><rect width="46" height="34" fill="#100800"/><rect x="2" y="13" width="9" height="21" rx="2" fill="rgba(146,96,10,.35)"/><rect x="13" y="18" width="9" height="16" rx="2" fill="rgba(146,96,10,.25)"/><rect x="24" y="9" width="9" height="25" rx="2" fill="rgba(146,96,10,.4)"/><rect x="35" y="15" width="9" height="19" rx="2" fill="rgba(146,96,10,.25)"/></svg></div>
+        </div>
+        <div class="ait" style="border-bottom:none">
+          <div><div class="atag">استدامة · السعودية</div><div class="at">الدرعية تعتمد LEED ND لتطوير الحي التاريخي بالكامل</div><div class="am">16 مارس · 5 أيام</div></div>
+          <div class="aimg"><svg width="46" height="34" viewBox="0 0 46 34"><rect width="46" height="34" fill="#062216"/><rect x="4" y="6" width="38" height="28" rx="2" fill="rgba(10,122,79,.12)" stroke="rgba(10,122,79,.28)" stroke-width=".5"/><path d="M4 16 Q23 4 42 16" fill="none" stroke="rgba(10,122,79,.45)" stroke-width="1"/></svg></div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ═══ RIGHT SIDEBAR — مواد البناء + وظائف + فعاليات + نشرة ═══ -->
+  <aside class="sb-l">
+
+    <!-- أسعار مواد البناء — مصدر: الهيئة السعودية للمقاولين -->
+    <div class="lhd" style="display:flex;align-items:center;justify-content:space-between">
+      <span>مواد البناء</span>
+      <span style="font-size:8px;color:var(--ink3);background:var(--f1);padding:1px 5px;border-radius:2px;border:1px solid var(--b)">شهري</span>
+    </div>
+
+    <div class="mat" style="padding:4px 10px">
+      <div><span class="mat-n">حديد التسليح</span><br><span style="font-size:9px;color:var(--ink3)">ريال / طن</span></div>
+      <div class="mat-r"><span class="mat-v">2,650</span><span class="chg cd">▼0.9%</span></div>
+    </div>
+    <div class="mat" style="padding:4px 10px">
+      <div><span class="mat-n">الأسمنت</span><br><span style="font-size:9px;color:var(--ink3)">ريال / طن</span></div>
+      <div class="mat-r"><span class="mat-v">255</span><span class="chg cn">—</span></div>
+    </div>
+    <div class="mat" style="padding:4px 10px">
+      <div><span class="mat-n">الألمنيوم</span><br><span style="font-size:9px;color:var(--ink3)">ريال / طن</span></div>
+      <div class="mat-r"><span class="mat-v">8,450</span><span class="chg cd">▼0.4%</span></div>
+    </div>
+    <div class="mat" style="padding:4px 10px">
+      <div><span class="mat-n">الخرسانة الجاهزة</span><br><span style="font-size:9px;color:var(--ink3)">ريال / م³</span></div>
+      <div class="mat-r"><span class="mat-v">195</span><span class="chg cu">▲1.5%</span></div>
+    </div>
+    <div class="mat" style="padding:4px 10px">
+      <div><span class="mat-n">البلوك الإسمنتي</span><br><span style="font-size:9px;color:var(--ink3)">ريال / 1000 قطعة</span></div>
+      <div class="mat-r"><span class="mat-v">1,480</span><span class="chg cn">—</span></div>
+    </div>
+    <div class="mat" style="padding:4px 10px">
+      <div><span class="mat-n">البلاط والسيراميك</span><br><span style="font-size:9px;color:var(--ink3)">ريال / م²</span></div>
+      <div class="mat-r"><span class="mat-v">48</span><span class="chg cu">▲2.1%</span></div>
+    </div>
+    <div class="mat" style="padding:4px 10px">
+      <div><span class="mat-n">الكيابل الكهربائية</span><br><span style="font-size:9px;color:var(--ink3)">ريال / م</span></div>
+      <div class="mat-r"><span class="mat-v">12.4</span><span class="chg cu">▲10.8%</span></div>
+    </div>
+    <div class="mat" style="padding:4px 10px">
+      <div><span class="mat-n">الأسلاك الكهربائية</span><br><span style="font-size:9px;color:var(--ink3)">ريال / م</span></div>
+      <div class="mat-r"><span class="mat-v">4.8</span><span class="chg cu">▲11.2%</span></div>
+    </div>
+    <div class="mat" style="padding:4px 10px">
+      <div><span class="mat-n">الجبس</span><br><span style="font-size:9px;color:var(--ink3)">ريال / طن</span></div>
+      <div class="mat-r"><span class="mat-v">420</span><span class="chg cn">—</span></div>
+    </div>
+    <div class="mat" style="padding:4px 10px">
+      <div><span class="mat-n">الرمل الناعم</span><br><span style="font-size:9px;color:var(--ink3)">ريال / م³</span></div>
+      <div class="mat-r"><span class="mat-v">76.5</span><span class="chg cu">▲9.2%</span></div>
+    </div>
+    <div class="mat" style="padding:4px 10px">
+      <div><span class="mat-n">الخشب والأخشاب</span><br><span style="font-size:9px;color:var(--ink3)">ريال / م³</span></div>
+      <div class="mat-r"><span class="mat-v">1,920</span><span class="chg cd">▼1.3%</span></div>
+    </div>
+
+    <div style="padding:5px 10px 6px;font-size:9px;color:var(--ink3);border-bottom:1px solid var(--b);line-height:1.5">
+      المصدر: الهيئة السعودية للمقاولين<br>
+      آخر تحديث: مارس 2026
+    </div>
+
+    <div class="lhd" style="display:flex;align-items:center;justify-content:space-between">
+      <span>وظائف القطاع</span>
+      <a href="#" style="font-size:9px;color:var(--navy2);font-weight:600;letter-spacing:0;text-transform:none">234 ←</a>
+    </div>
+    <div class="job"><div class="j-co"><span class="j-ft">مميّزة</span>نيوم · تبوك</div><div class="j-t">مدير تصميم معماري — المشاريع الضخمة</div><div class="j-m"><span class="j-tp">دوام كامل</span><span class="j-s">35–55K ر</span></div></div>
+    <div class="job"><div class="j-co">دار الأركان · الرياض</div><div class="j-t">معماري تصميم سكني فاخر</div><div class="j-m"><span class="j-tp">دوام كامل</span><span class="j-s">18–28K ر</span></div></div>
+    <div class="job"><div class="j-co">مشاة للاستشارات · دبي</div><div class="j-t">مخطط عمراني — تطوير شامل</div><div class="j-m"><span class="j-tp">دوام كامل</span><span class="j-s">22–35K ر</span></div></div>
+    <div class="job"><div class="j-co">البحر الأحمر للتطوير</div><div class="j-t">مدير مشروع BIM</div><div class="j-m"><span class="j-tp">عقد</span><span class="j-s">حسب الخبرة</span></div></div>
+    <div class="job"><div class="j-co">مكتب الخطيب والعلمي</div><div class="j-t">مصمم داخلي أول</div><div class="j-m"><span class="j-tp">دوام كامل</span><span class="j-s">14–20K ر</span></div></div>
+
+    <div class="lhd" style="display:flex;align-items:center;justify-content:space-between">
+      <span>الفعاليات</span>
+      <a href="#" style="font-size:9px;color:var(--navy2);font-weight:600;letter-spacing:0;text-transform:none">التقويم ←</a>
+    </div>
+    <div class="ev"><div class="ev-d">25–28 MAR</div><div class="ev-t">Cityscape Saudi 2026 — المعرض العقاري الدولي</div><div class="ev-l">الرياض · موفمبيك</div></div>
+    <div class="ev"><div class="ev-d">02 APR</div><div class="ev-t">ملتقى المعماريين السعوديين الشباب</div><div class="ev-l">جدة · حضوري + افتراضي</div></div>
+    <div class="ev"><div class="ev-d">10–12 APR</div><div class="ev-t">Index Dubai — معرض التصميم الداخلي</div><div class="ev-l">دبي · مركز دبي التجاري</div></div>
+    <div class="ev"><div class="ev-d">20 APR</div><div class="ev-t">ورشة LEED AP للمعماريين الخليجيين</div><div class="ev-l">أونلاين · 4 ساعات</div></div>
+
+    <div class="nl-box">
+      <div class="nl-t">نشرة عقار وعَمار</div>
+      <div class="nl-s">أبرز الأرقام والأخبار كل إثنين في بريدك</div>
+      <input type="email" class="nl-i" placeholder="بريدك الإلكتروني">
+      <button class="nl-b">اشترك مجاناً</button>
+    </div>
+
+  </aside>
+
+</div>
+
+<div class="foot">
+  <span>© 2026 عقار وعَمار · aqaramar.com — منصة العمران والعقار الخليجي</span>
+  <div><a href="#">من نحن</a><a href="#">الإعلان</a><a href="#">الخصوصية</a><a href="#">تواصل معنا</a><a href="#">API</a></div>
+</div>
+
+<script>
+function setCity(btn, city) {
+  document.querySelectorAll('.city-btn').forEach(b => b.classList.remove('city-on'));
+  btn.classList.add('city-on');
+  // في التطبيق الحقيقي: تُحدَّث الأرقام من API حسب المدينة المختارة
+}
+</script>
+</body>
+</html>
