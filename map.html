@@ -486,6 +486,12 @@
                 max-height: 45vh;
                 transform: translateY(0);
             }
+            /* في الوضع النصفي، المحتوى قابل للتمرير داخلياً */
+            #sidebar.half .tab-content-wrapper {
+                flex: 1;
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+            }
 
             /* على الجوال: ترتيب داخل sidebar (الرأس ثم المحتوى) */
             #sidebar > .mobile-close-panel { order: 1; display: flex; }
@@ -662,10 +668,7 @@
                 <div class="title">
                     <span id="mobile-panel-title">التفاصيل</span>
                 </div>
-                <div style="display:flex; gap:6px; align-items:center">
-                    <button class="close-btn" id="toggle-half-btn" onclick="togglePanelHeight()" title="تكبير / تصغير">⇅</button>
-                    <button class="close-btn" onclick="collapseMobilePanel()" title="إغلاق والعودة للخريطة">×</button>
-                </div>
+                <button class="close-btn" onclick="collapseMobilePanel(); event.stopPropagation();" title="إغلاق والعودة للخريطة">×</button>
             </div>
 
             <!-- رأس الديسكتوب -->
@@ -792,17 +795,6 @@
             return { lands: 'الأراضي', districts: 'الأحياء', city: 'المدينة' }[name] || 'التفاصيل';
         }
 
-        function togglePanelHeight() {
-            if (!isMobile()) return;
-            const sb = document.getElementById('sidebar');
-            const title = document.getElementById('mobile-panel-title')?.textContent;
-            if (sb.classList.contains('half')) {
-                expandMobilePanel(title);
-            } else {
-                halfMobilePanel(title);
-            }
-        }
-
         /* ═══════ السحب للأسفل لإغلاق اللوحة ═══════ */
         function setupSwipeToClose() {
             const header = document.getElementById('mobile-close-panel');
@@ -812,6 +804,8 @@
 
             const onStart = e => {
                 if (!isMobile()) return;
+                // تجاهل لمس الأزرار — دعها تعمل طبيعياً
+                if (e.target.closest('button')) return;
                 const t = e.touches ? e.touches[0] : e;
                 startY = t.clientY;
                 currentY = startY;
@@ -1155,7 +1149,11 @@
             const b = new google.maps.LatLngBounds();
             rings.forEach(ring => ring.forEach(([lng, lat]) => b.extend({ lat, lng })));
             map.fitBounds(b, { top: 40, right: 40, bottom: 40, left: 40 });
-            // لا نقيّد الزوم — نحترم fitBounds (يمنع حركة zoom-out مزعجة)
+            // حدّ أقصى للزوم بعد fitBounds — بدون حركة واضحة لأن fitBounds نفسه
+            // يضع الزوم النهائي قبل أن ترى العين أي حركة
+            google.maps.event.addListenerOnce(map, 'bounds_changed', () => {
+                if (map.getZoom() > 14) map.setZoom(14);
+            });
         }
 
         /* ═══════ نقر على حي ═══════ */
@@ -1164,10 +1162,11 @@
             const feature = event.feature;
             if (!feature) return;
 
+            // نظّف كل الـ overrides القديمة تماماً ثم طبّق النمط من جديد
             selectedDistrictId = feature.getId();
             hoveredDistrictId = null;
             map.data.revertStyle();
-            map.data.overrideStyle(feature, styleDistrictFeature(feature));
+            map.data.setStyle(styleDistrictFeature);
 
             // زوم شامل على الحي
             zoomToDistrictFeature(feature);
@@ -1854,7 +1853,7 @@
             selectedDistrictId = item.id;
             hoveredDistrictId = null;
             map.data.revertStyle();
-            map.data.overrideStyle(item.feature, styleDistrictFeature(item.feature));
+            map.data.setStyle(styleDistrictFeature);
 
             // زوم شامل على الحي
             zoomToDistrictFeature(item.feature);
