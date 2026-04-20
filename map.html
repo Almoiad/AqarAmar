@@ -474,10 +474,12 @@
                 border-top-right-radius: 12px;
             }
 
-            /* عند توسيع اللوحة */
+            /* عند توسيع اللوحة — اترك مساحة كافية فوق لشريط المتصفح + لزر الإغلاق */
             #sidebar.expanded {
-                height: calc(100vh - 48px);
-                max-height: calc(100vh - 48px);
+                /* 75% من الشاشة تكفي لتمرير المحتوى مع إبقاء الرأس ظاهراً */
+                height: 75vh;
+                max-height: 75vh;
+                bottom: 48px;
             }
 
             /* على الجوال: ترتيب داخل sidebar (الرأس ثم المحتوى) */
@@ -516,28 +518,65 @@
             /* عند فتح اللوحة، رأس اللوحة يحتوي على زر "العودة للخريطة" */
             .mobile-close-panel {
                 display: flex; align-items: center; justify-content: space-between;
-                padding: 10px 14px;
+                padding: 14px 16px;
                 background: #2c8c7c;
                 color: white;
-                font-size: 13px;
+                font-size: 15px;
                 font-weight: 600;
                 cursor: pointer;
                 flex-shrink: 0;
+                position: sticky;
+                top: 0;
+                z-index: 15;
+                min-height: 52px;
+                box-sizing: border-box;
+                border-top-left-radius: 12px;
+                border-top-right-radius: 12px;
             }
             .mobile-close-panel:hover { background: #1f6b5e; }
-            .mobile-close-panel .title { display: flex; align-items: center; gap: 8px; }
+            .mobile-close-panel .title { display: flex; align-items: center; gap: 8px; font-size: 15px; }
             .mobile-close-panel .close-btn {
-                background: rgba(255,255,255,0.2);
+                background: rgba(255,255,255,0.25);
                 color: white;
                 border: none;
-                width: 28px; height: 28px;
+                width: 36px; height: 36px;
                 border-radius: 50%;
-                font-size: 16px;
+                font-size: 20px;
+                font-weight: bold;
                 cursor: pointer;
                 display: flex; align-items: center; justify-content: center;
                 font-family: inherit;
+                padding: 0;
+                line-height: 1;
+                touch-action: manipulation;
             }
-            .mobile-close-panel .close-btn:hover { background: rgba(255,255,255,0.35); }
+            .mobile-close-panel .close-btn:active,
+            .mobile-close-panel .close-btn:hover { background: rgba(255,255,255,0.45); }
+
+            /* مقبض السحب أعلى اللوحة (إشارة بصرية) */
+            .mobile-close-panel::before {
+                content: '';
+                position: absolute;
+                top: 6px; left: 50%;
+                transform: translateX(-50%);
+                width: 36px; height: 4px;
+                background: rgba(255,255,255,0.4);
+                border-radius: 2px;
+            }
+
+            /* طبقة شفافة خلف اللوحة — نقرها يغلق */
+            .mobile-backdrop {
+                position: fixed;
+                top: 0; left: 0; right: 0; bottom: 48px;
+                background: rgba(0,0,0,0);
+                z-index: 19;
+                pointer-events: none;
+                transition: background 0.25s ease;
+            }
+            .mobile-backdrop.visible {
+                background: rgba(0,0,0,0.2);
+                pointer-events: auto;
+            }
 
             /* إخفاء رأس اللوحة الأصلي (نستبدله بـ mobile-close-panel) */
             .sidebar-header { display: none; }
@@ -661,6 +700,7 @@
             <div class="hint" id="hint">اضغط على أي قطعة أو حي</div>
             <div class="map-legend" id="map-legend" style="display:none"></div>
         </div>
+        <div class="mobile-backdrop" id="mobile-backdrop" onclick="collapseMobilePanel()"></div>
     </div>
 
     <script>
@@ -708,12 +748,16 @@
             if (!sb.classList.contains('expanded')) {
                 sb.classList.add('expanded');
             }
+            const bd = document.getElementById('mobile-backdrop');
+            if (bd) bd.classList.add('visible');
             if (title) setMobilePanelTitle(title);
         }
         function collapseMobilePanel() {
             if (!isMobile()) return;
             const sb = document.getElementById('sidebar');
             sb.classList.remove('expanded');
+            const bd = document.getElementById('mobile-backdrop');
+            if (bd) bd.classList.remove('visible');
         }
         // توسيع تلقائي عند التبويب بعنوان مناسب
         function mobileTitleForTab(name) {
@@ -726,6 +770,29 @@
                 district: lastData?.district?.name,
                 selected: !!lastData?.selected,
             });
+
+            // الجوال: إذا اللوحة مغلقة، افتحها — حتى لو كان التبويب مطابقاً
+            if (isMobile()) {
+                const sb = document.getElementById('sidebar');
+                const isCollapsed = !sb.classList.contains('expanded');
+                if (isCollapsed) {
+                    // افتح اللوحة على هذا التبويب بدون تبديل منطقي
+                    if (activeTab !== name) {
+                        activeTab = name;
+                        document.querySelectorAll('.tab').forEach(t =>
+                            t.classList.toggle('active', t.dataset.tab === name));
+                        document.querySelectorAll('.tab-content').forEach(c =>
+                            c.classList.toggle('active', c.id === `tab-${name}`));
+                        updateZoomBadge();
+                        if (map && map.data) map.data.setStyle(styleDistrictFeature);
+                        if (name === 'districts') setTimeout(() => renderDistrictTab(lastData || {}), 50);
+                        else if (name === 'city') setTimeout(() => renderCityTab(lastData || {}), 50);
+                    }
+                    expandMobilePanel(mobileTitleForTab(name));
+                    return;
+                }
+            }
+
             // الضغط على نفس التبويب النشط = العودة إلى القائمة إذا كنا في تفاصيل
             if (activeTab === name) {
                 if (name === 'districts' && lastData?.district) {
