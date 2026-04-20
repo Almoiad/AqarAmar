@@ -1712,7 +1712,12 @@
                 return Math.abs(b.stats.kpis.weeklyChange) - Math.abs(a.stats.kpis.weeklyChange);
             });
 
-            const q = (document.getElementById('district-search')?.value || '').trim();
+            // احفظ حالة خانة البحث قبل إعادة الرسم
+            const prevInput = document.getElementById('district-search');
+            const wasFocused = prevInput && document.activeElement === prevInput;
+            const cursorPos = wasFocused ? prevInput.selectionStart : null;
+
+            const q = (prevInput?.value || '').trim();
             const filtered = q
                 ? items.filter(it => normalizeDistrictName(it.name).includes(normalizeDistrictName(q)))
                 : items;
@@ -1747,13 +1752,15 @@
 
             container.innerHTML = header + '<div>' + list + '</div>';
 
-            // ربط البحث
-            const searchInput = document.getElementById('district-search');
-            if (searchInput) {
-                searchInput.focus();
-                const len = searchInput.value.length;
-                searchInput.setSelectionRange(len, len);
-                searchInput.addEventListener('input', () => renderDistrictsList());
+            // أعد التركيز فقط إن كان الحقل مركّزاً قبل إعادة الرسم
+            const newInput = document.getElementById('district-search');
+            if (newInput) {
+                if (wasFocused) {
+                    newInput.focus({ preventScroll: true });
+                    const pos = cursorPos != null ? cursorPos : newInput.value.length;
+                    try { newInput.setSelectionRange(pos, pos); } catch (e) {}
+                }
+                newInput.addEventListener('input', () => renderDistrictsList());
             }
 
             container.querySelectorAll('.district-list-item').forEach(el => {
@@ -1959,7 +1966,12 @@
                 stats: getCityStats(id),
             }));
 
-            const q = (document.getElementById('city-search')?.value || '').trim();
+            // احفظ حالة خانة البحث قبل إعادة الرسم (للحفاظ على التركيز إن كانت مركّزة)
+            const prevInput = document.getElementById('city-search');
+            const wasFocused = prevInput && document.activeElement === prevInput;
+            const cursorPos = wasFocused ? prevInput.selectionStart : null;
+
+            const q = (prevInput?.value || '').trim();
             const filtered = q ? items.filter(it => normalizeDistrictName(it.name).includes(normalizeDistrictName(q))) : items;
 
             const header = `
@@ -1989,13 +2001,15 @@
 
             document.getElementById('tab-city').innerHTML = header + '<div>' + list + '</div>';
 
-            // ربط البحث (احتفظ بموضع المؤشر)
-            const searchInput = document.getElementById('city-search');
-            if (searchInput) {
-                searchInput.focus();
-                const len = searchInput.value.length;
-                searchInput.setSelectionRange(len, len);
-                searchInput.addEventListener('input', () => renderCitiesList());
+            // أعد التركيز فقط إن كان الحقل مركّزاً قبل إعادة الرسم
+            const newInput = document.getElementById('city-search');
+            if (newInput) {
+                if (wasFocused) {
+                    newInput.focus({ preventScroll: true });
+                    const pos = cursorPos != null ? cursorPos : newInput.value.length;
+                    try { newInput.setSelectionRange(pos, pos); } catch (e) {}
+                }
+                newInput.addEventListener('input', () => renderCitiesList());
             }
 
             document.querySelectorAll('#tab-city .district-list-item').forEach(el => {
