@@ -175,6 +175,30 @@
             margin-bottom: 8px;
             display: flex; justify-content: space-between; align-items: center;
         }
+        /* خانة بحث القوائم */
+        .list-search {
+            position: relative; margin-bottom: 10px;
+        }
+        .list-search input {
+            width: 100%; padding: 9px 36px 9px 12px;
+            border: 1px solid #d0d8d5; border-radius: 6px;
+            font-size: 13px; font-family: inherit;
+            direction: rtl; text-align: right;
+        }
+        .list-search input:focus {
+            outline: none; border-color: #2c8c7c;
+            box-shadow: 0 0 0 3px rgba(44,140,124,0.12);
+        }
+        .list-search::before {
+            content: '🔍'; position: absolute;
+            right: 10px; top: 50%; transform: translateY(-50%);
+            color: #999; font-size: 14px; pointer-events: none;
+        }
+        .list-search input { padding-right: 34px; }
+        .list-empty-search {
+            text-align: center; padding: 24px 10px;
+            color: #999; font-size: 12px;
+        }
         .district-list-item {
             display: flex; justify-content: space-between; align-items: center;
             padding: 11px 12px; margin-bottom: 6px;
@@ -306,74 +330,220 @@
 
         /* ═══ لوحة الخرائط التفاعلية ═══ */
         .thematic-panel {
-            margin-top: 14px;
-            background: #1a2e2a; color: #e8f5f2;
-            border-radius: 8px; padding: 12px;
+            margin-top: 18px;
+            background: #f8fbfa;
+            border: 1px solid #d8e5e1;
+            border-radius: 8px;
+            padding: 14px;
             direction: rtl;
         }
+        .thematic-panel .t-header {
+            display: flex; align-items: baseline; justify-content: space-between;
+            margin-bottom: 4px;
+        }
         .thematic-panel h3 {
-            margin: 0 0 8px; font-size: 14px; color: #7fd4c1;
+            margin: 0; font-size: 14px; color: #2c8c7c;
             font-weight: 600;
         }
-        .thematic-category {
-            margin-bottom: 10px;
+        .thematic-panel .t-intro {
+            color: #666; font-size: 11px;
+            margin: 0 0 12px; line-height: 1.6;
         }
+        .thematic-category {
+            margin-bottom: 12px;
+        }
+        .thematic-category:last-child { margin-bottom: 0; }
         .thematic-category-title {
-            font-size: 11px; color: #9ab7b0;
-            margin-bottom: 5px; display: flex; align-items: center; gap: 4px;
+            font-size: 11px; color: #5a7a72; font-weight: 600;
+            margin-bottom: 6px; display: flex; align-items: center; gap: 4px;
         }
         .thematic-buttons {
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px;
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;
         }
         .thematic-btn {
-            background: #2a453f; color: #c9e5dd;
-            border: 1px solid #3a5a53; border-radius: 4px;
-            padding: 7px 4px; font-size: 10px;
+            background: white; color: #2c8c7c;
+            border: 1px solid #c5dbd5; border-radius: 5px;
+            padding: 8px 4px; font-size: 10.5px;
             font-family: inherit; cursor: pointer;
-            text-align: center; line-height: 1.3;
+            text-align: center; line-height: 1.35;
             transition: all 0.12s;
         }
         .thematic-btn:hover {
-            background: #355851; border-color: #4a7068;
+            background: #e8f5f2; border-color: #2c8c7c;
         }
         .thematic-btn.active {
             background: #2c8c7c; border-color: #2c8c7c;
             color: white; font-weight: 600;
+            box-shadow: 0 1px 4px rgba(44,140,124,0.3);
         }
         .thematic-btn.soon {
-            opacity: 0.4; cursor: not-allowed;
+            opacity: 0.45; cursor: not-allowed;
+            background: #f0f0f0; color: #999; border-color: #e0e0e0;
         }
         .thematic-btn.soon::after {
             content: ' · قريباً'; font-size: 8px;
         }
 
-        /* أسطورة الخريطة (فوق الخريطة) */
-        .map-legend {
-            position: absolute; bottom: 20px; left: 20px;
-            background: rgba(255,255,255,0.95);
-            border-radius: 6px; padding: 8px 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-            font-size: 12px; z-index: 5; min-width: 180px;
+        /* ── أسطورة الخريطة (في اللوحة الجانبية) ── */
+        .thematic-legend {
+            margin-top: 10px; padding: 10px;
+            background: white; border: 1px solid #c5dbd5;
+            border-radius: 5px;
         }
-        .map-legend .title { font-weight: 600; color: #1a1a1a; margin-bottom: 6px; }
-        .map-legend .scale {
-            height: 12px; border-radius: 2px;
+        .thematic-legend .tl-title {
+            font-weight: 600; color: #1a1a1a; font-size: 12px;
+            margin-bottom: 6px;
+        }
+        .thematic-legend .tl-desc {
+            font-size: 11px; color: #666; line-height: 1.6;
+            margin-bottom: 8px;
+        }
+        .thematic-legend .tl-scale {
+            height: 10px; border-radius: 2px;
             background: linear-gradient(to left, #fff, #2c8c7c);
             margin-bottom: 4px;
+            border: 1px solid #d0d8d5;
         }
-        .map-legend .scale.diverging {
+        .thematic-legend .tl-scale.diverging {
             background: linear-gradient(to left, #c0392b, #f5f5f5, #1f6b5e);
         }
-        .map-legend .labels {
+        .thematic-legend .tl-labels {
             display: flex; justify-content: space-between;
             color: #555; font-size: 10px;
         }
-        .map-legend .close {
-            position: absolute; top: 4px; left: 6px;
-            background: none; border: none; cursor: pointer;
-            color: #999; font-size: 14px; padding: 0;
+
+        /* ── شارة تذكير فوق الخريطة (صغيرة) ── */
+        .map-legend {
+            position: absolute; bottom: 20px; left: 20px;
+            background: rgba(255,255,255,0.96);
+            border: 1px solid #d0d8d5;
+            border-radius: 6px; padding: 6px 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            font-size: 11px; z-index: 5;
+            color: #2c8c7c; font-weight: 600;
         }
-        .map-legend .close:hover { color: #333; }
+        .map-legend .close {
+            background: none; border: none; cursor: pointer;
+            color: #999; font-size: 14px; padding: 0 0 0 6px;
+            vertical-align: middle;
+        }
+        .map-legend .close:hover { color: #c0392b; }
+        /* ═══════════════════════════════════════════════════════
+           📱 نسخة الجوال — تنشط عند عرض شاشة أقل من 768 بكسل
+           ═══════════════════════════════════════════════════════ */
+        @media (max-width: 767px) {
+            #container {
+                flex-direction: column;
+                height: 100vh;
+            }
+
+            /* الخريطة تأخذ النصف العلوي */
+            #map {
+                flex: none;
+                height: 55vh;
+                min-height: 300px;
+                width: 100%;
+            }
+
+            /* الشريط الجانبي يصبح قسماً سفلياً */
+            #sidebar {
+                flex: 1;
+                width: 100%;
+                min-height: 0;
+                box-shadow: 0 -2px 12px rgba(0,0,0,0.08);
+                z-index: 3;
+            }
+
+            /* رأس الشريط أصغر */
+            .sidebar-header {
+                padding: 10px 14px;
+            }
+            .sidebar-header h2 { font-size: 15px; margin-bottom: 2px; }
+            .sidebar-header p { font-size: 12px; }
+
+            /* شريط التبويبات ثابت دائماً في الأعلى */
+            .tabs {
+                position: sticky; top: 0;
+                z-index: 5;
+            }
+
+            /* حالة موسّعة: يُنقر تبويب فيملأ الشاشة */
+            #sidebar.expanded {
+                position: fixed;
+                top: 0; left: 0; right: 0; bottom: 0;
+                height: 100vh;
+                z-index: 10;
+            }
+            #sidebar.expanded ~ #map { display: none; }
+
+            /* زر توسيع/تصغير اللوحة */
+            .mobile-toggle {
+                position: absolute;
+                top: 10px; left: 10px;
+                background: rgba(255,255,255,0.95);
+                color: #2c8c7c;
+                border: 1px solid #2c8c7c;
+                border-radius: 50%;
+                width: 34px; height: 34px;
+                display: flex; align-items: center; justify-content: center;
+                font-size: 16px; cursor: pointer;
+                z-index: 8;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            }
+            .mobile-toggle:hover { background: #2c8c7c; color: white; }
+
+            /* محتوى التبويب: المساحة للقائمة */
+            .tab-content {
+                padding: 12px;
+            }
+
+            /* الخريطة التفاعلية: خاصية scrollable الرأسية */
+            .thematic-buttons {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            /* KPIs بحجم أصغر */
+            .kpi-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 6px;
+            }
+            .kpi-card { padding: 8px; }
+            .kpi-value { font-size: 16px; }
+            .kpi-label { font-size: 10px; }
+
+            /* الرسوم البيانية */
+            .chart-container { height: 180px; }
+
+            /* الليجيند فوق الخريطة — حجم أصغر على الجوال */
+            .map-legend {
+                bottom: 10px; left: 10px;
+                font-size: 10px; padding: 5px 8px;
+            }
+
+            /* الشارة فوق الخريطة */
+            .mode-badge {
+                font-size: 10px; padding: 4px 10px;
+                top: 8px; right: 8px;
+            }
+
+            /* إخفاء بعض العناصر الاختيارية على الجوال */
+            .hint { display: none; }
+        }
+
+        /* شاشات ضيقة جداً (أقل من 380 بكسل) */
+        @media (max-width: 379px) {
+            #map { height: 50vh; }
+            .sidebar-header { padding: 8px 10px; }
+            .tab {
+                font-size: 11px; padding: 8px 4px;
+            }
+        }
+
+        /* زر التوسيع يظهر فقط على الجوال */
+        .mobile-toggle { display: none; }
+        @media (max-width: 767px) {
+            .mobile-toggle { display: flex; }
+        }
     </style>
 </head>
 <body>
@@ -414,14 +584,10 @@
         </div>
 
         <div id="map">
+            <button class="mobile-toggle" id="mobile-toggle" onclick="toggleMobilePanel()" title="توسيع/تصغير اللوحة">⤢</button>
             <div class="mode-badge" id="mode-badge">وضع: الأراضي</div>
             <div class="hint" id="hint">اضغط على أي قطعة أو حي</div>
-            <div class="map-legend" id="map-legend" style="display:none">
-                <button class="close" onclick="clearThematicMap()">×</button>
-                <div class="title" id="legend-title">—</div>
-                <div class="scale" id="legend-scale"></div>
-                <div class="labels" id="legend-labels"><span>—</span><span>—</span></div>
-            </div>
+            <div class="map-legend" id="map-legend" style="display:none"></div>
         </div>
     </div>
 
@@ -456,6 +622,40 @@
         const PARCEL_STATUS = { '1': 'دائم', '2': 'مؤقت', '3': 'قيد المراجعة' };
 
         /* ═══════ تبديل التبويبات ═══════ */
+        /* ═══════ نسخة الجوال — إدارة توسيع اللوحة ═══════ */
+        function isMobile() {
+            return window.matchMedia('(max-width: 767px)').matches;
+        }
+        function toggleMobilePanel() {
+            const sb = document.getElementById('sidebar');
+            const btn = document.getElementById('mobile-toggle');
+            if (sb.classList.contains('expanded')) {
+                sb.classList.remove('expanded');
+                if (btn) btn.textContent = '⤢';
+            } else {
+                sb.classList.add('expanded');
+                if (btn) btn.textContent = '⤡';
+            }
+        }
+        function expandMobilePanel() {
+            if (!isMobile()) return;
+            const sb = document.getElementById('sidebar');
+            if (!sb.classList.contains('expanded')) {
+                sb.classList.add('expanded');
+                const btn = document.getElementById('mobile-toggle');
+                if (btn) btn.textContent = '⤡';
+            }
+        }
+        function collapseMobilePanel() {
+            if (!isMobile()) return;
+            const sb = document.getElementById('sidebar');
+            if (sb.classList.contains('expanded')) {
+                sb.classList.remove('expanded');
+                const btn = document.getElementById('mobile-toggle');
+                if (btn) btn.textContent = '⤢';
+            }
+        }
+
         function switchTab(name) {
             console.log(`→ switchTab('${name}'), activeTab=${activeTab}, lastData:`, {
                 selectedCity: lastData?.selectedCity,
@@ -493,6 +693,9 @@
 
             if (map && map.data) map.data.setStyle(styleDistrictFeature);
 
+            // على الجوال: النقر على تبويب يوسّع اللوحة
+            expandMobilePanel();
+
             if (name === 'districts') {
                 setTimeout(() => renderDistrictTab(lastData || {}), 50);
             } else if (name === 'city') {
@@ -509,13 +712,17 @@
             const { Map, FeatureType } = mapsLib;
             window.PlaceClass = placesLib.Place;
 
+            const mobile = window.matchMedia('(max-width: 767px)').matches;
             map = new Map(document.getElementById("map"), {
                 mapId: MAP_ID,
                 center: { lat: 24.7136, lng: 46.6753 },
-                zoom: 11,
+                zoom: mobile ? 10 : 11, // على الجوال ابدأ بمنظر أوسع للمدينة
                 mapTypeId: 'roadmap',
-                mapTypeControl: true,
+                mapTypeControl: !mobile,        // على الجوال: أخفِ
                 streetViewControl: false,
+                fullscreenControl: !mobile,     // على الجوال: أخفِ
+                zoomControl: true,
+                gestureHandling: mobile ? 'greedy' : 'auto', // الجوال: إصبع واحد للتحريك
             });
 
             // تحميل حدود الأحياء من OpenStreetMap
@@ -1261,7 +1468,9 @@
 
             const html = backBtn + `
                 <div class="district-title">${escapeHtml(stats.name)} ${realBadge}</div>
-                <div class="district-ranking">ترتيب السعر: ${stats.ranking.rank} / ${stats.ranking.total} حياً</div>
+                <div class="district-ranking" title="ترتيب هذا الحي بين أحياء المدينة من الأغلى (١) إلى الأرخص">
+                    السعر: المرتبة <b>${stats.ranking.rank}</b> من <b>${stats.ranking.total}</b> حي في المدينة
+                </div>
                 <div class="kpi-grid">
                     <div class="kpi-card">
                         <div class="kpi-value">${fmtMillion(stats.kpis.cost300m)}</div>
@@ -1370,13 +1579,23 @@
                 return Math.abs(b.stats.kpis.weeklyChange) - Math.abs(a.stats.kpis.weeklyChange);
             });
 
+            const q = (document.getElementById('district-search')?.value || '').trim();
+            const filtered = q
+                ? items.filter(it => normalizeDistrictName(it.name).includes(normalizeDistrictName(q)))
+                : items;
+
             const header = `
                 <div class="districts-list-header">
                     <span>أحياء مدينة ${escapeHtml(cityAr)}</span>
-                    <span style="font-weight: bold; color: #2c8c7c">${items.length} حياً</span>
+                    <span style="font-weight: bold; color: #2c8c7c">${filtered.length} / ${items.length}</span>
+                </div>
+                <div class="list-search">
+                    <input id="district-search" placeholder="ابحث عن حي..." value="${escapeHtml(q)}" />
                 </div>`;
 
-            const list = items.map(item => {
+            const list = filtered.length === 0
+                ? `<div class="list-empty-search">لا توجد أحياء تطابق "${escapeHtml(q)}"</div>`
+                : filtered.map(item => {
                 const ch = item.stats.kpis.weeklyChange;
                 const sign = ch >= 0 ? '▲' : '▼';
                 const cls = ch >= 0 ? 'positive' : 'negative';
@@ -1394,6 +1613,15 @@
             }).join('');
 
             container.innerHTML = header + '<div>' + list + '</div>';
+
+            // ربط البحث
+            const searchInput = document.getElementById('district-search');
+            if (searchInput) {
+                searchInput.focus();
+                const len = searchInput.value.length;
+                searchInput.setSelectionRange(len, len);
+                searchInput.addEventListener('input', () => renderDistrictsList());
+            }
 
             container.querySelectorAll('.district-list-item').forEach(el => {
                 el.addEventListener('click', () => {
@@ -1427,6 +1655,7 @@
                 district: { name: nameAr, nameEn, id: item.id, source: 'osm' }
             };
             renderDistrictTab(lastData);
+            expandMobilePanel();
         }
 
         function backToDistrictsList() {
@@ -1596,29 +1825,45 @@
                 name: CITY_NAMES_AR[id] || id,
                 stats: getCityStats(id),
             }));
-            // لا يوجد sort — الترتيب بحسب الأهمية المحفوظة
+
+            const q = (document.getElementById('city-search')?.value || '').trim();
+            const filtered = q ? items.filter(it => normalizeDistrictName(it.name).includes(normalizeDistrictName(q))) : items;
 
             const header = `
                 <div class="districts-list-header">
                     <span>المدن السعودية المدعومة</span>
-                    <span style="font-weight: bold; color: #2c8c7c">${items.length} مدينة</span>
+                    <span style="font-weight: bold; color: #2c8c7c">${filtered.length} / ${items.length}</span>
+                </div>
+                <div class="list-search">
+                    <input id="city-search" placeholder="ابحث عن مدينة..." value="${escapeHtml(q)}" />
                 </div>`;
 
-            const list = items.map(it => {
-                const ch = it.stats.weeklyChange;
-                const sign = ch >= 0 ? '▲' : '▼';
-                const cls  = ch >= 0 ? 'positive' : 'negative';
-                return `
-                    <div class="district-list-item" data-city="${it.id}">
-                        <div class="district-list-name">${escapeHtml(it.name)}</div>
-                        <div class="district-list-stats">
-                            <span class="district-change ${cls}">${sign} ${Math.abs(ch).toFixed(1)}%</span>
-                            <span class="district-price">${it.stats.avgPrice.toLocaleString('ar-SA')} ر.س/م²</span>
-                        </div>
-                    </div>`;
-            }).join('');
+            const list = filtered.length === 0
+                ? `<div class="list-empty-search">لا توجد مدن تطابق "${escapeHtml(q)}"</div>`
+                : filtered.map(it => {
+                    const ch = it.stats.weeklyChange;
+                    const sign = ch >= 0 ? '▲' : '▼';
+                    const cls  = ch >= 0 ? 'positive' : 'negative';
+                    return `
+                        <div class="district-list-item" data-city="${it.id}">
+                            <div class="district-list-name">${escapeHtml(it.name)}</div>
+                            <div class="district-list-stats">
+                                <span class="district-change ${cls}">${sign} ${Math.abs(ch).toFixed(1)}%</span>
+                                <span class="district-price">${it.stats.avgPrice.toLocaleString('ar-SA')} ر.س/م²</span>
+                            </div>
+                        </div>`;
+                }).join('');
 
             document.getElementById('tab-city').innerHTML = header + '<div>' + list + '</div>';
+
+            // ربط البحث (احتفظ بموضع المؤشر)
+            const searchInput = document.getElementById('city-search');
+            if (searchInput) {
+                searchInput.focus();
+                const len = searchInput.value.length;
+                searchInput.setSelectionRange(len, len);
+                searchInput.addEventListener('input', () => renderCitiesList());
+            }
 
             document.querySelectorAll('#tab-city .district-list-item').forEach(el => {
                 el.addEventListener('click', () => selectCityFromList(el.dataset.city));
@@ -1667,6 +1912,9 @@
             } catch (err) {
                 console.error('فشل renderCityDetail:', err);
             }
+
+            // على الجوال: وسّع اللوحة لإظهار التفاصيل
+            expandMobilePanel();
 
             // جلب أحياء المدينة تلقائياً إن لم تكن محمّلة
             rescanLoadedCities();
@@ -1865,35 +2113,38 @@
         const THEMATIC_METRICS = {
             // 🏠 المشتري السكني
             price     : { cat: 'buyer', label: 'سعر م²',         type: 'heatmap',    real: true,
+                          desc: 'متوسط سعر المتر المربّع في كل حي من صفقات وزارة العدل. الأحياء الأغمق لوناً تعني أسعار أعلى.',
                           value: d => d.medianPpm || d.avgPpm,
                           format: v => `${Math.round(v).toLocaleString('ar-SA')} ر.س/م²` },
             pchange   : { cat: 'buyer', label: 'تغيّر السعر',     type: 'diverging',  real: true,
+                          desc: 'التغيّر في متوسط سعر المتر بين النصف الأقدم والأحدث من صفقات الربع. الأخضر = ارتفاع، الأحمر = انخفاض.',
                           value: d => calcTrendFromDeals(d.deals),
                           format: v => `${v >= 0 ? '+' : ''}${v.toFixed(1)}%` },
             compare   : { cat: 'buyer', label: 'مقارنة بالمدينة', type: 'diverging',  real: true,
-                          // نحتاج متوسط المدينة، يُحسب ديناميكياً
+                          desc: 'نسبة فرق سعر الحي عن متوسط المدينة. الأخضر = أغلى من المتوسط، الأحمر = أرخص.',
                           value: (d, ctx) => ctx.cityAvg ? ((d.medianPpm - ctx.cityAvg) / ctx.cityAvg * 100) : 0,
                           format: v => `${v >= 0 ? '+' : ''}${v.toFixed(1)}%` },
 
             // 📈 المستثمر
             demand    : { cat: 'investor', label: 'مؤشر الطلب',   type: 'heatmap',    real: true,
-                          value: d => d.count, // كعقدة تقريبية
+                          desc: 'عدد الصفقات في الحي كمؤشر على نشاط الطلب. الأحياء الأغمق = طلب أعلى.',
+                          value: d => d.count,
                           format: v => `${v} صفقة` },
             value     : { cat: 'investor', label: 'القيمة',       type: 'heatmap',    real: true,
+                          desc: 'إجمالي قيمة الصفقات المنفذة في الحي خلال الفترة. الأغمق = حجم تداول أكبر.',
                           value: d => d.totalVolume,
                           format: v => `${(v / 1_000_000).toFixed(1)} م.ر` },
             return    : { cat: 'investor', label: 'العائد',       type: 'heatmap',    real: false },
 
             // 🏢 الوسيط العقاري
             deals     : { cat: 'broker', label: 'الصفقات',        type: 'heatmap',    real: true,
+                          desc: 'عدد صفقات البيع المسجّلة في الحي. مؤشر على فرص الوساطة.',
                           value: d => d.count,
                           format: v => `${v} صفقة` },
             dchange   : { cat: 'broker', label: 'تغيّر الصفقات',  type: 'diverging',  real: false },
             velocity  : { cat: 'broker', label: 'سرعة البيع',     type: 'heatmap',    real: true,
-                          value: d => {
-                              // صفقات/شهر تقديرية: count / 3 (ربع سنة)
-                              return d.count / 3;
-                          },
+                          desc: 'متوسط الصفقات الشهرية في الحي خلال الربع. الأحياء الأغمق تدور فيها صفقات أسرع.',
+                          value: d => d.count / 3,
                           format: v => `${v.toFixed(1)} صفقة/شهر` },
 
             // 🏗 المطوّر
@@ -1923,7 +2174,8 @@
         function buildThematicPanel(cityId) {
             const html = [];
             html.push('<div class="thematic-panel">');
-            html.push('<h3>🗺️ الخرائط التفاعلية</h3>');
+            html.push('<div class="t-header"><h3>🗺️ الخرائط التفاعلية</h3></div>');
+            html.push('<p class="t-intro">اضغط على أي مؤشر لتلوين أحياء المدينة على الخريطة حسب قيمته. تساعد هذه الخرائط على كشف الأنماط المكانية بسرعة.</p>');
 
             for (const [catKey, catMeta] of Object.entries(THEMATIC_CATEGORIES)) {
                 const metrics = Object.entries(THEMATIC_METRICS).filter(([, m]) => m.cat === catKey);
@@ -1942,6 +2194,28 @@
                 }
                 html.push('</div></div>');
             }
+
+            // أسطورة المؤشر النشط
+            if (activeThematicKey) {
+                const m = THEMATIC_METRICS[activeThematicKey];
+                const legend = window._lastLegend || {};
+                html.push('<div class="thematic-legend">');
+                html.push(`<div class="tl-title">${escapeHtml(m.label)}</div>`);
+                if (m.desc) html.push(`<div class="tl-desc">${escapeHtml(m.desc)}</div>`);
+                html.push(`<div class="tl-scale ${m.type === 'diverging' ? 'diverging' : ''}"></div>`);
+                if (legend.min != null && legend.max != null) {
+                    const fmt = m.format || (v => Math.round(v));
+                    html.push('<div class="tl-labels">');
+                    if (m.type === 'diverging') {
+                        html.push(`<span>${fmt(legend.min)}</span><span>0</span><span>${fmt(legend.max)}</span>`);
+                    } else {
+                        html.push(`<span>${fmt(legend.min)}</span><span>${fmt(legend.max)}</span>`);
+                    }
+                    html.push('</div>');
+                }
+                html.push('</div>');
+            }
+
             html.push('</div>');
             return html.join('');
         }
@@ -1960,11 +2234,13 @@
 
         function clearThematicMap() {
             activeThematicKey = null;
+            window._lastLegend = null;
             if (map?.data) {
                 map.data.revertStyle();
                 map.data.setStyle(styleDistrictFeature);
             }
-            document.getElementById('map-legend').style.display = 'none';
+            const legend = document.getElementById('map-legend');
+            if (legend) legend.style.display = 'none';
             if (lastData?.selectedCity) renderCityDetail(lastData.selectedCity);
         }
 
@@ -2039,16 +2315,17 @@
                 });
             });
 
-            // عرض الأسطورة
+            // احفظ min/max لعرضهم في اللوحة الجانبية
+            window._lastLegend = { min, max, type: metric.type };
+
+            // شارة صغيرة على الخريطة تذكّر المستخدم بالمؤشر النشط
             const legend = document.getElementById('map-legend');
-            document.getElementById('legend-title').textContent = metric.label;
-            const scaleEl = document.getElementById('legend-scale');
-            scaleEl.className = metric.type === 'diverging' ? 'scale diverging' : 'scale';
-            const labels = document.getElementById('legend-labels');
-            labels.innerHTML = metric.type === 'diverging'
-                ? `<span>${metric.format ? metric.format(min) : min.toFixed(1)}</span><span>0</span><span>${metric.format ? metric.format(max) : max.toFixed(1)}</span>`
-                : `<span>${metric.format ? metric.format(min) : Math.round(min)}</span><span>${metric.format ? metric.format(max) : Math.round(max)}</span>`;
-            legend.style.display = 'block';
+            if (legend) {
+                legend.innerHTML = `
+                    <span>${escapeHtml(metric.label)}</span>
+                    <button class="close" onclick="clearThematicMap()" title="إلغاء">×</button>`;
+                legend.style.display = 'block';
+            }
         }
 
         function heatmapColor(v, min, max) {
