@@ -243,6 +243,35 @@
             padding: 1px 6px; border-radius: 8px;
             margin-right: 4px; vertical-align: middle;
         }
+
+        /* شارة "خريطة تفاعلية نشطة" في تفاصيل الحي */
+        .thematic-active-hint {
+            display: flex; align-items: center; gap: 8px;
+            background: #f0f9f6; border: 1px solid #c5e5dc;
+            border-radius: 6px; padding: 8px 12px;
+            margin: 10px 0; font-size: 12px; color: #1a5a4e;
+        }
+        .thematic-active-hint .t-dot {
+            width: 8px; height: 8px; border-radius: 50%;
+            background: #2c8c7c; flex-shrink: 0;
+            animation: pulse 1.8s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.45; }
+        }
+        .thematic-active-hint span { flex: 1; }
+        .thematic-active-hint .t-off {
+            background: white; color: #c0392b;
+            border: 1px solid #c0392b;
+            padding: 4px 10px; border-radius: 4px;
+            font-size: 11px; font-weight: 600;
+            cursor: pointer; font-family: inherit;
+            flex-shrink: 0;
+        }
+        .thematic-active-hint .t-off:hover {
+            background: #c0392b; color: white;
+        }
         .district-list-item.has-real-data {
             border-right: 3px solid #1f6b5e;
         }
@@ -889,7 +918,10 @@
                         document.querySelectorAll('.tab-content').forEach(c =>
                             c.classList.toggle('active', c.id === `tab-${name}`));
                         updateZoomBadge();
-                        if (map && map.data) map.data.setStyle(styleDistrictFeature);
+                        if (map && map.data) {
+                            if (activeThematicKey) renderThematicMap();
+                            else map.data.setStyle(styleDistrictFeature);
+                        }
                         if (name === 'districts') setTimeout(() => renderDistrictTab(lastData || {}), 50);
                         else if (name === 'city') setTimeout(() => renderCityTab(lastData || {}), 50);
                     }
@@ -928,7 +960,14 @@
 
             updateZoomBadge();
 
-            if (map && map.data) map.data.setStyle(styleDistrictFeature);
+            if (map && map.data) {
+                // احتفظ بألوان الخريطة التفاعلية إن كانت نشطة
+                if (activeThematicKey) {
+                    renderThematicMap();
+                } else {
+                    map.data.setStyle(styleDistrictFeature);
+                }
+            }
 
             // على الجوال: النقر على تبويب يوسّع اللوحة
             expandMobilePanel(mobileTitleForTab(name));
@@ -1149,6 +1188,11 @@
         function onDistrictHover(event) {
             // لا تُطبّق تأثير الـ hover عند الزوم القريب (الأحياء مخفية)
             if (map.getZoom() >= 15) return;
+            // لا تُطبّق الـ hover عند تفعيل خريطة تفاعلية (تحترم ألوانها)
+            if (activeThematicKey) {
+                document.getElementById('map').style.cursor = 'pointer';
+                return;
+            }
 
             const id = event.feature.getId();
             if (hoveredDistrictId !== id) {
@@ -1163,6 +1207,11 @@
             document.getElementById('map').style.cursor = 'pointer';
         }
         function onDistrictHoverEnd(event) {
+            // عند الخريطة التفاعلية، لا نمس الأنماط
+            if (activeThematicKey) {
+                document.getElementById('map').style.cursor = '';
+                return;
+            }
             hoveredDistrictId = null;
             map.data.revertStyle();
             // إعادة رسم الحي المختار
@@ -1201,7 +1250,12 @@
             selectedDistrictId = feature.getId();
             hoveredDistrictId = null;
             map.data.revertStyle();
-            map.data.setStyle(styleDistrictFeature);
+            // احتفظ بألوان الخريطة التفاعلية إن كانت نشطة
+            if (activeThematicKey) {
+                renderThematicMap();
+            } else {
+                map.data.setStyle(styleDistrictFeature);
+            }
 
             // زوم شامل على الحي
             zoomToDistrictFeature(feature);
@@ -1230,7 +1284,14 @@
                     source: 'osm'
                 }
             };
-            switchTab('districts');
+            // إذا كنا في تبويب الأحياء أصلاً، تجنّب switchTab (الذي قد يعيدنا للقائمة)
+            // وبدلاً منه ارسم التفاصيل مباشرة
+            if (activeTab === 'districts') {
+                renderDistrictTab(lastData);
+                expandMobilePanel(nameAr);
+            } else {
+                switchTab('districts');
+            }
         }
 
         /* ═══════ نقر عام على الخريطة — سلوك ذكي حسب الزوم ═══════ */
@@ -1712,8 +1773,18 @@
                 ? `<span style="display:inline-block;background:#1f6b5e;color:white;padding:2px 8px;border-radius:10px;font-size:10px;margin-right:6px;vertical-align:middle">✓ بيانات وزارة العدل</span>`
                 : `<span style="display:inline-block;background:#f0f0f0;color:#777;padding:2px 8px;border-radius:10px;font-size:10px;margin-right:6px;vertical-align:middle">تقديرية</span>`;
 
+            // إشعار بوجود خريطة تفاعلية نشطة + زر لإلغائها
+            const thematicActiveHint = activeThematicKey
+                ? `<div class="thematic-active-hint">
+                        <span class="t-dot"></span>
+                        <span>الخريطة التفاعلية مفعّلة: <b>${escapeHtml(THEMATIC_METRICS[activeThematicKey]?.label || '')}</b></span>
+                        <button class="t-off" onclick="clearThematicMap()" title="إيقاف الخريطة التفاعلية">إيقاف</button>
+                   </div>`
+                : '';
+
             const html = backBtn + `
                 <div class="district-title">${escapeHtml(stats.name)} ${realBadge}</div>
+                ${thematicActiveHint}
                 <div class="district-ranking" title="ترتيب هذا الحي بين أحياء المدينة من الأغلى (١) إلى الأرخص">
                     السعر: المرتبة <b>${stats.ranking.rank}</b> من <b>${stats.ranking.total}</b> حي في المدينة
                 </div>
@@ -1889,7 +1960,11 @@
             selectedDistrictId = item.id;
             hoveredDistrictId = null;
             map.data.revertStyle();
-            map.data.setStyle(styleDistrictFeature);
+            if (activeThematicKey) {
+                renderThematicMap();
+            } else {
+                map.data.setStyle(styleDistrictFeature);
+            }
 
             // زوم شامل على الحي
             zoomToDistrictFeature(item.feature);
@@ -2488,16 +2563,34 @@
             }
             activeThematicKey = key;
             renderThematicMap();
-            // حدّث واجهة التبويب (للتلوين الفعلي للأزرار)
-            if (lastData?.selectedCity) renderCityDetail(lastData.selectedCity);
 
-            // على الجوال: طوِ اللوحة للوضع النصفي لرؤية الخريطة الملوّنة
+            // على الجوال: طوِ اللوحة للوضع النصفي أولاً — ثم أعد رسم اللوحة
             if (isMobile()) {
                 const cityName = lastData?.selectedCity
                     ? (CITY_NAMES_AR[lastData.selectedCity] || lastData.selectedCity)
                     : 'المدينة';
                 halfMobilePanel(cityName);
+                // أعد الرسم بعد الحركة حتى يظهر زر المؤشر النشط
+                setTimeout(() => {
+                    if (lastData?.selectedCity) {
+                        renderCityDetail(lastData.selectedCity);
+                        // مرّر اللوحة لأعلى لإبراز قسم الخرائط التفاعلية
+                        scrollToThematicPanel();
+                    }
+                }, 320); // بعد انتهاء animation (0.3s)
+            } else {
+                // على الديسكتوب: أعد الرسم مباشرة
+                if (lastData?.selectedCity) renderCityDetail(lastData.selectedCity);
             }
+        }
+
+        function scrollToThematicPanel() {
+            const wrapper = document.querySelector('.tab-content-wrapper');
+            const panel = document.querySelector('.thematic-panel');
+            if (!wrapper || !panel) return;
+            // حرّك محتوى اللوحة بحيث يظهر الجزء النشط من الخرائط التفاعلية
+            const topOffset = panel.offsetTop - 10;
+            wrapper.scrollTo({ top: topOffset, behavior: 'smooth' });
         }
 
         function clearThematicMap() {
@@ -2506,10 +2599,31 @@
             if (map?.data) {
                 map.data.revertStyle();
                 map.data.setStyle(styleDistrictFeature);
+                // أعد تمييز الحي المختار إن وُجد
+                if (selectedDistrictId) {
+                    map.data.forEach(f => {
+                        if (f.getId() === selectedDistrictId) {
+                            map.data.overrideStyle(f, styleDistrictFeature(f));
+                        }
+                    });
+                }
             }
             const legend = document.getElementById('map-legend');
             if (legend) legend.style.display = 'none';
-            if (lastData?.selectedCity) renderCityDetail(lastData.selectedCity);
+
+            // على الجوال: وسّع اللوحة (لا حاجة للخريطة النصفية)
+            if (isMobile()) {
+                const title = lastData?.district?.name
+                    || (lastData?.selectedCity ? (CITY_NAMES_AR[lastData.selectedCity] || lastData.selectedCity) : 'التفاصيل');
+                expandMobilePanel(title);
+            }
+
+            // أعد الرسم حسب الشاشة الحالية: حي مختار → تفاصيل الحي، وإلا → المدينة
+            if (lastData?.district) {
+                renderDistrictTab(lastData);
+            } else if (lastData?.selectedCity) {
+                renderCityDetail(lastData.selectedCity);
+            }
         }
 
         function renderThematicMap() {
@@ -2559,7 +2673,11 @@
             const min = Math.min(...values);
             const max = Math.max(...values);
 
-            // تطبيق التلوين
+            // الزوم القريب (≥ 15): أخفِ التلوين تماماً لإظهار القطع
+            const zoom = map.getZoom() ?? 12;
+            const hideForParcels = zoom >= 15;
+
+            // تطبيق التلوين (أو الإخفاء عند الزوم القريب)
             map.data.revertStyle();
             map.data.forEach(feature => {
                 const fc = getFeatureCity(feature);
@@ -2568,20 +2686,27 @@
                 }
             });
 
-            entries.forEach(({ feature, value }) => {
-                const color = metric.type === 'diverging'
-                    ? divergingColor(value, Math.max(Math.abs(min), Math.abs(max)))
-                    : heatmapColor(value, min, max);
-                map.data.overrideStyle(feature, {
-                    fillColor: color,
-                    fillOpacity: 0.72,
-                    strokeColor: '#1a1a1a',
-                    strokeOpacity: 0.5,
-                    strokeWeight: 0.5,
-                    clickable: true,
-                    visible: true,
+            if (!hideForParcels) {
+                entries.forEach(({ feature, value }) => {
+                    const color = metric.type === 'diverging'
+                        ? divergingColor(value, Math.max(Math.abs(min), Math.abs(max)))
+                        : heatmapColor(value, min, max);
+                    map.data.overrideStyle(feature, {
+                        fillColor: color,
+                        fillOpacity: 0.72,
+                        strokeColor: '#1a1a1a',
+                        strokeOpacity: 0.5,
+                        strokeWeight: 0.5,
+                        clickable: true,
+                        visible: true,
+                    });
                 });
-            });
+            } else {
+                // في الزوم القريب: أخفِ كل أحياء المدينة (اترك القطع مرئية)
+                entries.forEach(({ feature }) => {
+                    map.data.overrideStyle(feature, { visible: false, clickable: false });
+                });
+            }
 
             // احفظ min/max لعرضهم في اللوحة الجانبية
             window._lastLegend = { min, max, type: metric.type };
@@ -2589,10 +2714,14 @@
             // شارة صغيرة على الخريطة تذكّر المستخدم بالمؤشر النشط
             const legend = document.getElementById('map-legend');
             if (legend) {
-                legend.innerHTML = `
-                    <span>${escapeHtml(metric.label)}</span>
-                    <button class="close" onclick="clearThematicMap()" title="إلغاء">×</button>`;
-                legend.style.display = 'block';
+                if (hideForParcels) {
+                    legend.style.display = 'none';
+                } else {
+                    legend.innerHTML = `
+                        <span>${escapeHtml(metric.label)}</span>
+                        <button class="close" onclick="clearThematicMap()" title="إلغاء">×</button>`;
+                    legend.style.display = 'block';
+                }
             }
         }
 
