@@ -1,0 +1,1816 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>خريطة القطع العقارية</title>
+    <script>
+      (g=>{var h,a,k,p="The Google Maps JavaScript API",c="google",l="importLibrary",q="__ib__",m=document,b=window;b=b[c]||(b[c]={});var d=b.maps||(b.maps={}),r=new Set,e=new URLSearchParams,u=()=>h||(h=new Promise(async(f,n)=>{await (a=m.createElement("script"));e.set("libraries",[...r]+"");for(k in g)e.set(k.replace(/[A-Z]/g,t=>"_"+t[0].toLowerCase()),g[k]);e.set("callback",c+".maps."+q);a.src=`https://maps.${c}apis.com/maps/api/js?`+e;d[q]=f;a.onerror=()=>h=n(Error(p+" could not load."));a.nonce=m.querySelector("script[nonce]")?.nonce||"";m.head.append(a)}));d[l]?console.warn(p+" only loads once. Ignoring:",g):d[l]=(f,...n)=>r.add(f)&&u().then(()=>d[l](f,...n))})({
+        key: "AIzaSyDP3GJqgDmlto362n26Z3RnCIQS1J1Ctyc",
+        v: "weekly"
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <!-- يُحمَّل فقط إذا كان موجوداً في نفس المجلد — يوفّر الأحياء بدون شبكة -->
+    <script src="embedded_districts.js" onerror="console.log('ℹ️ embedded_districts.js غير موجود — سأجرب Worker')"></script>
+    <style>
+        * { box-sizing: border-box; }
+        html, body {
+            margin: 0; padding: 0; height: 100%;
+            font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+        }
+        #container { display: flex; height: 100vh; width: 100vw; }
+        #map { flex: 1; height: 100%; position: relative; }
+
+        #sidebar {
+            width: 420px; height: 100%;
+            background: #fff;
+            box-shadow: 2px 0 12px rgba(0,0,0,0.08);
+            display: flex; flex-direction: column;
+        }
+
+        .sidebar-header {
+            background: linear-gradient(135deg, #2c8c7c 0%, #1f6b5e 100%);
+            color: #fff; padding: 18px 20px;
+            position: relative; flex-shrink: 0;
+        }
+        .sidebar-header h2 { margin: 0 0 6px; font-size: 17px; }
+        .sidebar-header p { margin: 0; font-size: 13px; opacity: 0.9; }
+        .sidebar-header.empty { background: #f5f5f5; color: #888; }
+        .sidebar-header.empty h2 { color: #444; }
+
+        .source-badge {
+            display: inline-block; background: rgba(255,255,255,0.25);
+            padding: 2px 8px; border-radius: 10px;
+            font-size: 11px; margin-top: 6px;
+        }
+
+        .tabs {
+            display: flex; background: #f8f9fa;
+            border-bottom: 1px solid #e0e0e0; flex-shrink: 0;
+        }
+        .tab {
+            flex: 1; padding: 12px 8px; text-align: center; font-size: 13px;
+            cursor: pointer; color: #666; background: transparent; border: none;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s; font-family: inherit;
+        }
+        .tab:hover { background: rgba(44,140,124,0.06); color: #2c8c7c; }
+        .tab.active {
+            color: #2c8c7c; font-weight: bold; background: #fff;
+            border-bottom-color: #2c8c7c;
+        }
+
+        .tab-content { display: none; padding: 15px 20px; overflow-y: auto; flex: 1; }
+        .tab-content.active { display: block; }
+
+        .section { margin-bottom: 18px; }
+        .section-title {
+            color: #2c8c7c; font-weight: bold; font-size: 14px;
+            padding-bottom: 8px; border-bottom: 2px solid #2c8c7c;
+            margin-bottom: 10px;
+        }
+        .section-title.collapsible { cursor: pointer; user-select: none; border-bottom-style: dashed; }
+        .section-title.collapsible::after {
+            content: '▾'; float: left; font-size: 12px; transition: transform 0.2s;
+        }
+        .section.collapsed .section-title.collapsible::after { transform: rotate(180deg); }
+        .section.collapsed .section-body { display: none; }
+
+        .field {
+            display: flex; justify-content: space-between;
+            padding: 8px 0; font-size: 13px;
+            border-bottom: 1px solid #f0f0f0; gap: 10px;
+        }
+        .field:last-child { border-bottom: none; }
+        .field-label { color: #777; white-space: nowrap; }
+        .field-value { color: #2c8c7c; font-weight: 600; text-align: left; word-break: break-word; }
+
+        .district-title { font-size: 20px; font-weight: bold; color: #1f6b5e; margin-bottom: 4px; }
+        .district-ranking { color: #888; font-size: 12px; margin-bottom: 14px; }
+
+        .kpi-grid {
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 8px; margin-bottom: 18px;
+        }
+        .kpi-card {
+            background: #f7faf9; border: 1px solid #e4efec;
+            border-radius: 8px; padding: 10px 12px; text-align: center;
+        }
+        .kpi-value { font-size: 18px; font-weight: bold; color: #1f6b5e; }
+        .kpi-value.positive { color: #27ae60; }
+        .kpi-value.negative { color: #c0392b; }
+        .kpi-label { font-size: 11px; color: #888; margin-top: 2px; }
+
+        .chart-block { margin-bottom: 20px; }
+        .chart-heading {
+            font-size: 13px; color: #555; margin-bottom: 8px;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .chart-heading::before { content: '📊'; font-size: 14px; }
+        .chart-container {
+            position: relative; height: 160px;
+            background: #fafcfb; border: 1px solid #eaf1ef;
+            border-radius: 8px; padding: 8px;
+        }
+
+        .deals-list { display: flex; flex-direction: column; border-top: 1px solid #f0f0f0; }
+        .deal-row {
+            display: grid; grid-template-columns: 60px 1fr 1fr;
+            gap: 10px; padding: 10px 4px;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 13px; align-items: center;
+        }
+        .deal-row:last-child { border-bottom: none; }
+        .deal-date { color: #888; font-size: 12px; }
+        .deal-area { color: #555; text-align: center; }
+        .deal-price { color: #2c8c7c; font-weight: bold; text-align: left; }
+
+        .empty-state { padding: 40px 20px; text-align: center; color: #999; }
+        .empty-state .icon { font-size: 42px; margin-bottom: 10px; opacity: 0.5; }
+        .empty-state .msg { font-size: 13px; }
+        .empty-state .hint-text { font-size: 12px; margin-top: 6px; color: #bbb; }
+
+        .status { padding: 30px 20px; text-align: center; }
+        .status.loading { color: #2c8c7c; }
+        .status.error { color: #c0392b; }
+        .spinner {
+            border: 3px solid #eee; border-top: 3px solid #2c8c7c;
+            border-radius: 50%; width: 32px; height: 32px;
+            animation: spin 1s linear infinite; margin: 0 auto 12px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .hint {
+            position: absolute; bottom: 20px; left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.75); color: #fff;
+            padding: 10px 20px; border-radius: 20px;
+            font-size: 13px; pointer-events: none;
+            transition: opacity 0.5s; z-index: 5;
+        }
+        .mode-badge {
+            position: absolute; top: 10px; right: 10px;
+            background: #2c8c7c; color: #fff;
+            padding: 6px 14px; border-radius: 20px;
+            font-size: 12px; z-index: 5;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        .warn {
+            position: absolute; top: 10px; left: 50%;
+            transform: translateX(-50%);
+            background: #fff3cd; color: #856404;
+            border: 1px solid #ffc107;
+            padding: 8px 14px; border-radius: 6px;
+            font-size: 12px; z-index: 4;
+            max-width: 85%;
+        }
+
+        /* قائمة الأحياء */
+        .districts-list-header {
+            padding: 10px 2px;
+            color: #555; font-size: 12px;
+            border-bottom: 1px solid #e6ecea;
+            margin-bottom: 8px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .district-list-item {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 11px 12px; margin-bottom: 6px;
+            background: #f8fbfa; border: 1px solid #e6ecea;
+            border-radius: 6px; cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        .district-list-item:hover {
+            background: #e8f5f2; border-color: #2c8c7c;
+            transform: translateX(-2px);
+        }
+        .district-list-name {
+            font-size: 14px; font-weight: 600; color: #1a1a1a;
+        }
+        .district-list-stats {
+            display: flex; flex-direction: column; align-items: flex-start; gap: 2px;
+            min-width: 90px;
+        }
+        .district-change {
+            font-size: 14px; font-weight: bold;
+        }
+        .district-change.positive { color: #1f6b5e; }
+        .district-change.negative { color: #c0392b; }
+        .district-price {
+            font-size: 11px; color: #777;
+        }
+        .back-btn {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 7px 14px; margin-bottom: 10px;
+            background: white; color: #2c8c7c;
+            border: 1px solid #2c8c7c; border-radius: 20px;
+            font-size: 13px; font-weight: 600;
+            cursor: pointer; transition: all 0.15s;
+            font-family: inherit;
+        }
+        .back-btn:hover {
+            background: #2c8c7c; color: white;
+        }
+
+        /* بحث برقم الهوية */
+        .re-search {
+            display: flex; gap: 6px; margin: 6px 0 14px;
+        }
+        .re-search input {
+            flex: 1; padding: 10px 12px;
+            border: 1px solid #d0d8d5; border-radius: 6px;
+            font-size: 13px; font-family: inherit; direction: ltr; text-align: right;
+        }
+        .re-search input:focus {
+            outline: none; border-color: #2c8c7c;
+            box-shadow: 0 0 0 3px rgba(44,140,124,0.15);
+        }
+        .re-search button {
+            padding: 10px 16px; background: #2c8c7c; color: white;
+            border: none; border-radius: 6px; cursor: pointer;
+            font-size: 13px; font-family: inherit;
+        }
+        .re-search button:hover { background: #1f6b5e; }
+        .re-search button:disabled { background: #bbb; cursor: wait; }
+
+        /* زر الحفظ */
+        .save-btn {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 8px 16px; margin: 0 8px 10px 0;
+            background: white; color: #e6a82e;
+            border: 1px solid #e6a82e; border-radius: 20px;
+            font-size: 13px; font-weight: 600;
+            cursor: pointer; font-family: inherit;
+            transition: all 0.15s;
+        }
+        .save-btn:hover { background: #e6a82e; color: white; }
+        .save-btn.saved { background: #e6a82e; color: white; }
+        .save-btn.saved:hover { background: #d4981e; }
+
+        /* قائمة المحفوظات */
+        .saved-section { margin-top: 10px; }
+        .saved-section h3 {
+            font-size: 13px; color: #555; margin: 10px 0 8px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .saved-count { color: #e6a82e; font-weight: bold; }
+        .saved-item {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 10px 12px; margin-bottom: 6px;
+            background: #fffbef; border: 1px solid #f0e3b8;
+            border-radius: 6px; cursor: pointer; position: relative;
+            transition: all 0.15s;
+        }
+        .saved-item:hover {
+            background: #fff4d4; border-color: #e6a82e;
+        }
+        .saved-item .saved-star { font-size: 18px; color: #e6a82e; margin-left: 8px; }
+        .saved-item .saved-info { flex: 1; min-width: 0; }
+        .saved-item .saved-title {
+            font-size: 13px; font-weight: 600;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .saved-item .saved-sub {
+            font-size: 11px; color: #777; margin-top: 2px;
+        }
+        .saved-remove {
+            background: none; border: none; color: #c0392b;
+            cursor: pointer; font-size: 18px; padding: 4px 8px;
+            border-radius: 4px;
+        }
+        .saved-remove:hover { background: #fdecec; }
+
+        .lands-empty-hint {
+            padding: 30px 20px; text-align: center; color: #999;
+            font-size: 13px;
+        }
+        .lands-empty-hint .icon { font-size: 40px; margin-bottom: 10px; opacity: 0.4; }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <div id="sidebar">
+            <div class="sidebar-header empty" id="sidebar-header">
+                <h2 id="sb-title">اختر قطعة أو حي من الخريطة</h2>
+                <p id="sb-subtitle">اضغط على أي موقع لعرض بياناته</p>
+                <span class="source-badge" id="sb-source" style="display:none"></span>
+            </div>
+            <div class="tabs">
+                <button class="tab active" data-tab="lands"     onclick="switchTab('lands')">الأراضي</button>
+                <button class="tab"        data-tab="districts" onclick="switchTab('districts')">الأحياء</button>
+                <button class="tab"        data-tab="city"      onclick="switchTab('city')">المدينة</button>
+            </div>
+
+            <div class="tab-content active" id="tab-lands">
+                <div class="empty-state">
+                    <div class="icon">🗺️</div>
+                    <div class="msg">لا توجد قطعة محددة</div>
+                    <div class="hint-text">اضغط على أي قطعة في الخريطة</div>
+                </div>
+            </div>
+            <div class="tab-content" id="tab-districts">
+                <div class="empty-state">
+                    <div class="icon">🏘️</div>
+                    <div class="msg">اضغط على حي في الخريطة</div>
+                    <div class="hint-text">حدود الأحياء تظهر عند تصغير التكبير</div>
+                </div>
+            </div>
+            <div class="tab-content" id="tab-city">
+                <div class="empty-state">
+                    <div class="icon">🏙️</div>
+                    <div class="msg">بيانات المدينة</div>
+                    <div class="hint-text">اضغط على أي موقع</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="map">
+            <div class="mode-badge" id="mode-badge">وضع: الأراضي</div>
+            <div class="hint" id="hint">اضغط على أي قطعة أو حي</div>
+        </div>
+    </div>
+
+    <script>
+        const PROXY_URL = 'https://balady-proxy.almoiad-alkadam.workers.dev';
+
+        /* Map ID مطلوب لإظهار حدود الأحياء.
+           DEMO_MAP_ID للاختبار. أنشئ Map ID خاص بك من:
+           Google Cloud Console → Map Management → Create Map ID
+           (نوع: JavaScript، Vector، مع تفعيل Data-driven styling) */
+        const MAP_ID = 'fe5bb36f745305930c630843';
+
+        let map, currentPolygon = null, currentMarker = null;
+        let districtLayer = null;
+        let selectedDistrictPlaceId = null;
+        let hoveredPlaceId = null;
+        let lastData = null;
+        let activeTab = 'lands';
+        let chartInstances = [];
+        let lastFeatureClick = 0;
+
+        const LAND_USE_MAIN = {
+            '100000': 'سكني', '200000': 'تجاري', '300000': 'صناعي',
+            '400000': 'زراعي', '500000': 'خدمات', '600000': 'ترفيهي',
+            '700000': 'ديني', '800000': 'حكومي', '900000': 'شوارع ومرافق',
+        };
+        const LAND_USE_DETAIL = {
+            '101000': 'سكني عام', '101011': 'عمارة سكنية', '101012': 'فيلا',
+            '101013': 'دوبلكس', '101014': 'شقة', '101015': 'بيت شعبي', '101016': 'استراحة',
+            '201000': 'تجاري عام', '201011': 'محل تجاري', '201012': 'مجمع تجاري',
+        };
+        const PARCEL_STATUS = { '1': 'دائم', '2': 'مؤقت', '3': 'قيد المراجعة' };
+
+        /* ═══════ تبديل التبويبات ═══════ */
+        function switchTab(name) {
+            activeTab = name;
+            document.querySelectorAll('.tab').forEach(t =>
+                t.classList.toggle('active', t.dataset.tab === name));
+            document.querySelectorAll('.tab-content').forEach(c =>
+                c.classList.toggle('active', c.id === `tab-${name}`));
+
+            const modeLabels = { lands: 'الأراضي', districts: 'الأحياء', city: 'المدينة' };
+            updateZoomBadge();
+
+            // إعادة تنسيق حدود الأحياء (أبرز عند الوضع الأحياء)
+            if (map && map.data) map.data.setStyle(styleDistrictFeature);
+
+            if (name === 'districts') {
+                // إما قائمة أو تفاصيل حسب الاختيار
+                setTimeout(() => renderDistrictTab(lastData || {}), 50);
+            } else if (name === 'city') {
+                // إما قائمة المدن أو تفاصيل مدينة
+                setTimeout(() => renderCityTab(lastData || {}), 50);
+            }
+        }
+
+        /* ═══════ تهيئة الخريطة ═══════ */
+        async function initMap() {
+            // تحميل المكتبات المطلوبة ديناميكياً — نستخرج FeatureType من مكتبة maps
+            const mapsLib   = await google.maps.importLibrary("maps");
+            const markerLib = await google.maps.importLibrary("marker");
+            const placesLib = await google.maps.importLibrary("places");
+            const { Map, FeatureType } = mapsLib;
+            window.PlaceClass = placesLib.Place;
+
+            map = new Map(document.getElementById("map"), {
+                mapId: MAP_ID,
+                center: { lat: 24.7136, lng: 46.6753 },
+                zoom: 11,
+                mapTypeId: 'roadmap',
+                mapTypeControl: true,
+                streetViewControl: false,
+            });
+
+            // تحميل حدود الأحياء من OpenStreetMap
+            // (Google لا يدعم sublocality في Data-driven Styling)
+            loadRiyadhDistricts();
+
+            map.addListener('click', onMapClick);
+            map.addListener('zoom_changed', () => {
+                updateZoomBadge();
+                if (!map.data) return;
+                // امسح أي overrides عالقة (خصوصاً hover تحت الماوس)
+                hoveredDistrictId = null;
+                map.data.revertStyle();
+                // أعد تطبيق النمط الأساسي (يخفي/يظهر حسب الزوم)
+                map.data.setStyle(styleDistrictFeature);
+                // أعد تمييز الحي المختار إن وُجد
+                if (selectedDistrictId) {
+                    map.data.forEach(f => {
+                        if (f.getId() === selectedDistrictId) {
+                            map.data.overrideStyle(f, styleDistrictFeature(f));
+                        }
+                    });
+                }
+            });
+            // تحديث قائمة الأحياء فقط عند تغيّر المدينة (لا عند أي تحريك)
+            let boundsTimer = null;
+            let lastListCity = null;
+            map.addListener('bounds_changed', () => {
+                if (boundsTimer) clearTimeout(boundsTimer);
+                boundsTimer = setTimeout(() => {
+                    if (activeTab !== 'districts' || selectedDistrictId || !osmDistrictsLoaded) return;
+                    const currentCity = getCurrentMapCity();
+                    if (currentCity !== lastListCity) {
+                        lastListCity = currentCity;
+                        renderDistrictsList();
+                    }
+                }, 400);
+            });
+            updateZoomBadge();
+
+            // ارسم النجمات للقطع المحفوظة + الحالة الفارغة للأراضي
+            renderSavedMarkers();
+            renderLandsEmpty();
+        }
+
+        function updateZoomBadge() {
+            if (!map) return;
+            const zoom = map.getZoom();
+            const clickMode = zoom >= 15 ? 'القطعة' : 'الحي';
+            const badge = document.getElementById('mode-badge');
+            if (badge) {
+                const tabLabels = { lands: 'الأراضي', districts: 'الأحياء', city: 'المدينة' };
+                badge.textContent = `تبويب: ${tabLabels[activeTab]} | نقرة → ${clickMode} (z=${zoom})`;
+            }
+        }
+
+        /* ═══════ تحميل حدود الأحياء: مدمج > Worker > ملف محلي ═══════ */
+        let osmDistrictsLoaded = false;
+        async function loadRiyadhDistricts() {
+            let geojson = null;
+            let source = '';
+
+            // ١) بيانات مدمجة من embedded_districts.js (فورية، لا شبكة)
+            if (window.EMBEDDED_DISTRICTS && window.EMBEDDED_DISTRICTS.features) {
+                geojson = window.EMBEDDED_DISTRICTS;
+                source = 'embedded';
+            }
+
+            // ٢) Worker (عند عدم وجود المدمج)
+            if (!geojson) {
+                showWarn('⏳ جارٍ تحميل حدود الأحياء من Worker...', 60000);
+                try {
+                    const res = await fetch(`${PROXY_URL}/districts`);
+                    if (res.ok) {
+                        const data = await res.json();
+                        if (!data.error && data.features && data.features.length > 0) {
+                            geojson = data;
+                            source = data._cached || 'worker';
+                        }
+                    }
+                } catch (err) {}
+            }
+
+            // ٣) ملف محلي districts.geojson
+            if (!geojson) {
+                try {
+                    const res = await fetch('districts.geojson');
+                    if (res.ok) {
+                        geojson = await res.json();
+                        source = 'local file';
+                    }
+                } catch (err) {}
+            }
+
+            document.querySelectorAll('.warn').forEach(e => e.remove());
+
+            if (!geojson || !geojson.features) {
+                showWarn('تعذر تحميل حدود الأحياء. استخدم osm_converter.html لإنشاء embedded_districts.js');
+                return;
+            }
+
+            // تصفية: الأحياء فقط بأسماء حقيقية (استبعاد قطع/مخططات بلا اسم)
+            const before = geojson.features.length;
+            geojson.features = geojson.features.filter(f => {
+                const p = f.properties || {};
+                const name = p['name:ar'] || p.name;
+                return name && name.trim().length > 2;
+            });
+            const after = geojson.features.length;
+            if (before !== after) console.log(`↓ استُبعد ${before - after} عنصر بلا اسم`);
+
+            map.data.addGeoJson(geojson);
+            map.data.setStyle(styleDistrictFeature);
+            map.data.addListener('click',     onDistrictClick);
+            map.data.addListener('mouseover', onDistrictHover);
+            map.data.addListener('mouseout',  onDistrictHoverEnd);
+
+            osmDistrictsLoaded = true;
+            rescanLoadedCities();
+            console.log(`✓ حُمّل ${geojson.features.length} حياً (${source})`);
+            console.log(`✓ المدن المحمّلة: ${[...loadedCities].join(', ') || 'لا شيء'}`);
+        }
+
+        // بدء التهيئة
+        initMap();
+
+        function showWarn(msg, duration = 8000) {
+            const el = document.createElement('div');
+            el.className = 'warn';
+            el.textContent = msg;
+            document.getElementById('map').appendChild(el);
+            if (duration > 0) setTimeout(() => el.remove(), duration);
+        }
+
+        /* ═══════ تنسيق حدود الأحياء (Google Maps Data API) ═══════ */
+        let selectedDistrictId = null;
+        let hoveredDistrictId = null;
+
+        function styleDistrictFeature(feature) {
+            const zoom = map?.getZoom() ?? 12;
+
+            // إخفاء الأحياء تماماً عند الزوم القريب (لتحرير النقر للقطع)
+            if (zoom >= 15) {
+                return { visible: false, clickable: false };
+            }
+
+            const id = feature.getId();
+            const isSelected = id === selectedDistrictId;
+            const isHovered  = id === hoveredDistrictId;
+            const isActive   = activeTab === 'districts';
+
+            if (isSelected) {
+                return {
+                    strokeColor: '#2c8c7c', strokeOpacity: 1, strokeWeight: 3,
+                    fillColor: '#2c8c7c', fillOpacity: 0.25,
+                    clickable: true, visible: true,
+                };
+            }
+            if (isHovered) {
+                return {
+                    strokeColor: '#2c8c7c', strokeOpacity: 1, strokeWeight: 2.5,
+                    fillColor: '#2c8c7c', fillOpacity: 0.18,
+                    clickable: true, visible: true,
+                };
+            }
+            return {
+                strokeColor: '#2c8c7c',
+                strokeOpacity: isActive ? 0.85 : 0.55,
+                strokeWeight: isActive ? 1.5 : 1,
+                fillColor: '#2c8c7c',
+                fillOpacity: isActive ? 0.07 : 0.03,
+                clickable: true, visible: true,
+            };
+        }
+
+        /* ═══════ تأثير المرور بالماوس ═══════ */
+        function onDistrictHover(event) {
+            // لا تُطبّق تأثير الـ hover عند الزوم القريب (الأحياء مخفية)
+            if (map.getZoom() >= 15) return;
+
+            const id = event.feature.getId();
+            if (hoveredDistrictId !== id) {
+                hoveredDistrictId = id;
+                map.data.overrideStyle(event.feature, styleDistrictFeature(event.feature));
+                map.data.forEach(f => {
+                    if (f !== event.feature && f.getId() !== selectedDistrictId) {
+                        map.data.revertStyle(f);
+                    }
+                });
+            }
+            document.getElementById('map').style.cursor = 'pointer';
+        }
+        function onDistrictHoverEnd(event) {
+            hoveredDistrictId = null;
+            map.data.revertStyle();
+            // إعادة رسم الحي المختار
+            if (selectedDistrictId) {
+                map.data.forEach(f => {
+                    if (f.getId() === selectedDistrictId) {
+                        map.data.overrideStyle(f, styleDistrictFeature(f));
+                    }
+                });
+            }
+            document.getElementById('map').style.cursor = '';
+        }
+
+        /* ═══════ زوم شامل على حي ═══════ */
+        function zoomToDistrictFeature(feature) {
+            if (!feature || !map) return;
+            const rings = extractAllRings(feature.getGeometry());
+            if (rings.length === 0) return;
+            const b = new google.maps.LatLngBounds();
+            rings.forEach(ring => ring.forEach(([lng, lat]) => b.extend({ lat, lng })));
+            map.fitBounds(b, { top: 40, right: 40, bottom: 40, left: 40 });
+            // حدّ الزوم الأقصى 14 لإبقاء طبقة الأحياء ظاهرة
+            google.maps.event.addListenerOnce(map, 'idle', () => {
+                if (map.getZoom() > 14) map.setZoom(14);
+            });
+        }
+
+        /* ═══════ نقر على حي ═══════ */
+        async function onDistrictClick(event) {
+            lastFeatureClick = Date.now();
+            const feature = event.feature;
+            if (!feature) return;
+
+            selectedDistrictId = feature.getId();
+            hoveredDistrictId = null;
+            map.data.revertStyle();
+            map.data.overrideStyle(feature, styleDistrictFeature(feature));
+
+            // زوم شامل على الحي
+            zoomToDistrictFeature(feature);
+
+            // استخراج اسم الحي من خصائص OSM
+            const nameAr = feature.getProperty('name:ar') ||
+                           feature.getProperty('name') ||
+                           'الحي المحدد';
+            const nameEn = feature.getProperty('name:en') || '';
+            const placeType = feature.getProperty('place') ||
+                              feature.getProperty('boundary') || '';
+
+            const header = document.getElementById('sidebar-header');
+            header.classList.remove('empty');
+            document.getElementById('sb-title').textContent = nameAr;
+            document.getElementById('sb-subtitle').textContent =
+                [nameEn, placeType === 'suburb' ? 'حي' : placeType].filter(Boolean).join(' — ') || 'حي';
+            document.getElementById('sb-source').style.display = 'none';
+
+            lastData = {
+                ...(lastData || {}),
+                district: {
+                    name: nameAr,
+                    nameEn: nameEn,
+                    id: feature.getId(),
+                    source: 'osm'
+                }
+            };
+            switchTab('districts');
+        }
+
+        /* ═══════ نقر عام على الخريطة — سلوك ذكي حسب الزوم ═══════ */
+        function onMapClick(e) {
+            // إذا تم النقر على حد حي للتو، تجاهل
+            if (Date.now() - lastFeatureClick < 150) return;
+
+            const zoom = map.getZoom();
+            const latLng = e.latLng;
+
+            // زوم بعيد (< 15): ابحث عن حي تحت النقرة
+            if (zoom < 15) {
+                const feature = findDistrictUnder(latLng);
+                if (feature) {
+                    onDistrictClick({ feature });
+                    return;
+                }
+                // ما في حي تحت النقرة في الزوم البعيد — لا شيء
+                showWarn('اقترب بالزوم لرؤية تفاصيل القطعة، أو انقر على حدود حي', 3000);
+                return;
+            }
+
+            // زوم قريب (≥ 15): اجلب القطعة
+            fetchParcel(latLng.lat(), latLng.lng());
+        }
+
+        /* ═══════ إيجاد الحي الذي يحتوي نقطة ═══════ */
+        function findDistrictUnder(latLng) {
+            const pt = [latLng.lng(), latLng.lat()];
+            let found = null;
+            map.data.forEach(feature => {
+                if (found) return;
+                const geom = feature.getGeometry();
+                if (pointInDataGeometry(pt, geom)) found = feature;
+            });
+            return found;
+        }
+
+        function pointInDataGeometry(pt, geom) {
+            if (!geom) return false;
+            const type = geom.getType();
+            if (type === 'Polygon') {
+                return isPointInPolygon(pt, ringsFromPolygon(geom));
+            }
+            if (type === 'MultiPolygon') {
+                const polys = geom.getArray();
+                for (const p of polys) {
+                    if (isPointInPolygon(pt, ringsFromPolygon(p))) return true;
+                }
+            }
+            return false;
+        }
+
+        function ringsFromPolygon(polyGeom) {
+            const rings = [];
+            polyGeom.getArray().forEach(linearRing => {
+                const ring = [];
+                linearRing.getArray().forEach(ll => ring.push([ll.lng(), ll.lat()]));
+                rings.push(ring);
+            });
+            return rings;
+        }
+
+        /* ═══════ جلب بيانات القطعة ═══════ */
+        async function fetchParcel(lat, lng) {
+            // انتقل فوراً إلى تبويب الأراضي
+            if (activeTab !== 'lands') {
+                activeTab = 'lands';
+                document.querySelectorAll('.tab').forEach(t =>
+                    t.classList.toggle('active', t.dataset.tab === 'lands'));
+                document.querySelectorAll('.tab-content').forEach(c =>
+                    c.classList.toggle('active', c.id === 'tab-lands'));
+                updateZoomBadge();
+            }
+
+            const header = document.getElementById('sidebar-header');
+            header.classList.remove('empty');
+            document.getElementById('sb-title').textContent = 'جارٍ التحميل...';
+            document.getElementById('sb-subtitle').textContent =
+                `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+            document.getElementById('sb-source').style.display = 'none';
+            document.getElementById('tab-lands').innerHTML =
+                '<div class="status loading"><div class="spinner"></div>جارٍ جلب البيانات...</div>';
+
+            if (currentMarker) currentMarker.setMap(null);
+            currentMarker = new google.maps.Marker({
+                position: { lat, lng }, map,
+                icon: { path: google.maps.SymbolPath.CIRCLE, scale: 6,
+                        fillColor: '#2c8c7c', fillOpacity: 1,
+                        strokeColor: '#fff', strokeWeight: 2 }
+            });
+
+            try {
+                const ctl = new AbortController();
+                const tid = setTimeout(() => ctl.abort(), 20000);
+                const res = await fetch(`${PROXY_URL}/identify?lat=${lat}&lng=${lng}`,
+                                        { signal: ctl.signal });
+                clearTimeout(tid);
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const data = await res.json();
+                if (data.error) throw new Error(typeof data.error === 'string' ? data.error : JSON.stringify(data.error));
+
+                if (data._source) {
+                    const badge = document.getElementById('sb-source');
+                    badge.textContent = `مصدر: ${data._source}`;
+                    badge.style.display = 'inline-block';
+                }
+
+                if (data.results && data.results.length > 0) {
+                    const selected = selectBestResult(data.results, lat, lng);
+                    lastData = { ...(lastData || {}), results: data.results, selected, lat, lng };
+                    renderLandsTab(selected);
+                    drawPolygon(selected);
+                } else {
+                    document.getElementById('sb-title').textContent = 'لا توجد بيانات';
+                    document.getElementById('tab-lands').innerHTML = emptyTab('❓', 'لم يتم العثور على قطعة');
+                }
+            } catch (err) {
+                document.getElementById('sb-title').textContent = 'تعذر جلب البيانات';
+                document.getElementById('tab-lands').innerHTML = `
+                    <div class="status error">
+                        <div style="font-size:32px;margin-bottom:8px">⚠️</div>
+                        <div style="font-size:12px;direction:ltr">${escapeHtml(err.message)}</div>
+                    </div>`;
+            }
+        }
+
+        /* ═══════ اختيار الأنسب ═══════ */
+        function selectBestResult(results, lat, lng) {
+            const withGeom = results.filter(r => r.geometry && r.geometry.rings);
+            const parcels = withGeom.filter(r => /parcel|قطعة/i.test(r.layerName || ''));
+            const pool = parcels.length ? parcels : withGeom;
+            const containing = pool.filter(r => isPointInPolygon([lng, lat], r.geometry.rings));
+            if (containing.length > 0) {
+                return containing.sort((a, b) => polygonArea(a.geometry.rings) - polygonArea(b.geometry.rings))[0];
+            }
+            if (pool.length > 0) {
+                return pool.sort((a, b) =>
+                    distanceToCentroid([lng, lat], a.geometry.rings) -
+                    distanceToCentroid([lng, lat], b.geometry.rings)
+                )[0];
+            }
+            return results[0];
+        }
+        function isPointInPolygon(pt, rings) {
+            let inside = false;
+            for (const ring of rings) {
+                for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+                    const [xi, yi] = ring[i], [xj, yj] = ring[j];
+                    const intersect = ((yi > pt[1]) !== (yj > pt[1])) &&
+                                      (pt[0] < (xj - xi) * (pt[1] - yi) / (yj - yi) + xi);
+                    if (intersect) inside = !inside;
+                }
+            }
+            return inside;
+        }
+        function polygonArea(rings) {
+            let area = 0;
+            for (const ring of rings) {
+                for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+                    area += (ring[j][0] + ring[i][0]) * (ring[j][1] - ring[i][1]);
+                }
+            }
+            return Math.abs(area / 2);
+        }
+        function distanceToCentroid(pt, rings) {
+            const ring = rings[0];
+            const cx = ring.reduce((s, p) => s + p[0], 0) / ring.length;
+            const cy = ring.reduce((s, p) => s + p[1], 0) / ring.length;
+            return Math.hypot(pt[0] - cx, pt[1] - cy);
+        }
+
+        /* ═══════ القطع المحفوظة (localStorage + نجمات على الخريطة) ═══════ */
+        const MAX_SAVED = 10;
+        let savedMarkers = [];
+
+        function getSaved() {
+            try { return JSON.parse(localStorage.getItem('savedParcels') || '[]'); }
+            catch { return []; }
+        }
+        function setSaved(arr) {
+            localStorage.setItem('savedParcels', JSON.stringify(arr));
+            renderSavedMarkers();
+        }
+        function isSaved(id) {
+            return getSaved().some(p => p.id === id);
+        }
+        function saveParcel(parcel) {
+            const list = getSaved();
+            if (list.some(p => p.id === parcel.id)) return { ok: false, reason: 'duplicate' };
+            if (list.length >= MAX_SAVED) return { ok: false, reason: 'full' };
+            list.push(parcel);
+            setSaved(list);
+            return { ok: true };
+        }
+        function unsaveParcel(id) {
+            setSaved(getSaved().filter(p => p.id !== id));
+        }
+
+        function renderSavedMarkers() {
+            savedMarkers.forEach(m => m.setMap(null));
+            savedMarkers = [];
+            if (!map) return;
+
+            getSaved().forEach(p => {
+                if (!p.lat || !p.lng) return;
+                const marker = new google.maps.Marker({
+                    position: { lat: p.lat, lng: p.lng },
+                    map,
+                    icon: {
+                        path: 'M 0,-10 L 2.6,-3 L 10,-3 L 4,2 L 6.5,10 L 0,5 L -6.5,10 L -4,2 L -10,-3 L -2.6,-3 Z',
+                        fillColor: '#ffc107',
+                        fillOpacity: 1,
+                        strokeColor: '#7a5a00',
+                        strokeWeight: 1.5,
+                        scale: 1.3,
+                        anchor: new google.maps.Point(0, 0),
+                    },
+                    title: p.title || 'قطعة محفوظة',
+                    zIndex: 999,
+                });
+                marker.addListener('click', () => {
+                    map.panTo({ lat: p.lat, lng: p.lng });
+                    if (map.getZoom() < 17) map.setZoom(17);
+                    fetchParcel(p.lat, p.lng);
+                });
+                savedMarkers.push(marker);
+            });
+        }
+
+        /* ═══════ البحث برقم الهوية العقارية ═══════ */
+        async function searchByReId() {
+            const input = document.getElementById('re-search-input');
+            const btn   = document.getElementById('re-search-btn');
+            const reId  = input.value.trim();
+            if (!reId) { input.focus(); return; }
+
+            btn.disabled = true;
+            btn.textContent = '⏳';
+
+            try {
+                const res = await fetch(`${PROXY_URL}/search?re_id=${encodeURIComponent(reId)}`);
+                const data = await res.json();
+                if (data.error) throw new Error(data.error);
+                if (!data.features || data.features.length === 0) {
+                    throw new Error('لم يتم العثور');
+                }
+
+                const f = data.features[0];
+                if (f.geometry && f.geometry.rings) {
+                    const ring = f.geometry.rings[0];
+                    const cx = ring.reduce((s, p) => s + p[0], 0) / ring.length;
+                    const cy = ring.reduce((s, p) => s + p[1], 0) / ring.length;
+                    map.panTo({ lat: cy, lng: cx });
+                    map.setZoom(17);
+                    fetchParcel(cy, cx);
+                } else {
+                    throw new Error('لا توجد إحداثيات للقطعة');
+                }
+            } catch (err) {
+                showWarn('البحث: ' + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'بحث';
+            }
+        }
+
+        /* ═══════ الحالة الفارغة لتبويب الأراضي (بحث + محفوظات) ═══════ */
+        function renderLandsEmpty() {
+            const saved = getSaved();
+            const searchHtml = `
+                <div class="re-search">
+                    <input id="re-search-input" placeholder="رقم الهوية العقارية..." />
+                    <button id="re-search-btn" onclick="searchByReId()">بحث</button>
+                </div>`;
+
+            let body;
+            if (saved.length === 0) {
+                body = `
+                    <div class="lands-empty-hint">
+                        <div class="icon">🏡</div>
+                        <div>انقر على قطعة في الخريطة، أو ابحث برقم الهوية، أو احفظ قطعاً لعرضها هنا</div>
+                    </div>`;
+            } else {
+                const items = saved.map(p => `
+                    <div class="saved-item" data-id="${escapeHtml(p.id)}">
+                        <div class="saved-star">⭐</div>
+                        <div class="saved-info">
+                            <div class="saved-title">${escapeHtml(p.title || 'قطعة')}</div>
+                            <div class="saved-sub">${escapeHtml(p.subtitle || '')}</div>
+                        </div>
+                        <button class="saved-remove" data-remove="${escapeHtml(p.id)}" title="حذف">×</button>
+                    </div>`).join('');
+                body = `
+                    <div class="saved-section">
+                        <h3>
+                            <span>⭐ القطع المحفوظة</span>
+                            <span class="saved-count">${saved.length} / ${MAX_SAVED}</span>
+                        </h3>
+                        ${items}
+                    </div>`;
+            }
+
+            document.getElementById('tab-lands').innerHTML = searchHtml + body;
+
+            // ربط الاحداث
+            const input = document.getElementById('re-search-input');
+            input.addEventListener('keydown', e => {
+                if (e.key === 'Enter') searchByReId();
+            });
+            document.querySelectorAll('.saved-item').forEach(el => {
+                el.addEventListener('click', e => {
+                    if (e.target.classList.contains('saved-remove')) return;
+                    const id = el.dataset.id;
+                    const p = getSaved().find(x => x.id === id);
+                    if (p && p.lat && p.lng) {
+                        map.panTo({ lat: p.lat, lng: p.lng });
+                        if (map.getZoom() < 17) map.setZoom(17);
+                        fetchParcel(p.lat, p.lng);
+                    }
+                });
+            });
+            document.querySelectorAll('.saved-remove').forEach(el => {
+                el.addEventListener('click', e => {
+                    e.stopPropagation();
+                    unsaveParcel(el.dataset.remove);
+                    renderLandsEmpty();
+                });
+            });
+        }
+
+        /* ─── تبويب الأراضي ─── */
+        function renderLandsTab(selected) {
+            const a = selected.attributes || {};
+            const subUse = LAND_USE_DETAIL[a.DETAILSLANDUSE];
+            const mainUse = LAND_USE_MAIN[a.MAINLANDUSE];
+            const title = subUse || mainUse || a.DETAILSLANDUSE || 'قطعة أرض';
+            document.getElementById('sb-title').textContent = title;
+
+            const subtitleParts = [];
+            if (a.ROADCENTERLINENAME_AR) subtitleParts.push(`شارع ${a.ROADCENTERLINENAME_AR}`);
+            if (a.SUBDIVISIONPARCELNUMBER) subtitleParts.push(`قطعة ${a.SUBDIVISIONPARCELNUMBER}`);
+            const subtitle = subtitleParts.join(' ، ') || '—';
+            document.getElementById('sb-subtitle').textContent = subtitle;
+
+            // زر العودة + زر الحفظ
+            const parcelId = a.RE_PARCELID || a.IN_PARCELID || a.GLOBALID || `${lastData?.lat},${lastData?.lng}`;
+            const saved = isSaved(parcelId);
+            const savedCount = getSaved().length;
+            const canSave = saved || savedCount < MAX_SAVED;
+
+            const toolbar = `
+                <div style="display:flex;flex-wrap:wrap;align-items:center;margin-bottom:10px">
+                    <button class="back-btn" onclick="backToLandsHome()">← العودة</button>
+                    <button class="save-btn ${saved ? 'saved' : ''}" onclick="toggleSave()" ${!canSave ? 'disabled' : ''}>
+                        ${saved ? '⭐ محفوظة — احذف' : canSave ? '☆ احفظ هذه القطعة' : `☆ الحد الأقصى (${MAX_SAVED})`}
+                    </button>
+                </div>`;
+
+            let html = toolbar;
+            html += buildSection('البيانات الأساسية', [
+                ['المساحة التقريبية', a.MEASUREDAREA, v => `${Number(v).toFixed(2)} م²`],
+                ['الاستعمال العام', a.MAINLANDUSE, v => fmtCoded(LAND_USE_MAIN, v)],
+                ['الاستعمال التفصيلي', a.DETAILSLANDUSE, v => fmtCoded(LAND_USE_DETAIL, v)],
+                ['رقم القطعة', a.SUBDIVISIONPARCELNUMBER],
+                ['رقم المخطط', a.SUBDIVISIONPLAN_ID],
+            ]);
+            html += buildSection('بيانات واشتراطات البناء', [
+                ['عدد الأدوار', a.NOOFFLOORS],
+                ['عدد الوحدات السكنية', a.RESIDENTIALUNITS],
+                ['عدد الوحدات التجارية', a.COMMERCIALUNITS],
+                ['إجمالي الوحدات', a.UNITSNUMBER],
+            ]);
+            html += buildSection('الهوية العقارية', [
+                ['رقم الهوية العقارية', a.RE_PARCELID],
+                ['الرقم الداخلي للهوية', a.IN_PARCELID],
+                ['حالة الهوية', a.PARCELSTATUS, v => fmtCoded(PARCEL_STATUS, v)],
+            ]);
+            html += buildSection('بيانات الترخيص', [
+                ['رقم الرخصة', a.LICENSENUMBER],
+                ['سنة الترخيص', a.DATEOFLICENSEHIJRI, v => `${v} هـ`],
+            ]);
+            html += buildSection('الموقع', [['الشارع', a.ROADCENTERLINENAME_AR]]);
+            html += renderDealsSection(a.RE_PARCELID);
+            html += buildSection('معلومات إدارية', [
+                ['المصدر', a.DATAOWNER],
+                ['تاريخ الإنشاء', a.CREATED_DATE, fmtDate],
+                ['تاريخ آخر تعديل', a.LAST_EDITED_DATE, fmtDate],
+            ], true);
+
+            document.getElementById('tab-lands').innerHTML = html;
+        }
+
+        function toggleSave() {
+            const a = lastData?.selected?.attributes || {};
+            const id = a.RE_PARCELID || a.IN_PARCELID || a.GLOBALID || `${lastData?.lat},${lastData?.lng}`;
+            if (isSaved(id)) {
+                unsaveParcel(id);
+                showWarn('تم حذف القطعة من المحفوظات', 2000);
+            } else {
+                const subUse = LAND_USE_DETAIL[a.DETAILSLANDUSE];
+                const mainUse = LAND_USE_MAIN[a.MAINLANDUSE];
+                const title = subUse || mainUse || 'قطعة أرض';
+                const subtitleParts = [];
+                if (a.ROADCENTERLINENAME_AR) subtitleParts.push(`شارع ${a.ROADCENTERLINENAME_AR}`);
+                if (a.SUBDIVISIONPARCELNUMBER) subtitleParts.push(`قطعة ${a.SUBDIVISIONPARCELNUMBER}`);
+
+                const res = saveParcel({
+                    id, title,
+                    subtitle: subtitleParts.join(' ، '),
+                    lat: lastData?.lat,
+                    lng: lastData?.lng,
+                    reId: a.RE_PARCELID,
+                    savedAt: Date.now(),
+                });
+                if (!res.ok) {
+                    if (res.reason === 'full') showWarn(`لا يمكن حفظ أكثر من ${MAX_SAVED} قطع. احذف قطعة أولاً.`, 4000);
+                    return;
+                }
+                showWarn('✓ تم حفظ القطعة', 2000);
+            }
+            // أعد الرسم لتحديث زر الحفظ
+            if (lastData?.selected) renderLandsTab(lastData.selected);
+        }
+
+        function backToLandsHome() {
+            if (currentMarker) { currentMarker.setMap(null); currentMarker = null; }
+            if (currentPolygon) { currentPolygon.setMap(null); currentPolygon = null; }
+            if (lastData) { delete lastData.selected; delete lastData.results; }
+            const hdr = document.getElementById('sidebar-header');
+            hdr.classList.add('empty');
+            document.getElementById('sb-title').textContent = 'اختر قطعة أو حي من الخريطة';
+            document.getElementById('sb-subtitle').textContent = '';
+            document.getElementById('sb-source').style.display = 'none';
+            renderLandsEmpty();
+        }
+
+        /* ─── تبويب الأحياء: إما قائمة أو تفاصيل ─── */
+        function renderDistrictTab(data) {
+            chartInstances.forEach(c => c.destroy());
+            chartInstances = [];
+
+            // إذا ما في حي مختار → اعرض القائمة
+            if (!data || !data.district) {
+                renderDistrictsList();
+                return;
+            }
+
+            const districtName = data.district.name || 'الحي';
+            const placeId = data.district.id || data.district.placeId;
+            const stats = getDistrictStats(placeId, districtName);
+
+            const backBtn = `<button class="back-btn" onclick="backToDistrictsList()">← العودة لقائمة الأحياء</button>`;
+
+            const html = backBtn + `
+                <div class="district-title">${escapeHtml(stats.name)}</div>
+                <div class="district-ranking">ترتيب السعر: ${stats.ranking.rank} / ${stats.ranking.total} حياً</div>
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-value">${fmtMillion(stats.kpis.cost300m)}</div>
+                        <div class="kpi-label">تكلفة 300م²</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-value">${stats.kpis.weeklyDeals}</div>
+                        <div class="kpi-label">صفقة الأسبوع</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-value ${stats.kpis.weeklyChange >= 0 ? 'positive' : 'negative'}">
+                            ${stats.kpis.weeklyChange >= 0 ? '▲' : '▼'} ${Math.abs(stats.kpis.weeklyChange)}%
+                        </div>
+                        <div class="kpi-label">تغيّر أسبوعي</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-value">${stats.kpis.pricePerMeter.toLocaleString('ar-SA')}</div>
+                        <div class="kpi-label">ريال/م²</div>
+                    </div>
+                </div>
+                <div class="chart-block">
+                    <div class="chart-heading">سعر م² — الحي (سكني مقابل تجاري) — آخر 12 شهر</div>
+                    <div class="chart-container"><canvas id="chart-price"></canvas></div>
+                </div>
+                <div class="chart-block">
+                    <div class="chart-heading">مقارنة بمتوسط المدينة — السكني</div>
+                    <div class="chart-container"><canvas id="chart-compare"></canvas></div>
+                </div>
+                <div class="chart-block">
+                    <div class="chart-heading">عدد الصفقات الأسبوعية — آخر 12 أسبوع</div>
+                    <div class="chart-container"><canvas id="chart-deals"></canvas></div>
+                </div>
+                <div class="section">
+                    <div class="section-title">آخر الصفقات المسجّلة</div>
+                    <div class="deals-list">
+                        ${stats.recentDeals.map(d => `
+                            <div class="deal-row">
+                                <div class="deal-date">${escapeHtml(d.date)}</div>
+                                <div class="deal-area">${d.area} م²</div>
+                                <div class="deal-price">${d.price.toFixed(2)} م.ر</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>`;
+
+            document.getElementById('tab-districts').innerHTML = html;
+            setTimeout(() => {
+                drawPriceChart(stats.priceHistory);
+                drawCompareChart(stats.cityComparison);
+                drawDealsChart(stats.weeklyDeals);
+            }, 50);
+        }
+
+        /* ─── قائمة أحياء المدينة الحالية ─── */
+        function renderDistrictsList() {
+            const container = document.getElementById('tab-districts');
+
+            if (!map || !map.data) {
+                container.innerHTML = emptyTab('🏘️', 'لم تُحمَّل الأحياء بعد');
+                return;
+            }
+
+            const currentCity = getCurrentMapCity();
+            if (!currentCity) {
+                container.innerHTML = emptyTab('🗺️',
+                    'الخريطة خارج المدن المدعومة',
+                    'حرّك الخريطة إلى الرياض، جدة، مكة، الدمام أو أي مدينة سعودية رئيسية');
+                return;
+            }
+
+            const cityAr = CITY_NAMES_AR[currentCity] || currentCity;
+
+            // اجمع كل أحياء هذه المدينة
+            const items = [];
+            map.data.forEach(feature => {
+                const fc = getFeatureCity(feature);
+                if (fc !== currentCity) return;
+
+                const name = feature.getProperty('name:ar') || feature.getProperty('name') || 'حي';
+                const id = feature.getId();
+                items.push({ id, name, feature, stats: getDistrictStats(id, name) });
+            });
+
+            if (items.length === 0) {
+                container.innerHTML = emptyTab('📭',
+                    `لا توجد أحياء محمّلة لمدينة ${cityAr}`,
+                    'استخدم osm_converter.html لجلب أحياء هذه المدينة');
+                return;
+            }
+
+            // ترتيب تنازلياً حسب شدة التغيّر
+            items.sort((a, b) => Math.abs(b.stats.kpis.weeklyChange) - Math.abs(a.stats.kpis.weeklyChange));
+
+            const header = `
+                <div class="districts-list-header">
+                    <span>أحياء مدينة ${escapeHtml(cityAr)}</span>
+                    <span style="font-weight: bold; color: #2c8c7c">${items.length} حياً</span>
+                </div>`;
+
+            const list = items.map(item => {
+                const ch = item.stats.kpis.weeklyChange;
+                const sign = ch >= 0 ? '▲' : '▼';
+                const cls = ch >= 0 ? 'positive' : 'negative';
+                return `
+                    <div class="district-list-item" data-id="${escapeHtml(String(item.id))}">
+                        <div class="district-list-name">${escapeHtml(item.name)}</div>
+                        <div class="district-list-stats">
+                            <span class="district-change ${cls}">${sign} ${Math.abs(ch).toFixed(1)}%</span>
+                            <span class="district-price">${item.stats.kpis.pricePerMeter.toLocaleString('ar-SA')} ر.س/م²</span>
+                        </div>
+                    </div>`;
+            }).join('');
+
+            container.innerHTML = header + '<div>' + list + '</div>';
+
+            container.querySelectorAll('.district-list-item').forEach(el => {
+                el.addEventListener('click', () => {
+                    const id = el.dataset.id;
+                    const item = items.find(i => String(i.id) === id);
+                    if (item) selectDistrictFromList(item);
+                });
+            });
+        }
+
+        function selectDistrictFromList(item) {
+            selectedDistrictId = item.id;
+            hoveredDistrictId = null;
+            map.data.revertStyle();
+            map.data.overrideStyle(item.feature, styleDistrictFeature(item.feature));
+
+            // زوم شامل على الحي
+            zoomToDistrictFeature(item.feature);
+
+            const nameAr = item.name;
+            const nameEn = item.feature.getProperty('name:en') || '';
+
+            const hdr = document.getElementById('sidebar-header');
+            hdr.classList.remove('empty');
+            document.getElementById('sb-title').textContent = nameAr;
+            document.getElementById('sb-subtitle').textContent = nameEn || 'حي';
+            document.getElementById('sb-source').style.display = 'none';
+
+            lastData = {
+                ...(lastData || {}),
+                district: { name: nameAr, nameEn, id: item.id, source: 'osm' }
+            };
+            renderDistrictTab(lastData);
+        }
+
+        function backToDistrictsList() {
+            selectedDistrictId = null;
+            if (lastData) delete lastData.district;
+            if (map && map.data) {
+                map.data.revertStyle();
+                map.data.setStyle(styleDistrictFeature);
+            }
+            // عُد إلى حالة الرأس الفارغ
+            const hdr = document.getElementById('sidebar-header');
+            hdr.classList.add('empty');
+            document.getElementById('sb-title').textContent = 'اختر قطعة أو حي من الخريطة';
+            document.getElementById('sb-subtitle').textContent = '';
+            document.getElementById('sb-source').style.display = 'none';
+            renderDistrictsList();
+        }
+
+        function extractAllRings(geom) {
+            if (!geom) return [];
+            const type = geom.getType();
+            if (type === 'Polygon') return ringsFromPolygon(geom);
+            if (type === 'MultiPolygon') {
+                const all = [];
+                geom.getArray().forEach(p => all.push(...ringsFromPolygon(p)));
+                return all;
+            }
+            return [];
+        }
+
+        /* ═══════ تتبع المدن المحمّلة ═══════ */
+        const loadedCities = new Set();
+
+        function rescanLoadedCities() {
+            if (!map || !map.data) return;
+            map.data.forEach(f => {
+                const c = getFeatureCity(f);
+                if (c) loadedCities.add(c);
+            });
+        }
+
+        /* ═══════ جلب أحياء مدينة من Worker عند الحاجة ═══════ */
+        async function loadCityDistricts(cityId) {
+            if (loadedCities.has(cityId)) return true;
+            if (!CITY_BBOX[cityId]) return false;
+
+            const cityAr = CITY_NAMES_AR[cityId] || cityId;
+            showWarn(`⏳ جاري تحميل أحياء ${cityAr}...`, 45000);
+
+            try {
+                const res = await fetch(`${PROXY_URL}/districts?city=${cityId}`);
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                const data = await res.json();
+                if (data.error) throw new Error(data.error);
+                if (!data.features || data.features.length === 0) {
+                    throw new Error('لا توجد أحياء');
+                }
+
+                // تصفية الأحياء بدون أسماء
+                data.features = data.features.filter(f => {
+                    const name = f.properties?.['name:ar'] || f.properties?.name;
+                    return name && name.trim().length > 2;
+                });
+
+                map.data.addGeoJson(data);
+                map.data.setStyle(styleDistrictFeature); // ضمان تطبيق النمط على الجديدة
+                loadedCities.add(cityId);
+
+                document.querySelectorAll('.warn').forEach(e => e.remove());
+                console.log(`✓ حُمّل ${data.features.length} حياً لـ ${cityId} (${data._cached || 'fresh'})`);
+                return true;
+            } catch (err) {
+                document.querySelectorAll('.warn').forEach(e => e.remove());
+                showWarn(`تعذر تحميل أحياء ${cityAr}: ${err.message}`);
+                return false;
+            }
+        }
+        const CITY_BBOX = {
+            riyadh   : [24.40, 46.30, 25.10, 47.20],
+            jeddah   : [21.30, 38.95, 21.85, 39.40],
+            makkah   : [21.22, 39.70, 21.58, 40.05],
+            madinah  : [24.30, 39.40, 24.70, 39.80],
+            dammam   : [26.25, 49.90, 26.60, 50.35],
+            khobar   : [26.15, 49.95, 26.40, 50.30],
+            taif     : [21.10, 40.20, 21.45, 40.55],
+            tabuk    : [28.25, 36.40, 28.55, 36.80],
+            abha     : [18.10, 42.35, 18.40, 42.70],
+            khamis   : [18.25, 42.65, 18.45, 42.85],
+            hail     : [27.40, 41.55, 27.65, 41.85],
+            buraydah : [26.20, 43.80, 26.50, 44.15],
+            unaizah  : [26.00, 43.90, 26.15, 44.10],
+            ahsa     : [25.25, 49.45, 25.65, 49.85],
+            jazan    : [16.80, 42.45, 17.10, 42.70],
+            najran   : [17.40, 44.05, 17.70, 44.35],
+            jubail   : [26.90, 49.55, 27.15, 49.80],
+            yanbu    : [24.00, 37.95, 24.20, 38.20],
+            arar     : [30.90, 40.90, 31.10, 41.10],
+            sakaka   : [29.85, 40.15, 30.00, 40.30],
+            rafha    : [29.60, 43.45, 29.70, 43.60],
+            qatif    : [26.50, 49.95, 26.65, 50.10],
+            hafr     : [28.35, 46.05, 28.55, 46.25],
+        };
+        const CITY_NAMES_AR = {
+            riyadh: 'الرياض', jeddah: 'جدة', makkah: 'مكة المكرمة',
+            madinah: 'المدينة المنورة', dammam: 'الدمام', khobar: 'الخبر',
+            taif: 'الطائف', tabuk: 'تبوك', abha: 'أبها', khamis: 'خميس مشيط',
+            hail: 'حائل', buraydah: 'بريدة', unaizah: 'عنيزة', ahsa: 'الأحساء',
+            jazan: 'جازان', najran: 'نجران', jubail: 'الجبيل', yanbu: 'ينبع',
+            arar: 'عرعر', sakaka: 'سكاكا', rafha: 'رفحاء', qatif: 'القطيف',
+            hafr: 'حفر الباطن',
+        };
+
+        // ترتيب المدن حسب الأهمية والحجم
+        const CITY_ORDER = [
+            'riyadh', 'jeddah', 'dammam', 'makkah', 'madinah', 'khobar',
+            'taif', 'ahsa', 'qatif', 'buraydah', 'tabuk', 'khamis',
+            'abha', 'jubail', 'hail', 'yanbu', 'najran', 'jazan',
+            'hafr', 'unaizah', 'sakaka', 'arar', 'rafha',
+        ];
+
+        function getCityAtPoint(lat, lng) {
+            for (const [city, [s, w, n, e]] of Object.entries(CITY_BBOX)) {
+                if (lat >= s && lat <= n && lng >= w && lng <= e) return city;
+            }
+            return null;
+        }
+        function getCurrentMapCity() {
+            if (!map) return null;
+            const c = map.getCenter();
+            return getCityAtPoint(c.lat(), c.lng());
+        }
+        function getFeatureCity(feature) {
+            const prop = feature.getProperty('_city');
+            if (prop && CITY_BBOX[prop]) return prop;
+            // حساب من centroid عند غياب الخاصية
+            const rings = extractAllRings(feature.getGeometry());
+            if (rings.length === 0) return null;
+            const r = rings[0];
+            const cx = r.reduce((s, p) => s + p[0], 0) / r.length;
+            const cy = r.reduce((s, p) => s + p[1], 0) / r.length;
+            return getCityAtPoint(cy, cx);
+        }
+
+        /* ─── تبويب المدينة ─── */
+        /* ─── تبويب المدينة: قائمة المدن أو تفاصيل مدينة ─── */
+        function renderCityTab(data) {
+            chartInstances.forEach(c => c.destroy());
+            chartInstances = [];
+
+            if (!data || !data.selectedCity) {
+                renderCitiesList();
+            } else {
+                renderCityDetail(data.selectedCity);
+            }
+        }
+
+        function renderCitiesList() {
+            const items = CITY_ORDER.map(id => ({
+                id,
+                name: CITY_NAMES_AR[id] || id,
+                stats: getCityStats(id),
+            }));
+            // لا يوجد sort — الترتيب بحسب الأهمية المحفوظة
+
+            const header = `
+                <div class="districts-list-header">
+                    <span>المدن السعودية المدعومة</span>
+                    <span style="font-weight: bold; color: #2c8c7c">${items.length} مدينة</span>
+                </div>`;
+
+            const list = items.map(it => {
+                const ch = it.stats.weeklyChange;
+                const sign = ch >= 0 ? '▲' : '▼';
+                const cls  = ch >= 0 ? 'positive' : 'negative';
+                return `
+                    <div class="district-list-item" data-city="${it.id}">
+                        <div class="district-list-name">${escapeHtml(it.name)}</div>
+                        <div class="district-list-stats">
+                            <span class="district-change ${cls}">${sign} ${Math.abs(ch).toFixed(1)}%</span>
+                            <span class="district-price">${it.stats.avgPrice.toLocaleString('ar-SA')} ر.س/م²</span>
+                        </div>
+                    </div>`;
+            }).join('');
+
+            document.getElementById('tab-city').innerHTML = header + '<div>' + list + '</div>';
+
+            document.querySelectorAll('#tab-city .district-list-item').forEach(el => {
+                el.addEventListener('click', () => selectCityFromList(el.dataset.city));
+            });
+        }
+
+        async function selectCityFromList(cityId) {
+            const bbox = CITY_BBOX[cityId];
+            if (!bbox || !map) return;
+            const [s, w, n, e] = bbox;
+
+            // زوم كامل على المدينة
+            const b = new google.maps.LatLngBounds({ lat: s, lng: w }, { lat: n, lng: e });
+            map.fitBounds(b);
+            google.maps.event.addListenerOnce(map, 'idle', () => {
+                if (map.getZoom() > 12) map.setZoom(12);
+            });
+
+            // نظّف اختيار الحي السابق
+            selectedDistrictId = null;
+            if (lastData?.district) delete lastData.district;
+            if (map.data) map.data.setStyle(styleDistrictFeature);
+
+            lastData = { ...(lastData || {}), selectedCity: cityId };
+
+            // حدّث رأس الشريط الجانبي
+            const hdr = document.getElementById('sidebar-header');
+            hdr.classList.remove('empty');
+            document.getElementById('sb-title').textContent = CITY_NAMES_AR[cityId] || cityId;
+            document.getElementById('sb-subtitle').textContent = 'مدينة';
+            document.getElementById('sb-source').style.display = 'none';
+
+            // اعرض تفاصيل المدينة (تظهر حالة "جاري التحميل" إذا لم تُحمَّل)
+            renderCityDetail(cityId);
+
+            // جلب أحياء المدينة تلقائياً إن لم تكن محمّلة
+            rescanLoadedCities();
+            if (!loadedCities.has(cityId)) {
+                const ok = await loadCityDistricts(cityId);
+                if (ok) {
+                    // أعد تنسيق الخريطة ورسم التفاصيل بعد التحميل
+                    map.data.setStyle(styleDistrictFeature);
+                    renderCityDetail(cityId);
+                }
+            }
+        }
+
+        function renderCityDetail(cityId) {
+            const name = CITY_NAMES_AR[cityId] || cityId;
+            const stats = getCityStats(cityId);
+
+            // عدّ الأحياء المحمّلة لهذه المدينة
+            let loadedDistricts = 0;
+            if (map && map.data) {
+                map.data.forEach(f => { if (getFeatureCity(f) === cityId) loadedDistricts++; });
+            }
+
+            const backBtn = `<button class="back-btn" onclick="backToCitiesList()">← العودة لقائمة المدن</button>`;
+
+            const loadedHint = loadedDistricts === 0
+                ? `<div class="status" style="background:#fff3cd;color:#856404;border:1px solid #ffc107;padding:10px;border-radius:4px;margin:10px 0;font-size:12px">
+                      ⚠ لم تُحمَّل أحياء هذه المدينة. افتح <code>osm_converter.html</code> لجلبها.
+                   </div>`
+                : `<div style="color:#555;font-size:12px;margin:4px 0 14px">
+                      ✓ ${loadedDistricts} حي محمّل على الخريطة
+                   </div>`;
+
+            const html = backBtn + `
+                <div class="district-title">${escapeHtml(name)}</div>
+                ${loadedHint}
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-value">${stats.totalDistricts}</div>
+                        <div class="kpi-label">إجمالي الأحياء</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-value">${stats.avgPrice.toLocaleString('ar-SA')}</div>
+                        <div class="kpi-label">ريال/م² متوسط</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-value ${stats.weeklyChange >= 0 ? 'positive' : 'negative'}">
+                            ${stats.weeklyChange >= 0 ? '▲' : '▼'} ${Math.abs(stats.weeklyChange)}%
+                        </div>
+                        <div class="kpi-label">تغيّر أسبوعي</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-value">${stats.weeklyDeals.toLocaleString('ar-SA')}</div>
+                        <div class="kpi-label">صفقة الأسبوع</div>
+                    </div>
+                </div>
+                <div class="chart-block">
+                    <div class="chart-heading">متوسط سعر م² في المدينة — آخر 12 شهر</div>
+                    <div class="chart-container"><canvas id="city-chart-price"></canvas></div>
+                </div>`;
+
+            document.getElementById('tab-city').innerHTML = html;
+            setTimeout(() => drawCityPriceChart(stats.priceHistory), 50);
+        }
+
+        function backToCitiesList() {
+            if (lastData) delete lastData.selectedCity;
+            renderCitiesList();
+
+            const hdr = document.getElementById('sidebar-header');
+            hdr.classList.add('empty');
+            document.getElementById('sb-title').textContent = 'اختر قطعة أو حي من الخريطة';
+            document.getElementById('sb-subtitle').textContent = '';
+        }
+
+        function drawCityPriceChart(h) {
+            const canvas = document.getElementById('city-chart-price');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            chartInstances.push(new Chart(ctx, {
+                type: 'line',
+                data: { labels: h.labels, datasets: [
+                    { label: 'السعر (ر.س/م²)', data: h.values,
+                      borderColor: '#2c8c7c', backgroundColor: 'rgba(44,140,124,0.1)',
+                      tension: 0.3, pointRadius: 3, fill: true },
+                ]}, options: CHART_COMMON_OPTS
+            }));
+        }
+
+        /* ═══════ بيانات المدينة (placeholder حتمية) ═══════ */
+        function getCityStats(cityId) {
+            const seed = hashStr(cityId);
+            const rand = n => ((seed >> n) % 1000) / 1000;
+
+            const avgPrice = 2500 + Math.round(rand(0) * 8500);
+            const weeklyChange = parseFloat((rand(3) * 10 - 3).toFixed(1));
+            const totalDistricts = 50 + Math.round(rand(5) * 250);
+            const weeklyDeals = 500 + Math.round(rand(7) * 2500);
+
+            const labels12m = ['مايو','يون','يول','أغس','سبت','أكت','نوف','ديس','ين','فبر','مار','أبر'];
+            const values = [];
+            let p = avgPrice * 0.92;
+            for (let i = 0; i < 12; i++) {
+                p += (rand(10 + i) - 0.4) * avgPrice * 0.02;
+                values.push(Math.round(p));
+            }
+            return {
+                avgPrice, weeklyChange, totalDistricts, weeklyDeals,
+                priceHistory: { labels: labels12m, values },
+            };
+        }
+
+        /* ═══════ الرسوم البيانية ═══════ */
+        const CHART_COMMON_OPTS = {
+            responsive: true, maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'top', align: 'start',
+                          labels: { font: { size: 11 }, boxWidth: 12, padding: 8 } },
+                tooltip: { rtl: true, bodyFont: { size: 11 }, titleFont: { size: 11 } }
+            },
+            scales: {
+                x: { ticks: { font: { size: 10 } }, grid: { display: false } },
+                y: { ticks: { font: { size: 10 } }, grid: { color: '#f0f0f0' } }
+            }
+        };
+        function drawPriceChart(h) {
+            const ctx = document.getElementById('chart-price').getContext('2d');
+            chartInstances.push(new Chart(ctx, {
+                type: 'line',
+                data: { labels: h.labels, datasets: [
+                    { label: 'تجاري', data: h.commercial,
+                      borderColor: '#e6a82e', backgroundColor: 'transparent',
+                      tension: 0.3, pointRadius: 3 },
+                    { label: 'سكني', data: h.residential,
+                      borderColor: '#2c8c7c', backgroundColor: 'transparent',
+                      tension: 0.3, pointRadius: 3 },
+                ]}, options: CHART_COMMON_OPTS
+            }));
+        }
+        function drawCompareChart(c) {
+            const ctx = document.getElementById('chart-compare').getContext('2d');
+            chartInstances.push(new Chart(ctx, {
+                type: 'line',
+                data: { labels: c.labels, datasets: [
+                    { label: 'متوسط الرياض', data: c.cityAvg,
+                      borderColor: '#999', borderDash: [4, 4],
+                      backgroundColor: 'transparent', tension: 0.3, pointRadius: 2 },
+                    { label: 'الحي (سكني)', data: c.district,
+                      borderColor: '#3498db', backgroundColor: 'transparent',
+                      tension: 0.3, pointRadius: 3 },
+                ]}, options: CHART_COMMON_OPTS
+            }));
+        }
+        function drawDealsChart(d) {
+            const ctx = document.getElementById('chart-deals').getContext('2d');
+            chartInstances.push(new Chart(ctx, {
+                type: 'bar',
+                data: { labels: d.labels, datasets: [
+                    { label: 'متوسط المدينة', data: d.cityAvg, backgroundColor: '#cfd8d5' },
+                    { label: 'الحي', data: d.district, backgroundColor: '#2c8c7c' },
+                ]}, options: CHART_COMMON_OPTS
+            }));
+        }
+
+        /* ═══════ بيانات الحي (placeholder حتمية لكل حي) ═══════ */
+        function hashStr(s) {
+            let h = 0;
+            for (let i = 0; i < (s || '').length; i++) {
+                h = ((h << 5) - h + s.charCodeAt(i)) | 0;
+            }
+            return Math.abs(h);
+        }
+
+        function getDistrictStats(placeId, name) {
+            // بيانات توضيحية حتمية — كل حي له قيمه الثابتة بناء على اسمه
+            const seed = hashStr(String(placeId || name || 'default'));
+            const rand = n => (seed >> n) % 1000 / 1000; // 0..1
+
+            const basePrice = 3500 + Math.round(rand(0) * 7500);  // 3500..11000
+            const weeklyChange = parseFloat((rand(3) * 16 - 8).toFixed(1)); // -8%..+8%
+            const weeklyDeals = 15 + Math.round(rand(5) * 280);
+            const rank = 1 + Math.round(rand(7) * 149);
+
+            const labels12m = ['مايو','يون','يول','أغس','سبت','أكت','نوف','ديس','ين','فبر','مار','أبر'];
+            const labels12w = Array.from({ length: 12 }, (_, i) => `${i+1}أ`);
+
+            // تاريخ اتجاه
+            const residential = [];
+            const commercial  = [];
+            let r = basePrice * 0.95, c = basePrice * 1.25;
+            for (let i = 0; i < 12; i++) {
+                r += (rand(8 + i) - 0.4) * 120;
+                c += (rand(14 + i) - 0.4) * 180;
+                residential.push(Math.round(r));
+                commercial.push(Math.round(c));
+            }
+
+            const recentDeals = [];
+            for (let i = 0; i < 3; i++) {
+                const area = 300 + Math.round(rand(20 + i) * 500);
+                const ppm  = basePrice * (0.9 + rand(25 + i) * 0.2);
+                recentDeals.push({
+                    date: ['15 مارس', '22 مارس', '29 مارس'][i],
+                    area,
+                    price: parseFloat((area * ppm / 1_000_000).toFixed(2)), // بالمليون
+                });
+            }
+
+            return {
+                name: name || 'الحي',
+                ranking: { rank, total: 150 },
+                kpis: {
+                    cost300m: basePrice * 300,
+                    weeklyDeals,
+                    weeklyChange,
+                    pricePerMeter: basePrice,
+                },
+                priceHistory: { labels: labels12m, residential, commercial },
+                cityComparison: {
+                    labels: labels12m,
+                    district: residential.map(v => Math.round(v * 1.02)),
+                    cityAvg : residential.map(() => 9800 + Math.round(rand(30) * 300)),
+                },
+                weeklyDeals: {
+                    labels: labels12w,
+                    district: Array.from({ length: 12 }, (_, i) => 8 + Math.round(rand(40 + i) * 15)),
+                    cityAvg : Array.from({ length: 12 }, (_, i) => 100 + Math.round(rand(52 + i) * 160)),
+                },
+                recentDeals,
+            };
+        }
+
+        /* ═══════ صفقات القطعة ═══════ */
+        function renderDealsSection(parcelId) {
+            const deals = getDealsFor(parcelId);
+            if (!deals || deals.length === 0) {
+                return `<div class="section">
+                    <div class="section-title">سجل الصفقات المسجلة</div>
+                    <div class="empty-state" style="padding: 20px 10px">
+                        <div class="icon" style="font-size: 32px">📋</div>
+                        <div class="msg">لا توجد صفقات مسجلة لهذه القطعة</div>
+                    </div>
+                </div>`;
+            }
+            const cards = deals.map(d => `
+                <div class="deal-row">
+                    <div class="deal-date">${escapeHtml(d.date || '')}</div>
+                    <div class="deal-area">${d.area || ''} م²</div>
+                    <div class="deal-price">${formatSAR(d.price)}</div>
+                </div>
+            `).join('');
+            return `<div class="section">
+                <div class="section-title">سجل الصفقات المسجلة (${deals.length})</div>
+                <div class="deals-list">${cards}</div>
+            </div>`;
+        }
+        function getDealsFor(parcelId) { return []; }
+        function formatSAR(n) {
+            if (n == null || isNaN(n)) return '—';
+            return Number(n).toLocaleString('ar-SA') + ' ر.س';
+        }
+
+        /* ═══════ رسم ═══════ */
+        function drawPolygon(result) {
+            if (currentPolygon) currentPolygon.setMap(null);
+            if (result.geometry && result.geometry.rings) {
+                const paths = result.geometry.rings.map(ring =>
+                    ring.map(p => ({ lat: p[1], lng: p[0] }))
+                );
+                currentPolygon = new google.maps.Polygon({
+                    paths, strokeColor: '#2c8c7c', strokeOpacity: 1, strokeWeight: 2,
+                    fillColor: '#2c8c7c', fillOpacity: 0.25, map, clickable: false
+                });
+                const bounds = new google.maps.LatLngBounds();
+                paths.flat().forEach(p => bounds.extend(p));
+                map.fitBounds(bounds);
+            }
+        }
+
+        /* ═══════ مساعدات ═══════ */
+        function buildSection(title, rows, collapsed = false) {
+            const filtered = rows.filter(r => r[1] !== null && r[1] !== undefined && r[1] !== '' && r[1] !== 'Null');
+            if (!filtered.length) return '';
+            const id = 'sec_' + Math.random().toString(36).slice(2, 8);
+            const cls = collapsed ? 'section collapsed' : 'section';
+            let body = '';
+            filtered.forEach(([label, value, formatter]) => {
+                const display = formatter ? formatter(value) : value;
+                body += `<div class="field">
+                    <span class="field-label">${escapeHtml(label)}</span>
+                    <span class="field-value">${escapeHtml(String(display))}</span>
+                </div>`;
+            });
+            return `<div class="${cls}" id="${id}">
+                <div class="section-title collapsible" onclick="document.getElementById('${id}').classList.toggle('collapsed')">
+                    ${escapeHtml(title)}
+                </div>
+                <div class="section-body">${body}</div>
+            </div>`;
+        }
+        function emptyTab(icon, msg, hint) {
+            return `<div class="empty-state">
+                <div class="icon">${icon}</div>
+                <div class="msg">${escapeHtml(msg)}</div>
+                ${hint ? `<div class="hint-text">${escapeHtml(hint)}</div>` : ''}
+            </div>`;
+        }
+        function fmtCoded(dict, value) {
+            const label = dict[String(value)];
+            return label ? `${label} (${value})` : String(value);
+        }
+        function fmtDate(ms) {
+            const n = Number(ms);
+            if (!isFinite(n) || n < 1e10) return String(ms);
+            return new Date(n).toLocaleDateString('ar-EG', {
+                year: 'numeric', month: 'long', day: 'numeric'
+            });
+        }
+        function fmtMillion(n) {
+            if (n >= 1e6) return (n / 1e6).toFixed(1) + 'م';
+            if (n >= 1e3) return (n / 1e3).toFixed(0) + 'ك';
+            return Number(n).toLocaleString('ar-SA');
+        }
+        function escapeHtml(s) {
+            return String(s).replace(/[&<>"']/g, c => ({
+                '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+            })[c]);
+        }
+    </script>
+</body>
+</html>
