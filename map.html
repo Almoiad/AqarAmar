@@ -201,6 +201,22 @@
         .district-price {
             font-size: 11px; color: #777;
         }
+        .estimate-tag {
+            display: inline-block;
+            background: #e0e0e0; color: #666;
+            font-size: 9px; font-weight: normal;
+            padding: 1px 6px; border-radius: 8px;
+            margin-right: 4px; vertical-align: middle;
+        }
+        .district-list-item.has-real-data {
+            border-right: 3px solid #1f6b5e;
+        }
+        .district-list-item.estimated {
+            background: #fafafa;
+        }
+        .district-list-item.estimated .district-list-name {
+            color: #555;
+        }
         .back-btn {
             display: inline-flex; align-items: center; gap: 6px;
             padding: 7px 14px; margin-bottom: 10px;
@@ -287,6 +303,77 @@
             font-size: 13px;
         }
         .lands-empty-hint .icon { font-size: 40px; margin-bottom: 10px; opacity: 0.4; }
+
+        /* ═══ لوحة الخرائط التفاعلية ═══ */
+        .thematic-panel {
+            margin-top: 14px;
+            background: #1a2e2a; color: #e8f5f2;
+            border-radius: 8px; padding: 12px;
+            direction: rtl;
+        }
+        .thematic-panel h3 {
+            margin: 0 0 8px; font-size: 14px; color: #7fd4c1;
+            font-weight: 600;
+        }
+        .thematic-category {
+            margin-bottom: 10px;
+        }
+        .thematic-category-title {
+            font-size: 11px; color: #9ab7b0;
+            margin-bottom: 5px; display: flex; align-items: center; gap: 4px;
+        }
+        .thematic-buttons {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px;
+        }
+        .thematic-btn {
+            background: #2a453f; color: #c9e5dd;
+            border: 1px solid #3a5a53; border-radius: 4px;
+            padding: 7px 4px; font-size: 10px;
+            font-family: inherit; cursor: pointer;
+            text-align: center; line-height: 1.3;
+            transition: all 0.12s;
+        }
+        .thematic-btn:hover {
+            background: #355851; border-color: #4a7068;
+        }
+        .thematic-btn.active {
+            background: #2c8c7c; border-color: #2c8c7c;
+            color: white; font-weight: 600;
+        }
+        .thematic-btn.soon {
+            opacity: 0.4; cursor: not-allowed;
+        }
+        .thematic-btn.soon::after {
+            content: ' · قريباً'; font-size: 8px;
+        }
+
+        /* أسطورة الخريطة (فوق الخريطة) */
+        .map-legend {
+            position: absolute; bottom: 20px; left: 20px;
+            background: rgba(255,255,255,0.95);
+            border-radius: 6px; padding: 8px 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            font-size: 12px; z-index: 5; min-width: 180px;
+        }
+        .map-legend .title { font-weight: 600; color: #1a1a1a; margin-bottom: 6px; }
+        .map-legend .scale {
+            height: 12px; border-radius: 2px;
+            background: linear-gradient(to left, #fff, #2c8c7c);
+            margin-bottom: 4px;
+        }
+        .map-legend .scale.diverging {
+            background: linear-gradient(to left, #c0392b, #f5f5f5, #1f6b5e);
+        }
+        .map-legend .labels {
+            display: flex; justify-content: space-between;
+            color: #555; font-size: 10px;
+        }
+        .map-legend .close {
+            position: absolute; top: 4px; left: 6px;
+            background: none; border: none; cursor: pointer;
+            color: #999; font-size: 14px; padding: 0;
+        }
+        .map-legend .close:hover { color: #333; }
     </style>
 </head>
 <body>
@@ -329,6 +416,12 @@
         <div id="map">
             <div class="mode-badge" id="mode-badge">وضع: الأراضي</div>
             <div class="hint" id="hint">اضغط على أي قطعة أو حي</div>
+            <div class="map-legend" id="map-legend" style="display:none">
+                <button class="close" onclick="clearThematicMap()">×</button>
+                <div class="title" id="legend-title">—</div>
+                <div class="scale" id="legend-scale"></div>
+                <div class="labels" id="legend-labels"><span>—</span><span>—</span></div>
+            </div>
         </div>
     </div>
 
@@ -364,23 +457,45 @@
 
         /* ═══════ تبديل التبويبات ═══════ */
         function switchTab(name) {
+            console.log(`→ switchTab('${name}'), activeTab=${activeTab}, lastData:`, {
+                selectedCity: lastData?.selectedCity,
+                district: lastData?.district?.name,
+                selected: !!lastData?.selected,
+            });
+            // الضغط على نفس التبويب النشط = العودة إلى القائمة إذا كنا في تفاصيل
+            if (activeTab === name) {
+                if (name === 'districts' && lastData?.district) {
+                    console.log('  → returning to districts list');
+                    backToDistrictsList();
+                    return;
+                }
+                if (name === 'city' && lastData?.selectedCity) {
+                    console.log('  → returning to cities list');
+                    backToCitiesList();
+                    return;
+                }
+                if (name === 'lands' && lastData?.selected) {
+                    console.log('  → returning to lands home');
+                    backToLandsHome();
+                    return;
+                }
+                console.log('  → already on list, no-op');
+                return;
+            }
+
             activeTab = name;
             document.querySelectorAll('.tab').forEach(t =>
                 t.classList.toggle('active', t.dataset.tab === name));
             document.querySelectorAll('.tab-content').forEach(c =>
                 c.classList.toggle('active', c.id === `tab-${name}`));
 
-            const modeLabels = { lands: 'الأراضي', districts: 'الأحياء', city: 'المدينة' };
             updateZoomBadge();
 
-            // إعادة تنسيق حدود الأحياء (أبرز عند الوضع الأحياء)
             if (map && map.data) map.data.setStyle(styleDistrictFeature);
 
             if (name === 'districts') {
-                // إما قائمة أو تفاصيل حسب الاختيار
                 setTimeout(() => renderDistrictTab(lastData || {}), 50);
             } else if (name === 'city') {
-                // إما قائمة المدن أو تفاصيل مدينة
                 setTimeout(() => renderCityTab(lastData || {}), 50);
             }
         }
@@ -411,18 +526,20 @@
             map.addListener('zoom_changed', () => {
                 updateZoomBadge();
                 if (!map.data) return;
-                // امسح أي overrides عالقة (خصوصاً hover تحت الماوس)
                 hoveredDistrictId = null;
                 map.data.revertStyle();
-                // أعد تطبيق النمط الأساسي (يخفي/يظهر حسب الزوم)
-                map.data.setStyle(styleDistrictFeature);
-                // أعد تمييز الحي المختار إن وُجد
-                if (selectedDistrictId) {
-                    map.data.forEach(f => {
-                        if (f.getId() === selectedDistrictId) {
-                            map.data.overrideStyle(f, styleDistrictFeature(f));
-                        }
-                    });
+                // إذا خريطة تفاعلية نشطة، طبّقها (تحلّ محلّ setStyle الافتراضي)
+                if (activeThematicKey) {
+                    renderThematicMap();
+                } else {
+                    map.data.setStyle(styleDistrictFeature);
+                    if (selectedDistrictId) {
+                        map.data.forEach(f => {
+                            if (f.getId() === selectedDistrictId) {
+                                map.data.overrideStyle(f, styleDistrictFeature(f));
+                            }
+                        });
+                    }
                 }
             });
             // تحديث قائمة الأحياء فقط عند تغيّر المدينة (لا عند أي تحريك)
@@ -541,16 +658,23 @@
 
         function styleDistrictFeature(feature) {
             const zoom = map?.getZoom() ?? 12;
-
-            // إخفاء الأحياء تماماً عند الزوم القريب (لتحرير النقر للقطع)
-            if (zoom >= 15) {
-                return { visible: false, clickable: false };
-            }
-
             const id = feature.getId();
             const isSelected = id === selectedDistrictId;
             const isHovered  = id === hoveredDistrictId;
             const isActive   = activeTab === 'districts';
+
+            // الزوم القريب: أخفِ الأحياء عدا الحي المختار (يبقى كخط حدود فقط)
+            if (zoom >= 15) {
+                if (isSelected) {
+                    return {
+                        strokeColor: '#2c8c7c', strokeOpacity: 0.85, strokeWeight: 2.5,
+                        fillColor: '#2c8c7c', fillOpacity: 0,
+                        clickable: false, // اترك النقر يمر للقطع أسفله
+                        visible: true,
+                    };
+                }
+                return { visible: false, clickable: false };
+            }
 
             if (isSelected) {
                 return {
@@ -615,10 +739,7 @@
             const b = new google.maps.LatLngBounds();
             rings.forEach(ring => ring.forEach(([lng, lat]) => b.extend({ lat, lng })));
             map.fitBounds(b, { top: 40, right: 40, bottom: 40, left: 40 });
-            // حدّ الزوم الأقصى 14 لإبقاء طبقة الأحياء ظاهرة
-            google.maps.event.addListenerOnce(map, 'idle', () => {
-                if (map.getZoom() > 14) map.setZoom(14);
-            });
+            // لا نقيّد الزوم — نحترم fitBounds (يمنع حركة zoom-out مزعجة)
         }
 
         /* ═══════ نقر على حي ═══════ */
@@ -764,7 +885,8 @@
 
                 if (data._source) {
                     const badge = document.getElementById('sb-source');
-                    badge.textContent = `مصدر: ${data._source}`;
+                    badge.textContent = 'مصدر: وزارة البلديات والإسكان';
+                    badge.title = `واجهة بلدي (${data._source})`;
                     badge.style.display = 'inline-block';
                 }
 
@@ -1045,7 +1167,8 @@
             html += buildSection('الموقع', [['الشارع', a.ROADCENTERLINENAME_AR]]);
             html += renderDealsSection(a.RE_PARCELID);
             html += buildSection('معلومات إدارية', [
-                ['المصدر', a.DATAOWNER],
+                ['الأمانة/البلدية', a.DATAOWNER],
+                ['المصدر', 'وزارة البلديات والإسكان — منصة بلدي'],
                 ['تاريخ الإنشاء', a.CREATED_DATE, fmtDate],
                 ['تاريخ آخر تعديل', a.LAST_EDITED_DATE, fmtDate],
             ], true);
@@ -1086,15 +1209,23 @@
         }
 
         function backToLandsHome() {
-            if (currentMarker) { currentMarker.setMap(null); currentMarker = null; }
-            if (currentPolygon) { currentPolygon.setMap(null); currentPolygon = null; }
-            if (lastData) { delete lastData.selected; delete lastData.results; }
-            const hdr = document.getElementById('sidebar-header');
-            hdr.classList.add('empty');
-            document.getElementById('sb-title').textContent = 'اختر قطعة أو حي من الخريطة';
-            document.getElementById('sb-subtitle').textContent = '';
-            document.getElementById('sb-source').style.display = 'none';
-            renderLandsEmpty();
+            console.log('→ backToLandsHome');
+            try {
+                if (currentMarker) { currentMarker.setMap(null); currentMarker = null; }
+                if (currentPolygon) { currentPolygon.setMap(null); currentPolygon = null; }
+                if (lastData) { delete lastData.selected; delete lastData.results; }
+                const hdr = document.getElementById('sidebar-header');
+                if (hdr) hdr.classList.add('empty');
+                const title = document.getElementById('sb-title');
+                if (title) title.textContent = 'اختر قطعة أو حي من الخريطة';
+                const sub = document.getElementById('sb-subtitle');
+                if (sub) sub.textContent = '';
+                const src = document.getElementById('sb-source');
+                if (src) src.style.display = 'none';
+                renderLandsEmpty();
+            } catch (err) {
+                console.error('فشل backToLandsHome:', err);
+            }
         }
 
         /* ─── تبويب الأحياء: إما قائمة أو تفاصيل ─── */
@@ -1108,14 +1239,28 @@
                 return;
             }
 
+            // حمّل صفقات المدينة الحالية (مرة واحدة) ثم أعد الرسم
+            const cityNow = getCurrentMapCity();
+            if (cityNow && !triedDeals.has(cityNow)) {
+                loadCityDeals(cityNow).then(ok => {
+                    if (ok && lastData?.district?.id === data.district.id) {
+                        renderDistrictTab(data);
+                    }
+                });
+            }
+
             const districtName = data.district.name || 'الحي';
             const placeId = data.district.id || data.district.placeId;
-            const stats = getDistrictStats(placeId, districtName);
+            const cityHint = getCurrentMapCity();
+            const stats = getDistrictStats(placeId, districtName, cityHint);
 
             const backBtn = `<button class="back-btn" onclick="backToDistrictsList()">← العودة لقائمة الأحياء</button>`;
+            const realBadge = stats.hasRealData
+                ? `<span style="display:inline-block;background:#1f6b5e;color:white;padding:2px 8px;border-radius:10px;font-size:10px;margin-right:6px;vertical-align:middle">✓ بيانات وزارة العدل</span>`
+                : `<span style="display:inline-block;background:#f0f0f0;color:#777;padding:2px 8px;border-radius:10px;font-size:10px;margin-right:6px;vertical-align:middle">تقديرية</span>`;
 
             const html = backBtn + `
-                <div class="district-title">${escapeHtml(stats.name)}</div>
+                <div class="district-title">${escapeHtml(stats.name)} ${realBadge}</div>
                 <div class="district-ranking">ترتيب السعر: ${stats.ranking.rank} / ${stats.ranking.total} حياً</div>
                 <div class="kpi-grid">
                     <div class="kpi-card">
@@ -1150,12 +1295,12 @@
                     <div class="chart-container"><canvas id="chart-deals"></canvas></div>
                 </div>
                 <div class="section">
-                    <div class="section-title">آخر الصفقات المسجّلة</div>
+                    <div class="section-title">آخر الصفقات المسجّلة${stats.hasRealData ? ` (${stats.kpis.weeklyDeals.toLocaleString('ar-SA')} صفقة)` : ''}</div>
                     <div class="deals-list">
                         ${stats.recentDeals.map(d => `
                             <div class="deal-row">
-                                <div class="deal-date">${escapeHtml(d.date)}</div>
-                                <div class="deal-area">${d.area} م²</div>
+                                <div class="deal-date">${escapeHtml(d.date)}${d.type ? ` <span style="color:#888;font-size:10px">· ${escapeHtml(d.type)}</span>` : ''}</div>
+                                <div class="deal-area">${d.area} م²${d.ppm ? `<br><span style="color:#777;font-size:10px">${d.ppm.toLocaleString('ar-SA')} ر.س/م²</span>` : ''}</div>
                                 <div class="deal-price">${d.price.toFixed(2)} م.ر</div>
                             </div>
                         `).join('')}
@@ -1187,6 +1332,16 @@
                 return;
             }
 
+            // حمّل صفقات المدينة مرة واحدة فقط — بعد التحميل أعد الرسم
+            if (!triedDeals.has(currentCity)) {
+                loadCityDeals(currentCity).then(ok => {
+                    if (ok && activeTab === 'districts' && !selectedDistrictId) {
+                        const now = getCurrentMapCity();
+                        if (now === currentCity) renderDistrictsList();
+                    }
+                });
+            }
+
             const cityAr = CITY_NAMES_AR[currentCity] || currentCity;
 
             // اجمع كل أحياء هذه المدينة
@@ -1197,7 +1352,7 @@
 
                 const name = feature.getProperty('name:ar') || feature.getProperty('name') || 'حي';
                 const id = feature.getId();
-                items.push({ id, name, feature, stats: getDistrictStats(id, name) });
+                items.push({ id, name, feature, stats: getDistrictStats(id, name, currentCity) });
             });
 
             if (items.length === 0) {
@@ -1207,8 +1362,13 @@
                 return;
             }
 
-            // ترتيب تنازلياً حسب شدة التغيّر
-            items.sort((a, b) => Math.abs(b.stats.kpis.weeklyChange) - Math.abs(a.stats.kpis.weeklyChange));
+            // ترتيب: البيانات الحقيقية أولاً، ثم تنازلياً حسب شدة التغيّر
+            items.sort((a, b) => {
+                if (a.stats.hasRealData !== b.stats.hasRealData) {
+                    return a.stats.hasRealData ? -1 : 1;
+                }
+                return Math.abs(b.stats.kpis.weeklyChange) - Math.abs(a.stats.kpis.weeklyChange);
+            });
 
             const header = `
                 <div class="districts-list-header">
@@ -1220,11 +1380,14 @@
                 const ch = item.stats.kpis.weeklyChange;
                 const sign = ch >= 0 ? '▲' : '▼';
                 const cls = ch >= 0 ? 'positive' : 'negative';
+                const estimatedBadge = item.stats.hasRealData
+                    ? ''
+                    : '<span class="estimate-tag">تقديرية</span>';
                 return `
-                    <div class="district-list-item" data-id="${escapeHtml(String(item.id))}">
+                    <div class="district-list-item ${item.stats.hasRealData ? 'has-real-data' : 'estimated'}" data-id="${escapeHtml(String(item.id))}">
                         <div class="district-list-name">${escapeHtml(item.name)}</div>
                         <div class="district-list-stats">
-                            <span class="district-change ${cls}">${sign} ${Math.abs(ch).toFixed(1)}%</span>
+                            <span class="district-change ${cls}">${sign} ${Math.abs(ch).toFixed(1)}% ${estimatedBadge}</span>
                             <span class="district-price">${item.stats.kpis.pricePerMeter.toLocaleString('ar-SA')} ر.س/م²</span>
                         </div>
                     </div>`;
@@ -1267,19 +1430,26 @@
         }
 
         function backToDistrictsList() {
-            selectedDistrictId = null;
-            if (lastData) delete lastData.district;
-            if (map && map.data) {
-                map.data.revertStyle();
-                map.data.setStyle(styleDistrictFeature);
+            console.log('→ backToDistrictsList');
+            try {
+                selectedDistrictId = null;
+                if (lastData) delete lastData.district;
+                if (map && map.data) {
+                    map.data.revertStyle();
+                    map.data.setStyle(styleDistrictFeature);
+                }
+                const hdr = document.getElementById('sidebar-header');
+                if (hdr) hdr.classList.add('empty');
+                const title = document.getElementById('sb-title');
+                if (title) title.textContent = 'اختر قطعة أو حي من الخريطة';
+                const sub = document.getElementById('sb-subtitle');
+                if (sub) sub.textContent = '';
+                const src = document.getElementById('sb-source');
+                if (src) src.style.display = 'none';
+                renderDistrictsList();
+            } catch (err) {
+                console.error('فشل backToDistrictsList:', err);
             }
-            // عُد إلى حالة الرأس الفارغ
-            const hdr = document.getElementById('sidebar-header');
-            hdr.classList.add('empty');
-            document.getElementById('sb-title').textContent = 'اختر قطعة أو حي من الخريطة';
-            document.getElementById('sb-subtitle').textContent = '';
-            document.getElementById('sb-source').style.display = 'none';
-            renderDistrictsList();
         }
 
         function extractAllRings(geom) {
@@ -1456,8 +1626,12 @@
         }
 
         async function selectCityFromList(cityId) {
+            console.log('→ selectCityFromList:', cityId);
             const bbox = CITY_BBOX[cityId];
-            if (!bbox || !map) return;
+            if (!bbox || !map) {
+                console.warn('bbox أو map مفقود', { cityId, hasMap: !!map });
+                return;
+            }
             const [s, w, n, e] = bbox;
 
             // زوم كامل على المدينة
@@ -1467,8 +1641,11 @@
                 if (map.getZoom() > 12) map.setZoom(12);
             });
 
-            // نظّف اختيار الحي السابق
+            // نظّف اختيار الحي السابق والخريطة التفاعلية (مع حماية ضد عناصر مفقودة)
             selectedDistrictId = null;
+            activeThematicKey = null;
+            const legend = document.getElementById('map-legend');
+            if (legend) legend.style.display = 'none';
             if (lastData?.district) delete lastData.district;
             if (map.data) map.data.setStyle(styleDistrictFeature);
 
@@ -1476,23 +1653,34 @@
 
             // حدّث رأس الشريط الجانبي
             const hdr = document.getElementById('sidebar-header');
-            hdr.classList.remove('empty');
-            document.getElementById('sb-title').textContent = CITY_NAMES_AR[cityId] || cityId;
-            document.getElementById('sb-subtitle').textContent = 'مدينة';
-            document.getElementById('sb-source').style.display = 'none';
+            if (hdr) {
+                hdr.classList.remove('empty');
+                document.getElementById('sb-title').textContent = CITY_NAMES_AR[cityId] || cityId;
+                document.getElementById('sb-subtitle').textContent = 'مدينة';
+                document.getElementById('sb-source').style.display = 'none';
+            }
 
             // اعرض تفاصيل المدينة (تظهر حالة "جاري التحميل" إذا لم تُحمَّل)
-            renderCityDetail(cityId);
+            try {
+                renderCityDetail(cityId);
+                console.log('✓ تم رسم تفاصيل المدينة', cityId);
+            } catch (err) {
+                console.error('فشل renderCityDetail:', err);
+            }
 
             // جلب أحياء المدينة تلقائياً إن لم تكن محمّلة
             rescanLoadedCities();
             if (!loadedCities.has(cityId)) {
                 const ok = await loadCityDistricts(cityId);
                 if (ok) {
-                    // أعد تنسيق الخريطة ورسم التفاصيل بعد التحميل
                     map.data.setStyle(styleDistrictFeature);
-                    renderCityDetail(cityId);
+                    try { renderCityDetail(cityId); } catch (e) { console.error(e); }
                 }
+            }
+            // جلب صفقات المدينة
+            await loadCityDeals(cityId);
+            if (lastData?.selectedCity === cityId) {
+                try { renderCityDetail(cityId); } catch (e) { console.error(e); }
             }
         }
 
@@ -1515,6 +1703,15 @@
                 : `<div style="color:#555;font-size:12px;margin:4px 0 14px">
                       ✓ ${loadedDistricts} حي محمّل على الخريطة
                    </div>`;
+
+            // لوحة الخرائط التفاعلية (محمية بـ try-catch حتى لا تكسر العرض)
+            let thematicHtml = '';
+            try {
+                thematicHtml = buildThematicPanel(cityId);
+            } catch (err) {
+                console.error('فشل بناء لوحة الخرائط:', err);
+                thematicHtml = '<div style="color:#999;font-size:11px;padding:10px">الخرائط التفاعلية غير متوفرة</div>';
+            }
 
             const html = backBtn + `
                 <div class="district-title">${escapeHtml(name)}</div>
@@ -1542,20 +1739,35 @@
                 <div class="chart-block">
                     <div class="chart-heading">متوسط سعر م² في المدينة — آخر 12 شهر</div>
                     <div class="chart-container"><canvas id="city-chart-price"></canvas></div>
-                </div>`;
+                </div>
+                ${thematicHtml}`;
 
             document.getElementById('tab-city').innerHTML = html;
             setTimeout(() => drawCityPriceChart(stats.priceHistory), 50);
         }
 
         function backToCitiesList() {
-            if (lastData) delete lastData.selectedCity;
-            renderCitiesList();
+            console.log('→ backToCitiesList');
+            try {
+                if (lastData) delete lastData.selectedCity;
+                activeThematicKey = null;
+                const legend = document.getElementById('map-legend');
+                if (legend) legend.style.display = 'none';
+                if (map?.data) {
+                    map.data.revertStyle();
+                    map.data.setStyle(styleDistrictFeature);
+                }
+                renderCitiesList();
 
-            const hdr = document.getElementById('sidebar-header');
-            hdr.classList.add('empty');
-            document.getElementById('sb-title').textContent = 'اختر قطعة أو حي من الخريطة';
-            document.getElementById('sb-subtitle').textContent = '';
+                const hdr = document.getElementById('sidebar-header');
+                if (hdr) hdr.classList.add('empty');
+                const title = document.getElementById('sb-title');
+                if (title) title.textContent = 'اختر قطعة أو حي من الخريطة';
+                const subtitle = document.getElementById('sb-subtitle');
+                if (subtitle) subtitle.textContent = '';
+            } catch (err) {
+                console.error('فشل backToCitiesList:', err);
+            }
         }
 
         function drawCityPriceChart(h) {
@@ -1647,7 +1859,305 @@
             }));
         }
 
-        /* ═══════ بيانات الحي (placeholder حتمية لكل حي) ═══════ */
+        /* ═══════ الخرائط التفاعلية ═══════ */
+
+        // تعريف كل مؤشر: المفتاح، العنوان، الفئة، نوع المقياس، دالة الاستخراج
+        const THEMATIC_METRICS = {
+            // 🏠 المشتري السكني
+            price     : { cat: 'buyer', label: 'سعر م²',         type: 'heatmap',    real: true,
+                          value: d => d.medianPpm || d.avgPpm,
+                          format: v => `${Math.round(v).toLocaleString('ar-SA')} ر.س/م²` },
+            pchange   : { cat: 'buyer', label: 'تغيّر السعر',     type: 'diverging',  real: true,
+                          value: d => calcTrendFromDeals(d.deals),
+                          format: v => `${v >= 0 ? '+' : ''}${v.toFixed(1)}%` },
+            compare   : { cat: 'buyer', label: 'مقارنة بالمدينة', type: 'diverging',  real: true,
+                          // نحتاج متوسط المدينة، يُحسب ديناميكياً
+                          value: (d, ctx) => ctx.cityAvg ? ((d.medianPpm - ctx.cityAvg) / ctx.cityAvg * 100) : 0,
+                          format: v => `${v >= 0 ? '+' : ''}${v.toFixed(1)}%` },
+
+            // 📈 المستثمر
+            demand    : { cat: 'investor', label: 'مؤشر الطلب',   type: 'heatmap',    real: true,
+                          value: d => d.count, // كعقدة تقريبية
+                          format: v => `${v} صفقة` },
+            value     : { cat: 'investor', label: 'القيمة',       type: 'heatmap',    real: true,
+                          value: d => d.totalVolume,
+                          format: v => `${(v / 1_000_000).toFixed(1)} م.ر` },
+            return    : { cat: 'investor', label: 'العائد',       type: 'heatmap',    real: false },
+
+            // 🏢 الوسيط العقاري
+            deals     : { cat: 'broker', label: 'الصفقات',        type: 'heatmap',    real: true,
+                          value: d => d.count,
+                          format: v => `${v} صفقة` },
+            dchange   : { cat: 'broker', label: 'تغيّر الصفقات',  type: 'diverging',  real: false },
+            velocity  : { cat: 'broker', label: 'سرعة البيع',     type: 'heatmap',    real: true,
+                          value: d => {
+                              // صفقات/شهر تقديرية: count / 3 (ربع سنة)
+                              return d.count / 3;
+                          },
+                          format: v => `${v.toFixed(1)} صفقة/شهر` },
+
+            // 🏗 المطوّر
+            build     : { cat: 'dev', label: 'نسبة البناء',    type: 'heatmap',    real: false },
+            white     : { cat: 'dev', label: 'أراضي بيضاء',   type: 'heatmap',    real: false },
+            supplygap : { cat: 'dev', label: 'فجوة العرض',    type: 'diverging',  real: false },
+
+            // 💵 الإيجار
+            rentR     : { cat: 'rent', label: 'إيجار سكني',   type: 'heatmap',    real: false },
+            rentC     : { cat: 'rent', label: 'إيجار تجاري',  type: 'heatmap',    real: false },
+            rentChg   : { cat: 'rent', label: 'تغيّر الإيجار', type: 'diverging',  real: false },
+            rentAct   : { cat: 'rent', label: 'نشاط الإيجار', type: 'heatmap',    real: false },
+            realRet   : { cat: 'rent', label: 'العائد الحقيقي',type: 'heatmap',    real: false },
+            occupancy : { cat: 'rent', label: 'نسبة الإشغال', type: 'heatmap',    real: false },
+        };
+
+        const THEMATIC_CATEGORIES = {
+            buyer   : { title: 'المشتري السكني',   icon: '🏠' },
+            investor: { title: 'المستثمر',         icon: '📈' },
+            broker  : { title: 'الوسيط العقاري',   icon: '🏢' },
+            dev     : { title: 'المطوّر',           icon: '🏗' },
+            rent    : { title: 'الإيجار · منصة إيجار', icon: '💵' },
+        };
+
+        let activeThematicKey = null;
+
+        function buildThematicPanel(cityId) {
+            const html = [];
+            html.push('<div class="thematic-panel">');
+            html.push('<h3>🗺️ الخرائط التفاعلية</h3>');
+
+            for (const [catKey, catMeta] of Object.entries(THEMATIC_CATEGORIES)) {
+                const metrics = Object.entries(THEMATIC_METRICS).filter(([, m]) => m.cat === catKey);
+                if (metrics.length === 0) continue;
+                html.push('<div class="thematic-category">');
+                html.push(`<div class="thematic-category-title">${catMeta.icon} ${catMeta.title}</div>`);
+                html.push('<div class="thematic-buttons">');
+                for (const [key, m] of metrics) {
+                    const cls = [
+                        'thematic-btn',
+                        m.real ? '' : 'soon',
+                        activeThematicKey === key ? 'active' : '',
+                    ].filter(Boolean).join(' ');
+                    const onclick = m.real ? `applyThematicMap('${key}')` : '';
+                    html.push(`<button class="${cls}" ${onclick ? `onclick="${onclick}"` : ''}>${m.label}</button>`);
+                }
+                html.push('</div></div>');
+            }
+            html.push('</div>');
+            return html.join('');
+        }
+
+        /* ═══════ تلوين الخريطة حسب المؤشر ═══════ */
+        function applyThematicMap(key) {
+            if (activeThematicKey === key) {
+                clearThematicMap();
+                return;
+            }
+            activeThematicKey = key;
+            renderThematicMap();
+            // حدّث واجهة التبويب (للتلوين الفعلي للأزرار)
+            if (lastData?.selectedCity) renderCityDetail(lastData.selectedCity);
+        }
+
+        function clearThematicMap() {
+            activeThematicKey = null;
+            if (map?.data) {
+                map.data.revertStyle();
+                map.data.setStyle(styleDistrictFeature);
+            }
+            document.getElementById('map-legend').style.display = 'none';
+            if (lastData?.selectedCity) renderCityDetail(lastData.selectedCity);
+        }
+
+        function renderThematicMap() {
+            if (!activeThematicKey || !map?.data) return;
+            const metric = THEMATIC_METRICS[activeThematicKey];
+            if (!metric) return;
+
+            const city = getCurrentMapCity();
+            if (!city) return;
+
+            // تأكد من وجود الصفقات
+            const cityDeals = getCityDeals(city);
+            if (!cityDeals) {
+                showWarn('لا تتوفر بيانات صفقات لهذه المدينة بعد', 3000);
+                clearThematicMap();
+                return;
+            }
+
+            // جمع القيم
+            const entries = [];
+            const cityValues = Object.values(cityDeals).map(d => d.medianPpm || d.avgPpm);
+            const cityAvg = cityValues.length
+                ? cityValues.reduce((s, v) => s + v, 0) / cityValues.length
+                : 0;
+            const ctx = { cityAvg };
+
+            map.data.forEach(feature => {
+                const fc = getFeatureCity(feature);
+                if (fc !== city) return;
+                const name = feature.getProperty('name:ar') || feature.getProperty('name');
+                if (!name) return;
+                const d = getDealsForDistrict(city, name);
+                if (!d) return;
+                const v = metric.value(d, ctx);
+                if (v == null || isNaN(v)) return;
+                entries.push({ feature, value: v });
+            });
+
+            if (entries.length === 0) {
+                showWarn('لا توجد قيم كافية لرسم الخريطة', 3000);
+                clearThematicMap();
+                return;
+            }
+
+            // حساب المقياس
+            const values = entries.map(e => e.value);
+            const min = Math.min(...values);
+            const max = Math.max(...values);
+
+            // تطبيق التلوين
+            map.data.revertStyle();
+            map.data.forEach(feature => {
+                const fc = getFeatureCity(feature);
+                if (fc !== city) {
+                    map.data.overrideStyle(feature, { visible: false });
+                }
+            });
+
+            entries.forEach(({ feature, value }) => {
+                const color = metric.type === 'diverging'
+                    ? divergingColor(value, Math.max(Math.abs(min), Math.abs(max)))
+                    : heatmapColor(value, min, max);
+                map.data.overrideStyle(feature, {
+                    fillColor: color,
+                    fillOpacity: 0.72,
+                    strokeColor: '#1a1a1a',
+                    strokeOpacity: 0.5,
+                    strokeWeight: 0.5,
+                    clickable: true,
+                    visible: true,
+                });
+            });
+
+            // عرض الأسطورة
+            const legend = document.getElementById('map-legend');
+            document.getElementById('legend-title').textContent = metric.label;
+            const scaleEl = document.getElementById('legend-scale');
+            scaleEl.className = metric.type === 'diverging' ? 'scale diverging' : 'scale';
+            const labels = document.getElementById('legend-labels');
+            labels.innerHTML = metric.type === 'diverging'
+                ? `<span>${metric.format ? metric.format(min) : min.toFixed(1)}</span><span>0</span><span>${metric.format ? metric.format(max) : max.toFixed(1)}</span>`
+                : `<span>${metric.format ? metric.format(min) : Math.round(min)}</span><span>${metric.format ? metric.format(max) : Math.round(max)}</span>`;
+            legend.style.display = 'block';
+        }
+
+        function heatmapColor(v, min, max) {
+            // أبيض → أخضر الفيروز (داكن)
+            if (max === min) return '#7fd4c1';
+            const t = (v - min) / (max - min); // 0..1
+            // خلط #ffffff → #2c8c7c
+            const r = Math.round(255 + t * (44  - 255));
+            const g = Math.round(255 + t * (140 - 255));
+            const b = Math.round(255 + t * (124 - 255));
+            return `rgb(${r},${g},${b})`;
+        }
+
+        function divergingColor(v, absMax) {
+            // أحمر (سالب) → أبيض (٠) → أخضر (موجب)
+            if (absMax === 0) return '#f5f5f5';
+            const t = Math.max(-1, Math.min(1, v / absMax));
+            if (t >= 0) {
+                // أبيض → أخضر
+                const r = Math.round(245 + t * (31 - 245));
+                const g = Math.round(245 + t * (107 - 245));
+                const b = Math.round(245 + t * (94 - 245));
+                return `rgb(${r},${g},${b})`;
+            } else {
+                const at = Math.abs(t);
+                const r = Math.round(245 + at * (192 - 245));
+                const g = Math.round(245 + at * (57  - 245));
+                const b = Math.round(245 + at * (43  - 245));
+                return `rgb(${r},${g},${b})`;
+            }
+        }
+
+        /* ═══════ نهاية الخرائط التفاعلية ═══════ */
+
+
+        const loadedDeals = new Set();    // حُمِّلت بنجاح
+        const triedDeals = new Set();     // جُرِّب تحميلها (نجاح أو فشل)
+        const loadingDeals = new Map();   // طلبات قيد التنفيذ
+        const dealsIndex = new Map();     // cityId → Map(normName → dealData)
+
+        function getCityDeals(cityId) {
+            return window[`DEALS_${cityId.toUpperCase()}`] || null;
+        }
+
+        function normalizeDistrictName(s) {
+            return String(s || '')
+                .trim()
+                .replace(/^حي\s+/, '')
+                .replace(/^الحي\s+/, '')
+                .replace(/[أإآٱ]/g, 'ا')
+                .replace(/ة/g, 'ه')
+                .replace(/ى/g, 'ي')
+                .replace(/ؤ/g, 'و')
+                .replace(/ئ/g, 'ي')
+                .replace(/[\u064B-\u065F\u0670]/g, '') // إزالة التشكيل
+                .replace(/\s+/g, ' ')
+                .toLowerCase();
+        }
+
+        function getDealsForDistrict(cityId, districtName) {
+            if (!cityId || !districtName) return null;
+            if (!dealsIndex.has(cityId)) {
+                const cityDeals = getCityDeals(cityId);
+                if (!cityDeals) return null;
+                const idx = new Map();
+                for (const [k, v] of Object.entries(cityDeals)) {
+                    idx.set(normalizeDistrictName(k), v);
+                }
+                dealsIndex.set(cityId, idx);
+            }
+            return dealsIndex.get(cityId).get(normalizeDistrictName(districtName)) || null;
+        }
+
+        async function loadCityDeals(cityId) {
+            if (loadedDeals.has(cityId)) return true;
+            if (getCityDeals(cityId)) {
+                loadedDeals.add(cityId);
+                triedDeals.add(cityId);
+                return true;
+            }
+            if (triedDeals.has(cityId)) return false; // جُرِّبت وفشلت، لا تعيد المحاولة
+            if (loadingDeals.has(cityId)) return loadingDeals.get(cityId);
+
+            const promise = new Promise(resolve => {
+                const script = document.createElement('script');
+                script.src = `deals_${cityId}.js`;
+                script.async = true;
+                script.onload = () => {
+                    loadedDeals.add(cityId);
+                    triedDeals.add(cityId);
+                    loadingDeals.delete(cityId);
+                    dealsIndex.delete(cityId); // أعد بناء الفهرس
+                    const d = getCityDeals(cityId);
+                    console.log(`✓ صفقات ${cityId}: ${d ? Object.keys(d).length : 0} حي`);
+                    resolve(true);
+                };
+                script.onerror = () => {
+                    triedDeals.add(cityId);
+                    loadingDeals.delete(cityId);
+                    console.log(`ℹ لا يوجد ملف صفقات deals_${cityId}.js`);
+                    resolve(false);
+                };
+                document.head.appendChild(script);
+            });
+            loadingDeals.set(cityId, promise);
+            return promise;
+        }
+
+        /* ═══════ بيانات الحي ═══════ */
         function hashStr(s) {
             let h = 0;
             for (let i = 0; i < (s || '').length; i++) {
@@ -1656,20 +2166,36 @@
             return Math.abs(h);
         }
 
-        function getDistrictStats(placeId, name) {
-            // بيانات توضيحية حتمية — كل حي له قيمه الثابتة بناء على اسمه
+        function getDistrictStats(placeId, name, cityHint) {
+            // ابدأ بالبيانات الحتمية كأساس، ثم اكتب فوقها البيانات الحقيقية إن وجدت
             const seed = hashStr(String(placeId || name || 'default'));
-            const rand = n => (seed >> n) % 1000 / 1000; // 0..1
+            const rand = n => (seed >> n) % 1000 / 1000;
 
-            const basePrice = 3500 + Math.round(rand(0) * 7500);  // 3500..11000
-            const weeklyChange = parseFloat((rand(3) * 16 - 8).toFixed(1)); // -8%..+8%
-            const weeklyDeals = 15 + Math.round(rand(5) * 280);
+            let basePrice = 3500 + Math.round(rand(0) * 7500);
+            let weeklyChange = parseFloat((rand(3) * 16 - 8).toFixed(1));
+            let weeklyDeals = 15 + Math.round(rand(5) * 280);
             const rank = 1 + Math.round(rand(7) * 149);
+            let realRecentDeals = null;
+            let hasRealData = false;
+
+            // محاولة استخدام بيانات حقيقية من deals_<city>.js
+            const city = cityHint || (map ? getCurrentMapCity() : null);
+            if (city) {
+                const d = getDealsForDistrict(city, name);
+                if (d) {
+                    basePrice     = Math.round(d.medianPpm || d.avgPpm);
+                    weeklyDeals   = d.count;
+                    const trend   = calcTrendFromDeals(d.deals);
+                    if (trend !== null) weeklyChange = trend;
+                    // (وإلا أبقِ weeklyChange التقديري إذا كانت العينة صغيرة)
+                    realRecentDeals = d.deals;
+                    hasRealData = true;
+                }
+            }
 
             const labels12m = ['مايو','يون','يول','أغس','سبت','أكت','نوف','ديس','ين','فبر','مار','أبر'];
             const labels12w = Array.from({ length: 12 }, (_, i) => `${i+1}أ`);
 
-            // تاريخ اتجاه
             const residential = [];
             const commercial  = [];
             let r = basePrice * 0.95, c = basePrice * 1.25;
@@ -1680,22 +2206,35 @@
                 commercial.push(Math.round(c));
             }
 
-            const recentDeals = [];
-            for (let i = 0; i < 3; i++) {
-                const area = 300 + Math.round(rand(20 + i) * 500);
-                const ppm  = basePrice * (0.9 + rand(25 + i) * 0.2);
-                recentDeals.push({
-                    date: ['15 مارس', '22 مارس', '29 مارس'][i],
-                    area,
-                    price: parseFloat((area * ppm / 1_000_000).toFixed(2)), // بالمليون
-                });
+            // الصفقات: استخدم الحقيقية إن وجدت، وإلا وهمية
+            let recentDeals;
+            if (realRecentDeals && realRecentDeals.length) {
+                recentDeals = realRecentDeals.slice(0, 5).map(d => ({
+                    date : formatDealDate(d.date),
+                    area : Math.round(d.area),
+                    price: parseFloat((d.price / 1_000_000).toFixed(2)),
+                    ppm  : d.ppm,
+                    type : d.type,
+                }));
+            } else {
+                recentDeals = [];
+                for (let i = 0; i < 3; i++) {
+                    const area = 300 + Math.round(rand(20 + i) * 500);
+                    const ppm  = basePrice * (0.9 + rand(25 + i) * 0.2);
+                    recentDeals.push({
+                        date: ['15 مارس', '22 مارس', '29 مارس'][i],
+                        area,
+                        price: parseFloat((area * ppm / 1_000_000).toFixed(2)),
+                    });
+                }
             }
 
             return {
                 name: name || 'الحي',
+                hasRealData,
                 ranking: { rank, total: 150 },
                 kpis: {
-                    cost300m: basePrice * 300,
+                    cost300m    : basePrice * 300,
                     weeklyDeals,
                     weeklyChange,
                     pricePerMeter: basePrice,
@@ -1713,6 +2252,31 @@
                 },
                 recentDeals,
             };
+        }
+
+        function calcTrendFromDeals(deals) {
+            // نحتاج عينة كافية — أقل من ٦ صفقات = ضجيج إحصائي
+            if (!deals || deals.length < 6) return null;
+            // استخدم الوسيط بدلاً من المتوسط (مقاوم للقيم الشاذة)
+            const half = Math.floor(deals.length / 2);
+            const newerPpms = deals.slice(0, half).map(d => d.ppm).sort((a, b) => a - b);
+            const olderPpms = deals.slice(half).map(d => d.ppm).sort((a, b) => a - b);
+            const medN = newerPpms[Math.floor(newerPpms.length / 2)];
+            const medO = olderPpms[Math.floor(olderPpms.length / 2)];
+            if (!medO) return null;
+            const pct = (medN - medO) / medO * 100;
+            // قيّد القيم المتطرفة (>٣٠٪ خلال ربع = ضجيج)
+            if (Math.abs(pct) > 30) return null;
+            return parseFloat(pct.toFixed(1));
+        }
+
+        function formatDealDate(s) {
+            // 2025/12/28 → 28 ديس
+            if (!s) return '';
+            const m = s.match(/(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})/);
+            if (!m) return s;
+            const months = ['ين','فبر','مار','أبر','مايو','يون','يول','أغس','سبت','أكت','نوف','ديس'];
+            return `${parseInt(m[3])} ${months[parseInt(m[2]) - 1] || ''}`;
         }
 
         /* ═══════ صفقات القطعة ═══════ */
