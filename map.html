@@ -246,58 +246,68 @@
 
         /* شريط علوي — خريطة تفاعلية مفعّلة */
         #thematic-topbar {
-            position: absolute;
-            top: 10px; left: 50%;
+            position: fixed;
+            top: 12px;
+            left: 50%;
             transform: translateX(-50%);
             background: #2c8c7c;
             color: white;
-            padding: 6px 8px 6px 14px;
-            border-radius: 18px;
-            font-size: 12px;
+            padding: 8px 8px 8px 16px;
+            border-radius: 22px;
+            font-size: 13px;
             font-weight: 600;
             display: none;
             align-items: center;
             gap: 10px;
-            z-index: 6;
-            box-shadow: 0 3px 12px rgba(0,0,0,0.22);
-            max-width: 85%;
+            z-index: 100;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+            max-width: 90%;
             white-space: nowrap;
+            pointer-events: auto;
         }
-        #thematic-topbar.visible { display: inline-flex; }
+        #thematic-topbar.visible {
+            display: inline-flex;
+        }
         #thematic-topbar .tb-dot {
-            width: 7px; height: 7px; border-radius: 50%;
-            background: #7fffd6;
+            width: 8px; height: 8px; border-radius: 50%;
+            background: #a7f3d0;
+            flex-shrink: 0;
             animation: pulse 1.8s ease-in-out infinite;
         }
         @keyframes pulse {
             0%, 100% { opacity: 1; }
-            50% { opacity: 0.45; }
+            50% { opacity: 0.4; }
         }
         #thematic-topbar .tb-close {
-            background: rgba(255,255,255,0.22);
+            background: rgba(255,255,255,0.25);
             color: white;
             border: none;
-            width: 22px; height: 22px;
+            width: 26px; height: 26px;
             border-radius: 50%;
-            font-size: 14px;
+            font-size: 16px;
             font-weight: bold;
             cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-family: inherit;
-            padding: 0; line-height: 1;
+            padding: 0;
+            line-height: 1;
             flex-shrink: 0;
+            touch-action: manipulation;
         }
         #thematic-topbar .tb-close:hover,
         #thematic-topbar .tb-close:active {
-            background: rgba(255,255,255,0.38);
+            background: rgba(255,255,255,0.4);
         }
-
         @media (max-width: 767px) {
             #thematic-topbar {
-                top: 8px;
-                font-size: 11px;
-                padding: 5px 6px 5px 12px;
-                max-width: 92%;
+                top: 10px;
+                font-size: 12px;
+                padding: 6px 6px 6px 14px;
+            }
+            #thematic-topbar .tb-close {
+                width: 24px; height: 24px; font-size: 15px;
             }
         }
         .district-list-item.has-real-data {
@@ -801,14 +811,16 @@
         <div id="map">
             <div class="mode-badge" id="mode-badge">وضع: الأراضي</div>
             <div class="hint" id="hint">اضغط على أي قطعة أو حي</div>
-            <div id="thematic-topbar">
-                <span class="tb-dot"></span>
-                <span id="thematic-topbar-label">—</span>
-                <button class="tb-close" onclick="clearThematicMap()" title="إيقاف الخريطة التفاعلية">×</button>
-            </div>
             <div class="map-legend" id="map-legend" style="display:none"></div>
         </div>
         <div class="mobile-backdrop" id="mobile-backdrop" onclick="collapseMobilePanel()"></div>
+
+        <!-- الشريط العلوي للخريطة التفاعلية — خارج كل الحاويات للظهور فوق كل شيء -->
+        <div id="thematic-topbar">
+            <span class="tb-dot"></span>
+            <span id="thematic-topbar-label">—</span>
+            <button class="tb-close" onclick="clearThematicMap()" title="إيقاف الخريطة التفاعلية">×</button>
+        </div>
 
         <!-- شريط تبويبات ثابت للجوال — خارج sidebar حتى لا يتأثر بـ transform -->
         <div id="mobile-tabs">
