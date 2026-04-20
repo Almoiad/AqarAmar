@@ -244,33 +244,61 @@
             margin-right: 4px; vertical-align: middle;
         }
 
-        /* شارة "خريطة تفاعلية نشطة" في تفاصيل الحي */
-        .thematic-active-hint {
-            display: flex; align-items: center; gap: 8px;
-            background: #f0f9f6; border: 1px solid #c5e5dc;
-            border-radius: 6px; padding: 8px 12px;
-            margin: 10px 0; font-size: 12px; color: #1a5a4e;
+        /* شريط علوي — خريطة تفاعلية مفعّلة */
+        #thematic-topbar {
+            position: absolute;
+            top: 10px; left: 50%;
+            transform: translateX(-50%);
+            background: #2c8c7c;
+            color: white;
+            padding: 6px 8px 6px 14px;
+            border-radius: 18px;
+            font-size: 12px;
+            font-weight: 600;
+            display: none;
+            align-items: center;
+            gap: 10px;
+            z-index: 6;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.22);
+            max-width: 85%;
+            white-space: nowrap;
         }
-        .thematic-active-hint .t-dot {
-            width: 8px; height: 8px; border-radius: 50%;
-            background: #2c8c7c; flex-shrink: 0;
+        #thematic-topbar.visible { display: inline-flex; }
+        #thematic-topbar .tb-dot {
+            width: 7px; height: 7px; border-radius: 50%;
+            background: #7fffd6;
             animation: pulse 1.8s ease-in-out infinite;
         }
         @keyframes pulse {
             0%, 100% { opacity: 1; }
             50% { opacity: 0.45; }
         }
-        .thematic-active-hint span { flex: 1; }
-        .thematic-active-hint .t-off {
-            background: white; color: #c0392b;
-            border: 1px solid #c0392b;
-            padding: 4px 10px; border-radius: 4px;
-            font-size: 11px; font-weight: 600;
-            cursor: pointer; font-family: inherit;
+        #thematic-topbar .tb-close {
+            background: rgba(255,255,255,0.22);
+            color: white;
+            border: none;
+            width: 22px; height: 22px;
+            border-radius: 50%;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            font-family: inherit;
+            padding: 0; line-height: 1;
             flex-shrink: 0;
         }
-        .thematic-active-hint .t-off:hover {
-            background: #c0392b; color: white;
+        #thematic-topbar .tb-close:hover,
+        #thematic-topbar .tb-close:active {
+            background: rgba(255,255,255,0.38);
+        }
+
+        @media (max-width: 767px) {
+            #thematic-topbar {
+                top: 8px;
+                font-size: 11px;
+                padding: 5px 6px 5px 12px;
+                max-width: 92%;
+            }
         }
         .district-list-item.has-real-data {
             border-right: 3px solid #1f6b5e;
@@ -769,6 +797,11 @@
         <div id="map">
             <div class="mode-badge" id="mode-badge">وضع: الأراضي</div>
             <div class="hint" id="hint">اضغط على أي قطعة أو حي</div>
+            <div id="thematic-topbar">
+                <span class="tb-dot"></span>
+                <span id="thematic-topbar-label">—</span>
+                <button class="tb-close" onclick="clearThematicMap()" title="إيقاف الخريطة التفاعلية">×</button>
+            </div>
             <div class="map-legend" id="map-legend" style="display:none"></div>
         </div>
         <div class="mobile-backdrop" id="mobile-backdrop" onclick="collapseMobilePanel()"></div>
@@ -1773,18 +1806,8 @@
                 ? `<span style="display:inline-block;background:#1f6b5e;color:white;padding:2px 8px;border-radius:10px;font-size:10px;margin-right:6px;vertical-align:middle">✓ بيانات وزارة العدل</span>`
                 : `<span style="display:inline-block;background:#f0f0f0;color:#777;padding:2px 8px;border-radius:10px;font-size:10px;margin-right:6px;vertical-align:middle">تقديرية</span>`;
 
-            // إشعار بوجود خريطة تفاعلية نشطة + زر لإلغائها
-            const thematicActiveHint = activeThematicKey
-                ? `<div class="thematic-active-hint">
-                        <span class="t-dot"></span>
-                        <span>الخريطة التفاعلية مفعّلة: <b>${escapeHtml(THEMATIC_METRICS[activeThematicKey]?.label || '')}</b></span>
-                        <button class="t-off" onclick="clearThematicMap()" title="إيقاف الخريطة التفاعلية">إيقاف</button>
-                   </div>`
-                : '';
-
             const html = backBtn + `
                 <div class="district-title">${escapeHtml(stats.name)} ${realBadge}</div>
-                ${thematicActiveHint}
                 <div class="district-ranking" title="ترتيب هذا الحي بين أحياء المدينة من الأغلى (١) إلى الأرخص">
                     السعر: المرتبة <b>${stats.ranking.rank}</b> من <b>${stats.ranking.total}</b> حي في المدينة
                 </div>
@@ -2608,6 +2631,9 @@
                     });
                 }
             }
+            // أخفِ الشريط العلوي
+            const topbar = document.getElementById('thematic-topbar');
+            if (topbar) topbar.classList.remove('visible');
             const legend = document.getElementById('map-legend');
             if (legend) legend.style.display = 'none';
 
@@ -2711,18 +2737,20 @@
             // احفظ min/max لعرضهم في اللوحة الجانبية
             window._lastLegend = { min, max, type: metric.type };
 
-            // شارة صغيرة على الخريطة تذكّر المستخدم بالمؤشر النشط
-            const legend = document.getElementById('map-legend');
-            if (legend) {
+            // شريط علوي يذكّر المستخدم بالخريطة التفاعلية النشطة
+            const topbar = document.getElementById('thematic-topbar');
+            const label  = document.getElementById('thematic-topbar-label');
+            if (topbar && label) {
                 if (hideForParcels) {
-                    legend.style.display = 'none';
+                    topbar.classList.remove('visible');
                 } else {
-                    legend.innerHTML = `
-                        <span>${escapeHtml(metric.label)}</span>
-                        <button class="close" onclick="clearThematicMap()" title="إلغاء">×</button>`;
-                    legend.style.display = 'block';
+                    label.textContent = metric.label;
+                    topbar.classList.add('visible');
                 }
             }
+            // أخفِ شارة الليجيند القديمة (لم نعد نستخدمها)
+            const legend = document.getElementById('map-legend');
+            if (legend) legend.style.display = 'none';
         }
 
         function heatmapColor(v, min, max) {
