@@ -38,6 +38,7 @@
             overflow-y: auto;
             min-height: 0;
         }
+        #mobile-tabs { display: none; }  /* لا يظهر على الديسكتوب */
 
         .sidebar-header {
             background: linear-gradient(135deg, #2c8c7c 0%, #1f6b5e 100%);
@@ -498,16 +499,41 @@
             #sidebar > .sidebar-header     { display: none; order: 2; }
             #sidebar > .tab-content-wrapper { order: 3; flex: 1; overflow-y: auto; min-height: 0; }
 
-            /* .tabs تُنقل عبر position:fixed خارج تدفّق sidebar */
-            #sidebar > .tabs {
+            /* التبويبات: نُخفيها من داخل sidebar ونستخدم نسخة خارجية دائمة الظهور */
+            #sidebar > .tabs { display: none; }
+
+            /* شريط التبويبات الخارجي الثابت — يبقى ظاهراً حتى لو sidebar مختفية */
+            #mobile-tabs {
                 position: fixed;
                 bottom: 0; left: 0; right: 0;
                 height: 48px;
                 display: flex;
                 background: white;
                 border-top: 1px solid #e0e0e0;
-                z-index: 30;
-                box-shadow: 0 -1px 6px rgba(0,0,0,0.06);
+                z-index: 35;
+                box-shadow: 0 -2px 8px rgba(0,0,0,0.08);
+            }
+            #mobile-tabs .tab {
+                flex: 1;
+                padding: 8px 4px;
+                text-align: center;
+                font-size: 12px;
+                font-weight: 600;
+                background: transparent;
+                border: none;
+                border-top: 3px solid transparent;
+                color: #666;
+                cursor: pointer;
+                font-family: inherit;
+                transition: all 0.15s;
+            }
+            #mobile-tabs .tab.active {
+                color: #2c8c7c;
+                border-top-color: #2c8c7c;
+                background: #f8fbfa;
+            }
+            #mobile-tabs .tab:active {
+                background: rgba(44,140,124,0.1);
             }
 
             /* التبويبات (styling مشترك) */
@@ -717,6 +743,13 @@
             <div class="map-legend" id="map-legend" style="display:none"></div>
         </div>
         <div class="mobile-backdrop" id="mobile-backdrop" onclick="collapseMobilePanel()"></div>
+
+        <!-- شريط تبويبات ثابت للجوال — خارج sidebar حتى لا يتأثر بـ transform -->
+        <div id="mobile-tabs">
+            <button class="tab active" data-mtab="lands"     onclick="switchTab('lands')">🏠 الأراضي</button>
+            <button class="tab"        data-mtab="districts" onclick="switchTab('districts')">🏘️ الأحياء</button>
+            <button class="tab"        data-mtab="city"      onclick="switchTab('city')">🏙️ المدينة</button>
+        </div>
     </div>
 
     <script>
@@ -851,7 +884,8 @@
                     if (activeTab !== name) {
                         activeTab = name;
                         document.querySelectorAll('.tab').forEach(t =>
-                            t.classList.toggle('active', t.dataset.tab === name));
+                            t.classList.toggle('active',
+                                t.dataset.tab === name || t.dataset.mtab === name));
                         document.querySelectorAll('.tab-content').forEach(c =>
                             c.classList.toggle('active', c.id === `tab-${name}`));
                         updateZoomBadge();
@@ -887,7 +921,8 @@
 
             activeTab = name;
             document.querySelectorAll('.tab').forEach(t =>
-                t.classList.toggle('active', t.dataset.tab === name));
+                t.classList.toggle('active',
+                    t.dataset.tab === name || t.dataset.mtab === name));
             document.querySelectorAll('.tab-content').forEach(c =>
                 c.classList.toggle('active', c.id === `tab-${name}`));
 
@@ -1265,7 +1300,8 @@
             if (activeTab !== 'lands') {
                 activeTab = 'lands';
                 document.querySelectorAll('.tab').forEach(t =>
-                    t.classList.toggle('active', t.dataset.tab === 'lands'));
+                    t.classList.toggle('active',
+                        t.dataset.tab === 'lands' || t.dataset.mtab === 'lands'));
                 document.querySelectorAll('.tab-content').forEach(c =>
                     c.classList.toggle('active', c.id === 'tab-lands'));
                 updateZoomBadge();
