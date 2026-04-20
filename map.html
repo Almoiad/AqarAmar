@@ -28,6 +28,16 @@
             box-shadow: 2px 0 12px rgba(0,0,0,0.08);
             display: flex; flex-direction: column;
         }
+        /* على الديسكتوب: التبويبات أعلى المحتوى مباشرة */
+        #sidebar .mobile-close-panel { display: none; }
+        #sidebar > .sidebar-header { order: 1; }
+        #sidebar > .tabs { order: 2; }
+        #sidebar > .tab-content-wrapper {
+            order: 3;
+            flex: 1;
+            overflow-y: auto;
+            min-height: 0;
+        }
 
         .sidebar-header {
             background: linear-gradient(135deg, #2c8c7c 0%, #1f6b5e 100%);
@@ -435,74 +445,112 @@
             #container {
                 flex-direction: column;
                 height: 100vh;
+                overflow: hidden;
             }
 
-            /* الخريطة تأخذ النصف العلوي */
+            /* الخريطة دائماً ظاهرة في الأعلى (تملأ كل الشاشة بين الحالة الأولى والتبويبات) */
             #map {
-                flex: none;
-                height: 55vh;
-                min-height: 300px;
-                width: 100%;
-            }
-
-            /* الشريط الجانبي يصبح قسماً سفلياً */
-            #sidebar {
                 flex: 1;
-                width: 100%;
                 min-height: 0;
-                box-shadow: 0 -2px 12px rgba(0,0,0,0.08);
-                z-index: 3;
+                width: 100%;
+                position: relative;
             }
 
-            /* رأس الشريط أصغر */
-            .sidebar-header {
-                padding: 10px 14px;
-            }
-            .sidebar-header h2 { font-size: 15px; margin-bottom: 2px; }
-            .sidebar-header p { font-size: 12px; }
-
-            /* شريط التبويبات ثابت دائماً في الأعلى */
-            .tabs {
-                position: sticky; top: 0;
-                z-index: 5;
-            }
-
-            /* حالة موسّعة: يُنقر تبويب فيملأ الشاشة */
-            #sidebar.expanded {
+            /* الشريط الجانبي يختفي في الحالة الأولى */
+            #sidebar {
                 position: fixed;
-                top: 0; left: 0; right: 0; bottom: 0;
-                height: 100vh;
-                z-index: 10;
+                left: 0; right: 0;
+                bottom: 48px;       /* فوق شريط التبويبات */
+                height: 0;
+                width: 100%;
+                max-height: 0;
+                background: #fff;
+                box-shadow: 0 -4px 16px rgba(0,0,0,0.12);
+                z-index: 20;
+                transition: max-height 0.28s ease, height 0.28s ease;
+                overflow: hidden;
+                display: flex; flex-direction: column;
+                border-top-left-radius: 12px;
+                border-top-right-radius: 12px;
             }
-            #sidebar.expanded ~ #map { display: none; }
 
-            /* زر توسيع/تصغير اللوحة */
-            .mobile-toggle {
-                position: absolute;
-                top: 10px; left: 10px;
-                background: rgba(255,255,255,0.95);
-                color: #2c8c7c;
-                border: 1px solid #2c8c7c;
+            /* عند توسيع اللوحة */
+            #sidebar.expanded {
+                height: calc(100vh - 48px);
+                max-height: calc(100vh - 48px);
+            }
+
+            /* على الجوال: ترتيب داخل sidebar (الرأس ثم المحتوى) */
+            #sidebar > .mobile-close-panel { order: 1; display: flex; }
+            #sidebar > .sidebar-header     { display: none; order: 2; }
+            #sidebar > .tab-content-wrapper { order: 3; flex: 1; overflow-y: auto; min-height: 0; }
+
+            /* .tabs تُنقل عبر position:fixed خارج تدفّق sidebar */
+            #sidebar > .tabs {
+                position: fixed;
+                bottom: 0; left: 0; right: 0;
+                height: 48px;
+                display: flex;
+                background: white;
+                border-top: 1px solid #e0e0e0;
+                z-index: 30;
+                box-shadow: 0 -1px 6px rgba(0,0,0,0.06);
+            }
+
+            /* التبويبات (styling مشترك) */
+            .tab {
+                flex: 1;
+                font-size: 12px;
+                font-weight: 600;
+                border-bottom: none !important;
+                border-top: 3px solid transparent;
+            }
+            .tab.active {
+                border-top: 3px solid #2c8c7c !important;
+                border-bottom: none !important;
+            }
+
+            /* أفسح مكاناً تحت الخريطة للتبويبات */
+            #container { padding-bottom: 48px; }
+
+            /* عند فتح اللوحة، رأس اللوحة يحتوي على زر "العودة للخريطة" */
+            .mobile-close-panel {
+                display: flex; align-items: center; justify-content: space-between;
+                padding: 10px 14px;
+                background: #2c8c7c;
+                color: white;
+                font-size: 13px;
+                font-weight: 600;
+                cursor: pointer;
+                flex-shrink: 0;
+            }
+            .mobile-close-panel:hover { background: #1f6b5e; }
+            .mobile-close-panel .title { display: flex; align-items: center; gap: 8px; }
+            .mobile-close-panel .close-btn {
+                background: rgba(255,255,255,0.2);
+                color: white;
+                border: none;
+                width: 28px; height: 28px;
                 border-radius: 50%;
-                width: 34px; height: 34px;
+                font-size: 16px;
+                cursor: pointer;
                 display: flex; align-items: center; justify-content: center;
-                font-size: 16px; cursor: pointer;
-                z-index: 8;
-                box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+                font-family: inherit;
             }
-            .mobile-toggle:hover { background: #2c8c7c; color: white; }
+            .mobile-close-panel .close-btn:hover { background: rgba(255,255,255,0.35); }
 
-            /* محتوى التبويب: المساحة للقائمة */
-            .tab-content {
-                padding: 12px;
+            /* إخفاء رأس اللوحة الأصلي (نستبدله بـ mobile-close-panel) */
+            .sidebar-header { display: none; }
+
+            /* محتوى تبويبات يملأ الباقي مع تمرير */
+            .tab-content-wrapper {
+                flex: 1;
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
             }
+            .tab-content { padding: 12px 14px; }
 
-            /* الخريطة التفاعلية: خاصية scrollable الرأسية */
-            .thematic-buttons {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            /* KPIs بحجم أصغر */
+            /* KPIs على الجوال */
             .kpi-grid {
                 grid-template-columns: repeat(2, 1fr);
                 gap: 6px;
@@ -511,80 +559,104 @@
             .kpi-value { font-size: 16px; }
             .kpi-label { font-size: 10px; }
 
+            /* خرائط تفاعلية */
+            .thematic-buttons { grid-template-columns: repeat(2, 1fr); }
+
             /* الرسوم البيانية */
             .chart-container { height: 180px; }
 
-            /* الليجيند فوق الخريطة — حجم أصغر على الجوال */
-            .map-legend {
-                bottom: 10px; left: 10px;
-                font-size: 10px; padding: 5px 8px;
-            }
+            /* الليجيند */
+            .map-legend { bottom: 10px; left: 10px; font-size: 10px; padding: 5px 8px; }
+            .mode-badge { font-size: 10px; padding: 4px 10px; top: 8px; right: 8px; }
 
-            /* الشارة فوق الخريطة */
-            .mode-badge {
-                font-size: 10px; padding: 4px 10px;
-                top: 8px; right: 8px;
-            }
-
-            /* إخفاء بعض العناصر الاختيارية على الجوال */
+            /* إخفاء عناصر غير ضرورية على الجوال */
             .hint { display: none; }
-        }
 
-        /* شاشات ضيقة جداً (أقل من 380 بكسل) */
-        @media (max-width: 379px) {
-            #map { height: 50vh; }
-            .sidebar-header { padding: 8px 10px; }
-            .tab {
-                font-size: 11px; padding: 8px 4px;
+            /* زر العودة للخريطة العائم (بديل لو أغلق المستخدم) */
+            .mobile-fab-map {
+                position: fixed;
+                bottom: 60px; right: 14px;
+                background: #2c8c7c;
+                color: white;
+                border: none;
+                width: 48px; height: 48px;
+                border-radius: 50%;
+                font-size: 20px;
+                cursor: pointer;
+                z-index: 25;
+                box-shadow: 0 4px 12px rgba(44,140,124,0.4);
+                display: none;
             }
+            #sidebar.expanded ~ .mobile-fab-map { display: none; }
         }
 
-        /* زر التوسيع يظهر فقط على الجوال */
-        .mobile-toggle { display: none; }
+        /* شاشات ضيقة جداً */
+        @media (max-width: 379px) {
+            .tab { font-size: 11px; }
+            #sidebar { bottom: 44px; }
+            .tabs { height: 44px; }
+            #container { padding-bottom: 44px; }
+        }
+
+        /* إخفاء زر الجوال والعائم على الديسكتوب */
+        .mobile-close-panel, .mobile-fab-map { display: none; }
         @media (max-width: 767px) {
-            .mobile-toggle { display: flex; }
+            .mobile-close-panel { display: flex; }
         }
     </style>
 </head>
 <body>
     <div id="container">
         <div id="sidebar">
+            <!-- رأس الجوال — العنوان + زر الإغلاق (يظهر فقط على الجوال) -->
+            <div class="mobile-close-panel" id="mobile-close-panel">
+                <div class="title">
+                    <span id="mobile-panel-title">التفاصيل</span>
+                </div>
+                <button class="close-btn" onclick="collapseMobilePanel()" title="إغلاق والعودة للخريطة">×</button>
+            </div>
+
+            <!-- رأس الديسكتوب -->
             <div class="sidebar-header empty" id="sidebar-header">
                 <h2 id="sb-title">اختر قطعة أو حي من الخريطة</h2>
                 <p id="sb-subtitle">اضغط على أي موقع لعرض بياناته</p>
                 <span class="source-badge" id="sb-source" style="display:none"></span>
             </div>
-            <div class="tabs">
-                <button class="tab active" data-tab="lands"     onclick="switchTab('lands')">الأراضي</button>
-                <button class="tab"        data-tab="districts" onclick="switchTab('districts')">الأحياء</button>
-                <button class="tab"        data-tab="city"      onclick="switchTab('city')">المدينة</button>
+
+            <!-- محتوى التبويبات قابل للتمرير -->
+            <div class="tab-content-wrapper">
+                <div class="tab-content active" id="tab-lands">
+                    <div class="empty-state">
+                        <div class="icon">🗺️</div>
+                        <div class="msg">لا توجد قطعة محددة</div>
+                        <div class="hint-text">اضغط على أي قطعة في الخريطة</div>
+                    </div>
+                </div>
+                <div class="tab-content" id="tab-districts">
+                    <div class="empty-state">
+                        <div class="icon">🏘️</div>
+                        <div class="msg">اضغط على حي في الخريطة</div>
+                        <div class="hint-text">حدود الأحياء تظهر عند تصغير التكبير</div>
+                    </div>
+                </div>
+                <div class="tab-content" id="tab-city">
+                    <div class="empty-state">
+                        <div class="icon">🏙️</div>
+                        <div class="msg">بيانات المدينة</div>
+                        <div class="hint-text">اضغط على أي موقع</div>
+                    </div>
+                </div>
             </div>
 
-            <div class="tab-content active" id="tab-lands">
-                <div class="empty-state">
-                    <div class="icon">🗺️</div>
-                    <div class="msg">لا توجد قطعة محددة</div>
-                    <div class="hint-text">اضغط على أي قطعة في الخريطة</div>
-                </div>
-            </div>
-            <div class="tab-content" id="tab-districts">
-                <div class="empty-state">
-                    <div class="icon">🏘️</div>
-                    <div class="msg">اضغط على حي في الخريطة</div>
-                    <div class="hint-text">حدود الأحياء تظهر عند تصغير التكبير</div>
-                </div>
-            </div>
-            <div class="tab-content" id="tab-city">
-                <div class="empty-state">
-                    <div class="icon">🏙️</div>
-                    <div class="msg">بيانات المدينة</div>
-                    <div class="hint-text">اضغط على أي موقع</div>
-                </div>
+            <!-- شريط التبويبات: في الأسفل دائماً على الجوال، أعلى اللوحة على الديسكتوب -->
+            <div class="tabs">
+                <button class="tab active" data-tab="lands"     onclick="switchTab('lands')">🏠 الأراضي</button>
+                <button class="tab"        data-tab="districts" onclick="switchTab('districts')">🏘️ الأحياء</button>
+                <button class="tab"        data-tab="city"      onclick="switchTab('city')">🏙️ المدينة</button>
             </div>
         </div>
 
         <div id="map">
-            <button class="mobile-toggle" id="mobile-toggle" onclick="toggleMobilePanel()" title="توسيع/تصغير اللوحة">⤢</button>
             <div class="mode-badge" id="mode-badge">وضع: الأراضي</div>
             <div class="hint" id="hint">اضغط على أي قطعة أو حي</div>
             <div class="map-legend" id="map-legend" style="display:none"></div>
@@ -626,34 +698,26 @@
         function isMobile() {
             return window.matchMedia('(max-width: 767px)').matches;
         }
-        function toggleMobilePanel() {
-            const sb = document.getElementById('sidebar');
-            const btn = document.getElementById('mobile-toggle');
-            if (sb.classList.contains('expanded')) {
-                sb.classList.remove('expanded');
-                if (btn) btn.textContent = '⤢';
-            } else {
-                sb.classList.add('expanded');
-                if (btn) btn.textContent = '⤡';
-            }
+        function setMobilePanelTitle(text) {
+            const el = document.getElementById('mobile-panel-title');
+            if (el) el.textContent = text || 'التفاصيل';
         }
-        function expandMobilePanel() {
+        function expandMobilePanel(title) {
             if (!isMobile()) return;
             const sb = document.getElementById('sidebar');
             if (!sb.classList.contains('expanded')) {
                 sb.classList.add('expanded');
-                const btn = document.getElementById('mobile-toggle');
-                if (btn) btn.textContent = '⤡';
             }
+            if (title) setMobilePanelTitle(title);
         }
         function collapseMobilePanel() {
             if (!isMobile()) return;
             const sb = document.getElementById('sidebar');
-            if (sb.classList.contains('expanded')) {
-                sb.classList.remove('expanded');
-                const btn = document.getElementById('mobile-toggle');
-                if (btn) btn.textContent = '⤢';
-            }
+            sb.classList.remove('expanded');
+        }
+        // توسيع تلقائي عند التبويب بعنوان مناسب
+        function mobileTitleForTab(name) {
+            return { lands: 'الأراضي', districts: 'الأحياء', city: 'المدينة' }[name] || 'التفاصيل';
         }
 
         function switchTab(name) {
@@ -694,7 +758,7 @@
             if (map && map.data) map.data.setStyle(styleDistrictFeature);
 
             // على الجوال: النقر على تبويب يوسّع اللوحة
-            expandMobilePanel();
+            expandMobilePanel(mobileTitleForTab(name));
 
             if (name === 'districts') {
                 setTimeout(() => renderDistrictTab(lastData || {}), 50);
@@ -1062,6 +1126,8 @@
                     c.classList.toggle('active', c.id === 'tab-lands'));
                 updateZoomBadge();
             }
+            // وسّع اللوحة على الجوال
+            expandMobilePanel('قطعة أرض');
 
             const header = document.getElementById('sidebar-header');
             header.classList.remove('empty');
@@ -1655,7 +1721,7 @@
                 district: { name: nameAr, nameEn, id: item.id, source: 'osm' }
             };
             renderDistrictTab(lastData);
-            expandMobilePanel();
+            expandMobilePanel(nameAr);
         }
 
         function backToDistrictsList() {
@@ -1914,7 +1980,7 @@
             }
 
             // على الجوال: وسّع اللوحة لإظهار التفاصيل
-            expandMobilePanel();
+            expandMobilePanel(CITY_NAMES_AR[cityId] || cityId);
 
             // جلب أحياء المدينة تلقائياً إن لم تكن محمّلة
             rescanLoadedCities();
