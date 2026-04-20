@@ -456,30 +456,35 @@
                 position: relative;
             }
 
-            /* الشريط الجانبي يختفي في الحالة الأولى */
+            /* الشريط الجانبي يختفي في الحالة الأولى (مكتمل الارتفاع لكن مدفوع للأسفل) */
             #sidebar {
                 position: fixed;
                 left: 0; right: 0;
-                bottom: 48px;       /* فوق شريط التبويبات */
-                height: 0;
+                bottom: 48px;
+                height: 75vh;
+                max-height: 75vh;
                 width: 100%;
-                max-height: 0;
                 background: #fff;
                 box-shadow: 0 -4px 16px rgba(0,0,0,0.12);
                 z-index: 20;
-                transition: max-height 0.28s ease, height 0.28s ease;
-                overflow: hidden;
+                transform: translateY(100%);
+                transition: transform 0.3s ease, height 0.3s ease;
                 display: flex; flex-direction: column;
-                border-top-left-radius: 12px;
-                border-top-right-radius: 12px;
+                border-top-left-radius: 14px;
+                border-top-right-radius: 14px;
+                will-change: transform;
             }
 
-            /* عند توسيع اللوحة — اترك مساحة كافية فوق لشريط المتصفح + لزر الإغلاق */
+            /* عند التوسيع: انزلاق من الأسفل */
             #sidebar.expanded {
-                /* 75% من الشاشة تكفي لتمرير المحتوى مع إبقاء الرأس ظاهراً */
-                height: 75vh;
-                max-height: 75vh;
-                bottom: 48px;
+                transform: translateY(0);
+            }
+
+            /* حالة "نصف" لإظهار الخريطة مع اللوحة (للخرائط التفاعلية) */
+            #sidebar.half {
+                height: 45vh;
+                max-height: 45vh;
+                transform: translateY(0);
             }
 
             /* على الجوال: ترتيب داخل sidebar (الرأس ثم المحتوى) */
@@ -574,8 +579,13 @@
                 transition: background 0.25s ease;
             }
             .mobile-backdrop.visible {
-                background: rgba(0,0,0,0.2);
+                background: rgba(0,0,0,0.25);
                 pointer-events: auto;
+            }
+            /* في الوضع النصفي: طبقة أخف حتى ترى الخريطة بوضوح */
+            .mobile-backdrop.half-mode {
+                background: rgba(0,0,0,0);
+                pointer-events: none;
             }
 
             /* إخفاء رأس اللوحة الأصلي (نستبدله بـ mobile-close-panel) */
@@ -652,7 +662,10 @@
                 <div class="title">
                     <span id="mobile-panel-title">التفاصيل</span>
                 </div>
-                <button class="close-btn" onclick="collapseMobilePanel()" title="إغلاق والعودة للخريطة">×</button>
+                <div style="display:flex; gap:6px; align-items:center">
+                    <button class="close-btn" id="toggle-half-btn" onclick="togglePanelHeight()" title="تكبير / تصغير">⇅</button>
+                    <button class="close-btn" onclick="collapseMobilePanel()" title="إغلاق والعودة للخريطة">×</button>
+                </div>
             </div>
 
             <!-- رأس الديسكتوب -->
@@ -745,23 +758,87 @@
         function expandMobilePanel(title) {
             if (!isMobile()) return;
             const sb = document.getElementById('sidebar');
+            sb.classList.remove('half');
             if (!sb.classList.contains('expanded')) {
                 sb.classList.add('expanded');
             }
             const bd = document.getElementById('mobile-backdrop');
-            if (bd) bd.classList.add('visible');
+            if (bd) {
+                bd.classList.add('visible');
+                bd.classList.remove('half-mode');
+            }
+            if (title) setMobilePanelTitle(title);
+        }
+        function halfMobilePanel(title) {
+            // وضع نصف الشاشة — يعرض اللوحة والخريطة معاً
+            if (!isMobile()) return;
+            const sb = document.getElementById('sidebar');
+            sb.classList.remove('expanded');
+            sb.classList.add('half');
+            const bd = document.getElementById('mobile-backdrop');
+            if (bd) {
+                bd.classList.add('visible', 'half-mode');
+            }
             if (title) setMobilePanelTitle(title);
         }
         function collapseMobilePanel() {
             if (!isMobile()) return;
             const sb = document.getElementById('sidebar');
-            sb.classList.remove('expanded');
+            sb.classList.remove('expanded', 'half');
             const bd = document.getElementById('mobile-backdrop');
-            if (bd) bd.classList.remove('visible');
+            if (bd) bd.classList.remove('visible', 'half-mode');
         }
-        // توسيع تلقائي عند التبويب بعنوان مناسب
         function mobileTitleForTab(name) {
             return { lands: 'الأراضي', districts: 'الأحياء', city: 'المدينة' }[name] || 'التفاصيل';
+        }
+
+        function togglePanelHeight() {
+            if (!isMobile()) return;
+            const sb = document.getElementById('sidebar');
+            const title = document.getElementById('mobile-panel-title')?.textContent;
+            if (sb.classList.contains('half')) {
+                expandMobilePanel(title);
+            } else {
+                halfMobilePanel(title);
+            }
+        }
+
+        /* ═══════ السحب للأسفل لإغلاق اللوحة ═══════ */
+        function setupSwipeToClose() {
+            const header = document.getElementById('mobile-close-panel');
+            if (!header) return;
+            let startY = 0, currentY = 0, dragging = false;
+            const sb = document.getElementById('sidebar');
+
+            const onStart = e => {
+                if (!isMobile()) return;
+                const t = e.touches ? e.touches[0] : e;
+                startY = t.clientY;
+                currentY = startY;
+                dragging = true;
+                sb.style.transition = 'none';
+            };
+            const onMove = e => {
+                if (!dragging) return;
+                const t = e.touches ? e.touches[0] : e;
+                currentY = t.clientY;
+                const dy = Math.max(0, currentY - startY);
+                sb.style.transform = `translateY(${dy}px)`;
+            };
+            const onEnd = () => {
+                if (!dragging) return;
+                dragging = false;
+                sb.style.transition = '';
+                sb.style.transform = '';
+                const dy = currentY - startY;
+                if (dy > 80) {
+                    collapseMobilePanel();
+                }
+            };
+            header.addEventListener('touchstart', onStart, { passive: true });
+            header.addEventListener('touchmove', onMove, { passive: true });
+            header.addEventListener('touchend', onEnd);
+            header.addEventListener('touchcancel', onEnd);
         }
 
         function switchTab(name) {
@@ -981,6 +1058,7 @@
 
         // بدء التهيئة
         initMap();
+        setupSwipeToClose();
 
         function showWarn(msg, duration = 8000) {
             const el = document.createElement('div');
@@ -2377,6 +2455,14 @@
             renderThematicMap();
             // حدّث واجهة التبويب (للتلوين الفعلي للأزرار)
             if (lastData?.selectedCity) renderCityDetail(lastData.selectedCity);
+
+            // على الجوال: طوِ اللوحة للوضع النصفي لرؤية الخريطة الملوّنة
+            if (isMobile()) {
+                const cityName = lastData?.selectedCity
+                    ? (CITY_NAMES_AR[lastData.selectedCity] || lastData.selectedCity)
+                    : 'المدينة';
+                halfMobilePanel(cityName);
+            }
         }
 
         function clearThematicMap() {
