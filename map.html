@@ -617,17 +617,20 @@
                 color: white;
                 font-size: 15px;
                 font-weight: 600;
-                cursor: pointer;
+                cursor: grab;
                 flex-shrink: 0;
                 position: sticky;
                 top: 0;
                 z-index: 15;
-                min-height: 52px;
+                min-height: 56px;
                 box-sizing: border-box;
-                border-top-left-radius: 12px;
-                border-top-right-radius: 12px;
+                border-top-left-radius: 14px;
+                border-top-right-radius: 14px;
+                touch-action: none;      /* نحن نتحكم بالـ touch */
+                user-select: none;
+                -webkit-user-select: none;
             }
-            .mobile-close-panel:hover { background: #1f6b5e; }
+            .mobile-close-panel:active { cursor: grabbing; }
             .mobile-close-panel .title { display: flex; align-items: center; gap: 8px; font-size: 15px; }
             .mobile-close-panel .close-btn {
                 background: rgba(255,255,255,0.25);
@@ -651,11 +654,12 @@
             .mobile-close-panel::before {
                 content: '';
                 position: absolute;
-                top: 6px; left: 50%;
+                top: 5px; left: 50%;
                 transform: translateX(-50%);
-                width: 36px; height: 4px;
-                background: rgba(255,255,255,0.4);
+                width: 44px; height: 4px;
+                background: rgba(255,255,255,0.55);
                 border-radius: 2px;
+                pointer-events: none;  /* لا يلتقط الأحداث - تمر للرأس */
             }
 
             /* طبقة شفافة خلف اللوحة — نقرها يغلق */
@@ -894,38 +898,50 @@
         function setupSwipeToClose() {
             const header = document.getElementById('mobile-close-panel');
             if (!header) return;
-            let startY = 0, currentY = 0, dragging = false;
             const sb = document.getElementById('sidebar');
+            let startY = 0, currentY = 0, dragging = false;
+
+            const getY = e => (e.touches && e.touches[0]) ? e.touches[0].clientY
+                            : (e.changedTouches && e.changedTouches[0]) ? e.changedTouches[0].clientY
+                            : e.clientY;
 
             const onStart = e => {
                 if (!isMobile()) return;
                 // تجاهل لمس الأزرار — دعها تعمل طبيعياً
-                if (e.target.closest('button')) return;
-                const t = e.touches ? e.touches[0] : e;
-                startY = t.clientY;
+                const target = e.target;
+                if (target && (target.closest('button') || target.tagName === 'BUTTON')) return;
+                startY = getY(e);
                 currentY = startY;
                 dragging = true;
                 sb.style.transition = 'none';
             };
             const onMove = e => {
                 if (!dragging) return;
-                const t = e.touches ? e.touches[0] : e;
-                currentY = t.clientY;
+                currentY = getY(e);
                 const dy = Math.max(0, currentY - startY);
                 sb.style.transform = `translateY(${dy}px)`;
+                if (dy > 10 && e.cancelable) {
+                    // أوقف تمرير الصفحة أثناء سحب اللوحة
+                    e.preventDefault();
+                }
             };
             const onEnd = () => {
                 if (!dragging) return;
                 dragging = false;
                 sb.style.transition = '';
-                sb.style.transform = '';
                 const dy = currentY - startY;
                 if (dy > 80) {
+                    // اسمح بتطبيق transform يدوياً قبل collapse لانتقال نظيف
+                    sb.style.transform = '';
                     collapseMobilePanel();
+                } else {
+                    // ارجع لمكانه
+                    sb.style.transform = '';
                 }
             };
+            // passive: false حتى نتمكن من preventDefault على touchmove
             header.addEventListener('touchstart', onStart, { passive: true });
-            header.addEventListener('touchmove', onMove, { passive: true });
+            header.addEventListener('touchmove', onMove, { passive: false });
             header.addEventListener('touchend', onEnd);
             header.addEventListener('touchcancel', onEnd);
         }
@@ -2740,12 +2756,22 @@
             // شريط علوي يذكّر المستخدم بالخريطة التفاعلية النشطة
             const topbar = document.getElementById('thematic-topbar');
             const label  = document.getElementById('thematic-topbar-label');
+            console.log('🎨 renderThematicMap:', {
+                activeKey: activeThematicKey,
+                metric: metric.label,
+                hideForParcels,
+                zoom,
+                topbarFound: !!topbar,
+                labelFound: !!label,
+                entries: entries.length,
+            });
             if (topbar && label) {
                 if (hideForParcels) {
                     topbar.classList.remove('visible');
                 } else {
                     label.textContent = metric.label;
                     topbar.classList.add('visible');
+                    console.log('✓ topbar shown, classes:', topbar.className);
                 }
             }
             // أخفِ شارة الليجيند القديمة (لم نعد نستخدمها)
