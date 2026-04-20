@@ -561,6 +561,30 @@
                 -webkit-overflow-scrolling: touch;
             }
 
+            /* حالة "مصغّرة" — الرأس الفيروزي فقط ظاهر يدعو للفتح */
+            #sidebar.minimized {
+                height: 56px;
+                max-height: 56px;
+                transform: translateY(0);
+            }
+            #sidebar.minimized .mobile-close-panel {
+                cursor: pointer;
+            }
+            #sidebar.minimized .mobile-close-panel::after {
+                /* أيقونة أعلى صغيرة تدعو للفتح */
+                content: '▲';
+                position: absolute;
+                top: 50%; left: 60px;
+                transform: translateY(-50%);
+                color: rgba(255,255,255,0.8);
+                font-size: 11px;
+            }
+            /* إخفاء زر × في الوضع المصغّر (يستبدل بفتح عند النقر) */
+            #sidebar.minimized .close-btn {
+                pointer-events: none;
+                opacity: 0.5;
+            }
+
             /* على الجوال: ترتيب داخل sidebar (الرأس ثم المحتوى) */
             #sidebar > .mobile-close-panel { order: 1; display: flex; }
             #sidebar > .sidebar-header     { display: none; order: 2; }
@@ -872,7 +896,7 @@
         function expandMobilePanel(title) {
             if (!isMobile()) return;
             const sb = document.getElementById('sidebar');
-            sb.classList.remove('half');
+            sb.classList.remove('half', 'minimized');
             if (!sb.classList.contains('expanded')) {
                 sb.classList.add('expanded');
             }
@@ -887,7 +911,7 @@
             // وضع نصف الشاشة — يعرض اللوحة والخريطة معاً
             if (!isMobile()) return;
             const sb = document.getElementById('sidebar');
-            sb.classList.remove('expanded');
+            sb.classList.remove('expanded', 'minimized');
             sb.classList.add('half');
             const bd = document.getElementById('mobile-backdrop');
             if (bd) {
@@ -895,10 +919,39 @@
             }
             if (title) setMobilePanelTitle(title);
         }
-        function collapseMobilePanel() {
+        function minimizeMobilePanel(title) {
+            // وضع "مصغّر" — الرأس فقط يبقى، الخريطة مكشوفة تماماً
             if (!isMobile()) return;
             const sb = document.getElementById('sidebar');
             sb.classList.remove('expanded', 'half');
+            sb.classList.add('minimized');
+            const bd = document.getElementById('mobile-backdrop');
+            if (bd) bd.classList.remove('visible', 'half-mode');
+            if (title) setMobilePanelTitle(title);
+        }
+        function collapseMobilePanel() {
+            if (!isMobile()) return;
+            const sb = document.getElementById('sidebar');
+            // إذا في وضع موسّع أو نصفي، اذهب للمصغّر (الرأس فقط)
+            // فقط إذا كانت حالة فعلية (مدينة مختارة أو حي محدد)
+            const hasDetails = lastData?.district || lastData?.selectedCity || lastData?.selected;
+            if (hasDetails && (sb.classList.contains('expanded') || sb.classList.contains('half'))) {
+                const title = lastData?.district?.name
+                    || (lastData?.selectedCity ? (CITY_NAMES_AR[lastData.selectedCity] || lastData.selectedCity) : null)
+                    || 'التفاصيل';
+                minimizeMobilePanel(title);
+            } else {
+                // لا شيء محدد، أغلق بالكامل
+                sb.classList.remove('expanded', 'half', 'minimized');
+                const bd = document.getElementById('mobile-backdrop');
+                if (bd) bd.classList.remove('visible', 'half-mode');
+            }
+        }
+        // إغلاق نهائي — يُنفّذ عند تغيير المدينة أو العودة للقائمة
+        function fullyCloseMobilePanel() {
+            if (!isMobile()) return;
+            const sb = document.getElementById('sidebar');
+            sb.classList.remove('expanded', 'half', 'minimized');
             const bd = document.getElementById('mobile-backdrop');
             if (bd) bd.classList.remove('visible', 'half-mode');
         }
@@ -919,7 +972,6 @@
 
             const onStart = e => {
                 if (!isMobile()) return;
-                // تجاهل لمس الأزرار — دعها تعمل طبيعياً
                 const target = e.target;
                 if (target && (target.closest('button') || target.tagName === 'BUTTON')) return;
                 startY = getY(e);
@@ -933,29 +985,43 @@
                 const dy = Math.max(0, currentY - startY);
                 sb.style.transform = `translateY(${dy}px)`;
                 if (dy > 10 && e.cancelable) {
-                    // أوقف تمرير الصفحة أثناء سحب اللوحة
                     e.preventDefault();
                 }
             };
-            const onEnd = () => {
+            const onEnd = e => {
                 if (!dragging) return;
                 dragging = false;
                 sb.style.transition = '';
                 const dy = currentY - startY;
+                sb.style.transform = '';
                 if (dy > 80) {
-                    // اسمح بتطبيق transform يدوياً قبل collapse لانتقال نظيف
-                    sb.style.transform = '';
                     collapseMobilePanel();
-                } else {
-                    // ارجع لمكانه
-                    sb.style.transform = '';
+                } else if (dy < 5) {
+                    // كانت نقرة فقط (لا سحب فعلي)
+                    // إذا اللوحة مصغّرة، وسّعها
+                    if (sb.classList.contains('minimized')) {
+                        const target = e && e.target;
+                        // تجنب التوسيع لو نُقر على زر
+                        if (!(target && target.closest('button'))) {
+                            const title = document.getElementById('mobile-panel-title')?.textContent;
+                            expandMobilePanel(title);
+                        }
+                    }
                 }
             };
-            // passive: false حتى نتمكن من preventDefault على touchmove
             header.addEventListener('touchstart', onStart, { passive: true });
             header.addEventListener('touchmove', onMove, { passive: false });
             header.addEventListener('touchend', onEnd);
             header.addEventListener('touchcancel', onEnd);
+            // نقرة على الرأس في وضع مصغّر (للفأرة)
+            header.addEventListener('click', e => {
+                if (!isMobile()) return;
+                if (e.target && e.target.closest('button')) return;
+                if (sb.classList.contains('minimized')) {
+                    const title = document.getElementById('mobile-panel-title')?.textContent;
+                    expandMobilePanel(title);
+                }
+            });
         }
 
         function switchTab(name) {
@@ -2044,7 +2110,11 @@
                 if (lastData) delete lastData.district;
                 if (map && map.data) {
                     map.data.revertStyle();
-                    map.data.setStyle(styleDistrictFeature);
+                    if (activeThematicKey) {
+                        renderThematicMap();
+                    } else {
+                        map.data.setStyle(styleDistrictFeature);
+                    }
                 }
                 const hdr = document.getElementById('sidebar-header');
                 if (hdr) hdr.classList.add('empty');
@@ -2054,6 +2124,8 @@
                 if (sub) sub.textContent = '';
                 const src = document.getElementById('sb-source');
                 if (src) src.style.display = 'none';
+                // على الجوال: اعرض قائمة الأحياء موسّعة
+                if (isMobile()) expandMobilePanel('الأحياء');
                 renderDistrictsList();
             } catch (err) {
                 console.error('فشل backToDistrictsList:', err);
@@ -2387,10 +2459,14 @@
                 activeThematicKey = null;
                 const legend = document.getElementById('map-legend');
                 if (legend) legend.style.display = 'none';
+                const topbar = document.getElementById('thematic-topbar');
+                if (topbar) topbar.classList.remove('visible');
                 if (map?.data) {
                     map.data.revertStyle();
                     map.data.setStyle(styleDistrictFeature);
                 }
+                // على الجوال: وسّع اللوحة لعرض قائمة المدن
+                if (isMobile()) expandMobilePanel('المدن');
                 renderCitiesList();
 
                 const hdr = document.getElementById('sidebar-header');
@@ -2615,23 +2691,25 @@
             activeThematicKey = key;
             renderThematicMap();
 
-            // على الجوال: طوِ اللوحة للوضع النصفي أولاً — ثم أعد رسم اللوحة
+            // على الجوال: صغّر اللوحة للرأس فقط — الخريطة التفاعلية تحتاج رؤية كاملة
             if (isMobile()) {
-                const cityName = lastData?.selectedCity
-                    ? (CITY_NAMES_AR[lastData.selectedCity] || lastData.selectedCity)
-                    : 'المدينة';
-                halfMobilePanel(cityName);
-                // أعد الرسم بعد الحركة حتى يظهر زر المؤشر النشط
+                const title = lastData?.district?.name
+                    || (lastData?.selectedCity
+                        ? (CITY_NAMES_AR[lastData.selectedCity] || lastData.selectedCity)
+                        : 'المدينة');
+                minimizeMobilePanel(title);
+                // إعادة رسم التفاصيل (ستظهر عندما يوسّع المستخدم اللوحة)
                 setTimeout(() => {
-                    if (lastData?.selectedCity) {
+                    if (lastData?.district) {
+                        renderDistrictTab(lastData);
+                    } else if (lastData?.selectedCity) {
                         renderCityDetail(lastData.selectedCity);
-                        // مرّر اللوحة لأعلى لإبراز قسم الخرائط التفاعلية
-                        scrollToThematicPanel();
                     }
-                }, 320); // بعد انتهاء animation (0.3s)
+                }, 320);
             } else {
                 // على الديسكتوب: أعد الرسم مباشرة
-                if (lastData?.selectedCity) renderCityDetail(lastData.selectedCity);
+                if (lastData?.district) renderDistrictTab(lastData);
+                else if (lastData?.selectedCity) renderCityDetail(lastData.selectedCity);
             }
         }
 
