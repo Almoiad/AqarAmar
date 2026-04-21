@@ -27,20 +27,133 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <!-- يُحمَّل فقط إذا كان موجوداً في نفس المجلد — يوفّر الأحياء بدون شبكة -->
     <script src="embedded_districts.js" onerror="console.log('ℹ️ embedded_districts.js غير موجود — سأجرب Worker')"></script>
+    <!-- خطوط الموقع -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@300;400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
     <style>
+        /* ═══ نظام الألوان الموحّد مع index.html ═══ */
+        :root {
+            --bg:      #091822;
+            --bg-1:    #0D1E2A;
+            --bg-2:    #112836;
+            --bg-3:    #16344A;
+            --pearl:   #E8DCC2;
+            --copper:  #B58763;
+            --copper-d:#8A6648;
+            --teal:    #2C8C7C;
+            --teal-b:  #4FC4B0;
+            --teal-s:  rgba(79, 196, 176, 0.12);
+            --t1: #F2EEE3; --t2: #BDB8A8; --t3: #8A8578; --t4: #5A5548;
+            --up: #5CCA8A; --up-bg: rgba(92, 202, 138, 0.12);
+            --down: #E8876A; --down-bg: rgba(232, 135, 106, 0.12);
+            --line:   rgba(242, 238, 227, 0.07);
+            --line-2: rgba(242, 238, 227, 0.12);
+            --line-3: rgba(181, 135, 99, 0.25);
+            --f-d: 'Readex Pro', sans-serif;
+            --f-b: 'IBM Plex Sans Arabic', sans-serif;
+            --f-m: 'JetBrains Mono', monospace;
+        }
+
         * { box-sizing: border-box; }
         html, body {
             margin: 0; padding: 0; height: 100%;
-            font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+            font-family: var(--f-b);
+            background: var(--bg);
+            color: var(--t1);
         }
-        #container { display: flex; height: 100vh; width: 100vw; }
-        #map { flex: 1; height: 100%; position: relative; }
+        #container {
+            display: flex;
+            height: calc(100vh - 46px);
+            width: 100vw;
+            margin-top: 46px;
+        }
+        #map { flex: 1; height: 100%; position: relative; background: var(--bg-1); }
+
+        /* ═══ HEADER الموقع — مشترك مع index.html ═══ */
+        .site-top {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 1500;
+            height: 46px;
+            background: rgba(9, 24, 34, 0.94);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border-bottom: 1px solid var(--line-2);
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            gap: 16px;
+        }
+        .site-brand {
+            display: flex;
+            align-items: baseline;
+            gap: 2px;
+            font-family: var(--f-d);
+            font-size: 15px;
+            font-weight: 600;
+            white-space: nowrap;
+            color: var(--t1);
+            text-decoration: none;
+        }
+        .site-brand i {
+            color: var(--copper);
+            font-style: normal;
+            font-weight: 400;
+            font-size: 12px;
+            margin: 0 2px;
+        }
+        .site-nav { display: flex; gap: 14px; }
+        .site-nav a {
+            font-size: 12px;
+            color: var(--t2);
+            padding: 3px 0;
+            border-bottom: 1.5px solid transparent;
+            font-weight: 500;
+            text-decoration: none;
+            transition: color .15s, border-color .15s;
+        }
+        .site-nav a:hover { color: var(--t1); }
+        .site-nav a.on { color: var(--copper); border-bottom-color: var(--copper); }
+        .site-right { margin-right: auto; display: flex; gap: 8px; align-items: center; }
+        .site-btn {
+            font-family: inherit;
+            padding: 5px 12px;
+            font-size: 11.5px;
+            font-weight: 500;
+            border-radius: 3px;
+            border: 1px solid transparent;
+            background: transparent;
+            color: var(--t2);
+            border-color: var(--line-3);
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: all .15s;
+        }
+        .site-btn:hover { color: var(--t1); border-color: var(--copper-d); }
+        .site-btn.primary {
+            background: var(--copper);
+            color: var(--bg);
+            font-weight: 600;
+            border-color: var(--copper);
+        }
+        .site-btn.primary:hover { background: var(--pearl); border-color: var(--pearl); }
+
+        @media (max-width: 767px) {
+            .site-top { height: 42px; padding: 0 12px; gap: 10px; }
+            .site-nav { display: none; }
+            #container { height: calc(100vh - 42px); margin-top: 42px; }
+        }
 
         #sidebar {
             width: 420px; height: 100%;
-            background: #fff;
-            box-shadow: 2px 0 12px rgba(0,0,0,0.08);
+            background: var(--bg-1);
+            box-shadow: 2px 0 12px rgba(0,0,0,0.3);
             display: flex; flex-direction: column;
+            border-right: 1px solid var(--line);
         }
         /* على الديسكتوب: التبويبات أعلى المحتوى مباشرة */
         #sidebar .mobile-close-panel { display: none; }
@@ -55,45 +168,62 @@
         #mobile-tabs { display: none; }  /* لا يظهر على الديسكتوب */
 
         .sidebar-header {
-            background: linear-gradient(135deg, #2c8c7c 0%, #1f6b5e 100%);
-            color: #fff; padding: 18px 20px;
+            background: linear-gradient(135deg, var(--bg-2) 0%, var(--bg-1) 100%);
+            color: var(--t1); padding: 18px 20px;
             position: relative; flex-shrink: 0;
+            border-bottom: 1px solid var(--line);
         }
-        .sidebar-header h2 { margin: 0 0 6px; font-size: 17px; }
-        .sidebar-header p { margin: 0; font-size: 13px; opacity: 0.9; }
-        .sidebar-header.empty { background: #f5f5f5; color: #888; }
-        .sidebar-header.empty h2 { color: #444; }
+        .sidebar-header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--copper), var(--teal-b), transparent);
+            opacity: 0.6;
+        }
+        .sidebar-header h2 {
+            margin: 0 0 6px; font-size: 17px; font-weight: 600;
+            font-family: var(--f-d); letter-spacing: -0.2px;
+        }
+        .sidebar-header p { margin: 0; font-size: 13px; color: var(--t2); }
+        .sidebar-header.empty {
+            background: var(--bg-1); color: var(--t3);
+        }
+        .sidebar-header.empty h2 { color: var(--t1); }
 
         .source-badge {
-            display: inline-block; background: rgba(255,255,255,0.25);
+            display: inline-block; background: var(--teal-s);
+            color: var(--teal-b);
             padding: 2px 8px; border-radius: 10px;
             font-size: 11px; margin-top: 6px;
+            border: 1px solid rgba(79, 196, 176, 0.22);
         }
 
         .tabs {
-            display: flex; background: #f8f9fa;
-            border-bottom: 1px solid #e0e0e0; flex-shrink: 0;
+            display: flex; background: var(--bg);
+            border-bottom: 1px solid var(--line); flex-shrink: 0;
         }
         .tab {
             flex: 1; padding: 12px 8px; text-align: center; font-size: 13px;
-            cursor: pointer; color: #666; background: transparent; border: none;
+            cursor: pointer; color: var(--t3); background: transparent; border: none;
             border-bottom: 3px solid transparent;
             transition: all 0.2s; font-family: inherit;
         }
-        .tab:hover { background: rgba(44,140,124,0.06); color: #2c8c7c; }
+        .tab:hover { background: var(--bg-2); color: var(--copper); }
         .tab.active {
-            color: #2c8c7c; font-weight: bold; background: #fff;
-            border-bottom-color: #2c8c7c;
+            color: var(--copper); font-weight: 600; background: var(--bg-1);
+            border-bottom-color: var(--copper);
         }
 
-        .tab-content { display: none; padding: 15px 20px; overflow-y: auto; flex: 1; }
+        .tab-content { display: none; padding: 15px 20px; overflow-y: auto; flex: 1; color: var(--t2); }
         .tab-content.active { display: block; }
 
         .section { margin-bottom: 18px; }
         .section-title {
-            color: #2c8c7c; font-weight: bold; font-size: 14px;
-            padding-bottom: 8px; border-bottom: 2px solid #2c8c7c;
+            color: var(--copper); font-weight: 600; font-size: 14px;
+            padding-bottom: 8px; border-bottom: 1px solid var(--line-3);
             margin-bottom: 10px;
+            font-family: var(--f-d);
         }
         .section-title.collapsible { cursor: pointer; user-select: none; border-bottom-style: dashed; }
         .section-title.collapsible::after {
@@ -105,62 +235,68 @@
         .field {
             display: flex; justify-content: space-between;
             padding: 8px 0; font-size: 13px;
-            border-bottom: 1px solid #f0f0f0; gap: 10px;
+            border-bottom: 1px solid var(--line); gap: 10px;
         }
         .field:last-child { border-bottom: none; }
-        .field-label { color: #777; white-space: nowrap; }
-        .field-value { color: #2c8c7c; font-weight: 600; text-align: left; word-break: break-word; }
+        .field-label { color: var(--t3); white-space: nowrap; }
+        .field-value { color: var(--t1); font-weight: 600; text-align: left; word-break: break-word; font-family: var(--f-m); font-size: 12.5px; }
 
-        .district-title { font-size: 20px; font-weight: bold; color: #1f6b5e; margin-bottom: 4px; }
-        .district-ranking { color: #888; font-size: 12px; margin-bottom: 14px; }
+        .district-title {
+            font-size: 20px; font-weight: 600; color: var(--t1); margin-bottom: 4px;
+            font-family: var(--f-d); letter-spacing: -0.3px;
+        }
+        .district-ranking { color: var(--t3); font-size: 12px; margin-bottom: 14px; }
 
         .kpi-grid {
             display: grid; grid-template-columns: 1fr 1fr;
             gap: 8px; margin-bottom: 18px;
         }
         .kpi-card {
-            background: #f7faf9; border: 1px solid #e4efec;
-            border-radius: 8px; padding: 10px 12px; text-align: center;
+            background: var(--bg); border: 1px solid var(--line);
+            border-radius: 6px; padding: 10px 12px; text-align: center;
         }
-        .kpi-value { font-size: 18px; font-weight: bold; color: #1f6b5e; }
-        .kpi-value.positive { color: #27ae60; }
-        .kpi-value.negative { color: #c0392b; }
-        .kpi-label { font-size: 11px; color: #888; margin-top: 2px; }
+        .kpi-value { font-size: 18px; font-weight: 700; color: var(--copper); font-family: var(--f-m); }
+        .kpi-value.positive { color: var(--up); }
+        .kpi-value.negative { color: var(--down); }
+        .kpi-label { font-size: 11px; color: var(--t3); margin-top: 4px; }
 
         .chart-block { margin-bottom: 20px; }
         .chart-heading {
-            font-size: 13px; color: #555; margin-bottom: 8px;
+            font-size: 12px; color: var(--t3); margin-bottom: 8px;
             display: flex; align-items: center; gap: 6px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            font-weight: 600;
         }
-        .chart-heading::before { content: '📊'; font-size: 14px; }
+        .chart-heading::before { content: '▸'; font-size: 11px; color: var(--copper); }
         .chart-container {
             position: relative; height: 160px;
-            background: #fafcfb; border: 1px solid #eaf1ef;
-            border-radius: 8px; padding: 8px;
+            background: var(--bg); border: 1px solid var(--line);
+            border-radius: 6px; padding: 8px;
         }
 
-        .deals-list { display: flex; flex-direction: column; border-top: 1px solid #f0f0f0; }
+        .deals-list { display: flex; flex-direction: column; border-top: 1px solid var(--line); }
         .deal-row {
             display: grid; grid-template-columns: 60px 1fr 1fr;
             gap: 10px; padding: 10px 4px;
-            border-bottom: 1px solid #f0f0f0;
+            border-bottom: 1px solid var(--line);
             font-size: 13px; align-items: center;
         }
         .deal-row:last-child { border-bottom: none; }
-        .deal-date { color: #888; font-size: 12px; }
-        .deal-area { color: #555; text-align: center; }
-        .deal-price { color: #2c8c7c; font-weight: bold; text-align: left; }
+        .deal-date { color: var(--t3); font-size: 12px; font-family: var(--f-m); }
+        .deal-area { color: var(--t2); text-align: center; font-family: var(--f-m); font-size: 12px; }
+        .deal-price { color: var(--copper); font-weight: 600; text-align: left; font-family: var(--f-m); }
 
-        .empty-state { padding: 40px 20px; text-align: center; color: #999; }
-        .empty-state .icon { font-size: 42px; margin-bottom: 10px; opacity: 0.5; }
-        .empty-state .msg { font-size: 13px; }
-        .empty-state .hint-text { font-size: 12px; margin-top: 6px; color: #bbb; }
+        .empty-state { padding: 40px 20px; text-align: center; color: var(--t3); }
+        .empty-state .icon { font-size: 42px; margin-bottom: 10px; opacity: 0.4; }
+        .empty-state .msg { font-size: 13px; color: var(--t2); }
+        .empty-state .hint-text { font-size: 12px; margin-top: 6px; color: var(--t4); }
 
         .status { padding: 30px 20px; text-align: center; }
-        .status.loading { color: #2c8c7c; }
-        .status.error { color: #c0392b; }
+        .status.loading { color: var(--copper); }
+        .status.error { color: var(--down); }
         .spinner {
-            border: 3px solid #eee; border-top: 3px solid #2c8c7c;
+            border: 3px solid var(--line-2); border-top: 3px solid var(--copper);
             border-radius: 50%; width: 32px; height: 32px;
             animation: spin 1s linear infinite; margin: 0 auto 12px;
         }
@@ -169,24 +305,30 @@
         .hint {
             position: absolute; bottom: 20px; left: 50%;
             transform: translateX(-50%);
-            background: rgba(0,0,0,0.75); color: #fff;
+            background: rgba(9, 24, 34, 0.85);
+            backdrop-filter: blur(10px);
+            color: var(--t1);
+            border: 1px solid var(--line-3);
             padding: 10px 20px; border-radius: 20px;
-            font-size: 13px; pointer-events: none;
+            font-size: 12.5px; pointer-events: none;
             transition: opacity 0.5s; z-index: 5;
         }
         .mode-badge {
             position: absolute; top: 10px; right: 10px;
-            background: #2c8c7c; color: #fff;
+            background: var(--copper); color: var(--bg);
             padding: 6px 14px; border-radius: 20px;
-            font-size: 12px; z-index: 5;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            font-size: 11.5px; z-index: 5;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.4);
+            font-weight: 600;
+            font-family: var(--f-m);
+            letter-spacing: 0.3px;
         }
 
         .warn {
             position: absolute; top: 10px; left: 50%;
             transform: translateX(-50%);
-            background: #fff3cd; color: #856404;
-            border: 1px solid #ffc107;
+            background: var(--down-bg); color: var(--down);
+            border: 1px solid var(--down);
             padding: 8px 14px; border-radius: 6px;
             font-size: 12px; z-index: 4;
             max-width: 85%;
@@ -195,8 +337,8 @@
         /* قائمة الأحياء */
         .districts-list-header {
             padding: 10px 2px;
-            color: #555; font-size: 12px;
-            border-bottom: 1px solid #e6ecea;
+            color: var(--t3); font-size: 12px;
+            border-bottom: 1px solid var(--line);
             margin-bottom: 8px;
             display: flex; justify-content: space-between; align-items: center;
         }
@@ -206,53 +348,57 @@
         }
         .list-search input {
             width: 100%; padding: 9px 36px 9px 12px;
-            border: 1px solid #d0d8d5; border-radius: 6px;
+            background: var(--bg);
+            color: var(--t1);
+            border: 1px solid var(--line-2); border-radius: 6px;
             font-size: 13px; font-family: inherit;
             direction: rtl; text-align: right;
         }
         .list-search input:focus {
-            outline: none; border-color: #2c8c7c;
-            box-shadow: 0 0 0 3px rgba(44,140,124,0.12);
+            outline: none; border-color: var(--copper);
+            box-shadow: 0 0 0 3px rgba(181, 135, 99, 0.15);
         }
+        .list-search input::placeholder { color: var(--t4); }
         .list-search::before {
             content: '🔍'; position: absolute;
             right: 10px; top: 50%; transform: translateY(-50%);
-            color: #999; font-size: 14px; pointer-events: none;
+            color: var(--t3); font-size: 13px; pointer-events: none;
+            opacity: 0.6;
         }
         .list-search input { padding-right: 34px; }
         .list-empty-search {
             text-align: center; padding: 24px 10px;
-            color: #999; font-size: 12px;
+            color: var(--t3); font-size: 12px;
         }
         .district-list-item {
             display: flex; justify-content: space-between; align-items: center;
             padding: 11px 12px; margin-bottom: 6px;
-            background: #f8fbfa; border: 1px solid #e6ecea;
+            background: var(--bg); border: 1px solid var(--line);
             border-radius: 6px; cursor: pointer;
             transition: all 0.15s ease;
         }
         .district-list-item:hover {
-            background: #e8f5f2; border-color: #2c8c7c;
+            background: var(--bg-2); border-color: var(--copper-d);
             transform: translateX(-2px);
         }
         .district-list-name {
-            font-size: 14px; font-weight: 600; color: #1a1a1a;
+            font-size: 14px; font-weight: 600; color: var(--t1);
         }
         .district-list-stats {
             display: flex; flex-direction: column; align-items: flex-start; gap: 2px;
             min-width: 90px;
         }
         .district-change {
-            font-size: 14px; font-weight: bold;
+            font-size: 14px; font-weight: 700; font-family: var(--f-m);
         }
-        .district-change.positive { color: #1f6b5e; }
-        .district-change.negative { color: #c0392b; }
+        .district-change.positive { color: var(--up); }
+        .district-change.negative { color: var(--down); }
         .district-price {
-            font-size: 11px; color: #777;
+            font-size: 11px; color: var(--t3); font-family: var(--f-m);
         }
         .estimate-tag {
             display: inline-block;
-            background: #e0e0e0; color: #666;
+            background: var(--line-2); color: var(--t3);
             font-size: 9px; font-weight: normal;
             padding: 1px 6px; border-radius: 8px;
             margin-right: 4px; vertical-align: middle;
@@ -261,20 +407,20 @@
         /* شريط علوي — خريطة تفاعلية مفعّلة */
         #thematic-topbar {
             position: fixed;
-            top: 12px;
+            top: 56px;
             left: 50%;
             transform: translateX(-50%);
-            background: #2c8c7c;
-            color: white;
+            background: var(--copper);
+            color: var(--bg);
             padding: 8px 8px 8px 16px;
             border-radius: 22px;
-            font-size: 13px;
+            font-size: 12.5px;
             font-weight: 600;
             display: none;
             align-items: center;
             gap: 10px;
             z-index: 100;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.35);
             max-width: 90%;
             white-space: nowrap;
             pointer-events: auto;
@@ -284,7 +430,7 @@
         }
         #thematic-topbar .tb-dot {
             width: 8px; height: 8px; border-radius: 50%;
-            background: #a7f3d0;
+            background: var(--bg);
             flex-shrink: 0;
             animation: pulse 1.8s ease-in-out infinite;
         }
@@ -293,8 +439,8 @@
             50% { opacity: 0.4; }
         }
         #thematic-topbar .tb-close {
-            background: rgba(255,255,255,0.25);
-            color: white;
+            background: rgba(9, 24, 34, 0.25);
+            color: var(--bg);
             border: none;
             width: 26px; height: 26px;
             border-radius: 50%;
@@ -312,12 +458,12 @@
         }
         #thematic-topbar .tb-close:hover,
         #thematic-topbar .tb-close:active {
-            background: rgba(255,255,255,0.4);
+            background: rgba(9, 24, 34, 0.4);
         }
         @media (max-width: 767px) {
             #thematic-topbar {
-                top: 10px;
-                font-size: 12px;
+                top: 54px;
+                font-size: 11.5px;
                 padding: 6px 6px 6px 14px;
             }
             #thematic-topbar .tb-close {
@@ -325,25 +471,26 @@
             }
         }
         .district-list-item.has-real-data {
-            border-right: 3px solid #1f6b5e;
+            border-right: 3px solid var(--copper);
         }
         .district-list-item.estimated {
-            background: #fafafa;
+            background: var(--bg-1);
+            opacity: 0.75;
         }
         .district-list-item.estimated .district-list-name {
-            color: #555;
+            color: var(--t2);
         }
         .back-btn {
             display: inline-flex; align-items: center; gap: 6px;
             padding: 7px 14px; margin-bottom: 10px;
-            background: white; color: #2c8c7c;
-            border: 1px solid #2c8c7c; border-radius: 20px;
-            font-size: 13px; font-weight: 600;
+            background: transparent; color: var(--copper);
+            border: 1px solid var(--copper); border-radius: 20px;
+            font-size: 12.5px; font-weight: 600;
             cursor: pointer; transition: all 0.15s;
             font-family: inherit;
         }
         .back-btn:hover {
-            background: #2c8c7c; color: white;
+            background: var(--copper); color: var(--bg);
         }
 
         /* بحث برقم الهوية */
@@ -352,70 +499,73 @@
         }
         .re-search input {
             flex: 1; padding: 10px 12px;
-            border: 1px solid #d0d8d5; border-radius: 6px;
-            font-size: 13px; font-family: inherit; direction: ltr; text-align: right;
+            background: var(--bg); color: var(--t1);
+            border: 1px solid var(--line-2); border-radius: 6px;
+            font-size: 13px; font-family: var(--f-m); direction: ltr; text-align: right;
         }
+        .re-search input::placeholder { color: var(--t4); }
         .re-search input:focus {
-            outline: none; border-color: #2c8c7c;
-            box-shadow: 0 0 0 3px rgba(44,140,124,0.15);
+            outline: none; border-color: var(--copper);
+            box-shadow: 0 0 0 3px rgba(181, 135, 99, 0.18);
         }
         .re-search button {
-            padding: 10px 16px; background: #2c8c7c; color: white;
+            padding: 10px 16px; background: var(--copper); color: var(--bg);
             border: none; border-radius: 6px; cursor: pointer;
-            font-size: 13px; font-family: inherit;
+            font-size: 12.5px; font-family: inherit; font-weight: 600;
         }
-        .re-search button:hover { background: #1f6b5e; }
-        .re-search button:disabled { background: #bbb; cursor: wait; }
+        .re-search button:hover { background: var(--pearl); }
+        .re-search button:disabled { background: var(--t4); cursor: wait; color: var(--t3); }
 
         /* زر الحفظ */
         .save-btn {
             display: inline-flex; align-items: center; gap: 6px;
             padding: 8px 16px; margin: 0 8px 10px 0;
-            background: white; color: #e6a82e;
-            border: 1px solid #e6a82e; border-radius: 20px;
-            font-size: 13px; font-weight: 600;
+            background: transparent; color: var(--copper);
+            border: 1px solid var(--copper); border-radius: 20px;
+            font-size: 12.5px; font-weight: 600;
             cursor: pointer; font-family: inherit;
             transition: all 0.15s;
         }
-        .save-btn:hover { background: #e6a82e; color: white; }
-        .save-btn.saved { background: #e6a82e; color: white; }
-        .save-btn.saved:hover { background: #d4981e; }
+        .save-btn:hover { background: var(--copper); color: var(--bg); }
+        .save-btn.saved { background: var(--copper); color: var(--bg); }
+        .save-btn.saved:hover { background: var(--pearl); }
 
         /* قائمة المحفوظات */
         .saved-section { margin-top: 10px; }
         .saved-section h3 {
-            font-size: 13px; color: #555; margin: 10px 0 8px;
+            font-size: 13px; color: var(--t2); margin: 10px 0 8px;
             display: flex; justify-content: space-between; align-items: center;
+            font-weight: 600;
         }
-        .saved-count { color: #e6a82e; font-weight: bold; }
+        .saved-count { color: var(--copper); font-weight: bold; font-family: var(--f-m); }
         .saved-item {
             display: flex; justify-content: space-between; align-items: center;
             padding: 10px 12px; margin-bottom: 6px;
-            background: #fffbef; border: 1px solid #f0e3b8;
+            background: var(--bg); border: 1px solid var(--line-3);
             border-radius: 6px; cursor: pointer; position: relative;
             transition: all 0.15s;
         }
         .saved-item:hover {
-            background: #fff4d4; border-color: #e6a82e;
+            background: var(--bg-2); border-color: var(--copper);
         }
-        .saved-item .saved-star { font-size: 18px; color: #e6a82e; margin-left: 8px; }
+        .saved-item .saved-star { font-size: 18px; color: var(--copper); margin-left: 8px; }
         .saved-item .saved-info { flex: 1; min-width: 0; }
         .saved-item .saved-title {
-            font-size: 13px; font-weight: 600;
+            font-size: 13px; font-weight: 600; color: var(--t1);
             white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
         .saved-item .saved-sub {
-            font-size: 11px; color: #777; margin-top: 2px;
+            font-size: 11px; color: var(--t3); margin-top: 2px;
         }
         .saved-remove {
-            background: none; border: none; color: #c0392b;
+            background: none; border: none; color: var(--down);
             cursor: pointer; font-size: 18px; padding: 4px 8px;
             border-radius: 4px;
         }
-        .saved-remove:hover { background: #fdecec; }
+        .saved-remove:hover { background: var(--down-bg); }
 
         .lands-empty-hint {
-            padding: 30px 20px; text-align: center; color: #999;
+            padding: 30px 20px; text-align: center; color: var(--t3);
             font-size: 13px;
         }
         .lands-empty-hint .icon { font-size: 40px; margin-bottom: 10px; opacity: 0.4; }
@@ -423,9 +573,9 @@
         /* ═══ لوحة الخرائط التفاعلية ═══ */
         .thematic-panel {
             margin-top: 18px;
-            background: #f8fbfa;
-            border: 1px solid #d8e5e1;
-            border-radius: 8px;
+            background: var(--bg);
+            border: 1px solid var(--line-2);
+            border-radius: 6px;
             padding: 14px;
             direction: rtl;
         }
@@ -434,11 +584,13 @@
             margin-bottom: 4px;
         }
         .thematic-panel h3 {
-            margin: 0; font-size: 14px; color: #2c8c7c;
+            margin: 0; font-size: 13px; color: var(--copper);
             font-weight: 600;
+            font-family: var(--f-d);
+            letter-spacing: 0.2px;
         }
         .thematic-panel .t-intro {
-            color: #666; font-size: 11px;
+            color: var(--t3); font-size: 11px;
             margin: 0 0 12px; line-height: 1.6;
         }
         .thematic-category {
@@ -446,31 +598,33 @@
         }
         .thematic-category:last-child { margin-bottom: 0; }
         .thematic-category-title {
-            font-size: 11px; color: #5a7a72; font-weight: 600;
+            font-size: 10.5px; color: var(--t3); font-weight: 600;
             margin-bottom: 6px; display: flex; align-items: center; gap: 4px;
+            letter-spacing: 0.4px;
+            text-transform: uppercase;
         }
         .thematic-buttons {
             display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;
         }
         .thematic-btn {
-            background: white; color: #2c8c7c;
-            border: 1px solid #c5dbd5; border-radius: 5px;
+            background: var(--bg-1); color: var(--t2);
+            border: 1px solid var(--line-2); border-radius: 5px;
             padding: 8px 4px; font-size: 10.5px;
             font-family: inherit; cursor: pointer;
             text-align: center; line-height: 1.35;
             transition: all 0.12s;
         }
         .thematic-btn:hover {
-            background: #e8f5f2; border-color: #2c8c7c;
+            background: var(--bg-2); border-color: var(--copper-d); color: var(--t1);
         }
         .thematic-btn.active {
-            background: #2c8c7c; border-color: #2c8c7c;
-            color: white; font-weight: 600;
-            box-shadow: 0 1px 4px rgba(44,140,124,0.3);
+            background: var(--copper); border-color: var(--copper);
+            color: var(--bg); font-weight: 600;
+            box-shadow: 0 1px 4px rgba(181, 135, 99, 0.4);
         }
         .thematic-btn.soon {
-            opacity: 0.45; cursor: not-allowed;
-            background: #f0f0f0; color: #999; border-color: #e0e0e0;
+            opacity: 0.4; cursor: not-allowed;
+            background: var(--bg); color: var(--t4); border-color: var(--line);
         }
         .thematic-btn.soon::after {
             content: ' · قريباً'; font-size: 8px;
@@ -479,54 +633,55 @@
         /* ── أسطورة الخريطة (في اللوحة الجانبية) ── */
         .thematic-legend {
             margin-top: 10px; padding: 10px;
-            background: white; border: 1px solid #c5dbd5;
+            background: var(--bg-1); border: 1px solid var(--line-2);
             border-radius: 5px;
         }
         .thematic-legend .tl-title {
-            font-weight: 600; color: #1a1a1a; font-size: 12px;
+            font-weight: 600; color: var(--t1); font-size: 12px;
             margin-bottom: 6px;
         }
         .thematic-legend .tl-desc {
-            font-size: 11px; color: #666; line-height: 1.6;
+            font-size: 11px; color: var(--t3); line-height: 1.6;
             margin-bottom: 8px;
         }
         .thematic-legend .tl-scale {
             height: 10px; border-radius: 2px;
-            background: linear-gradient(to left, #fff, #2c8c7c);
+            background: linear-gradient(to left, var(--bg), var(--copper));
             margin-bottom: 4px;
-            border: 1px solid #d0d8d5;
+            border: 1px solid var(--line-2);
         }
         .thematic-legend .tl-scale.diverging {
-            background: linear-gradient(to left, #c0392b, #f5f5f5, #1f6b5e);
+            background: linear-gradient(to left, var(--down), var(--bg-2), var(--up));
         }
         .thematic-legend .tl-labels {
             display: flex; justify-content: space-between;
-            color: #555; font-size: 10px;
+            color: var(--t3); font-size: 10px; font-family: var(--f-m);
         }
 
         /* ── شارة تذكير فوق الخريطة (صغيرة) ── */
         .map-legend {
             position: absolute; bottom: 20px; left: 20px;
-            background: rgba(255,255,255,0.96);
-            border: 1px solid #d0d8d5;
+            background: rgba(9, 24, 34, 0.88);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--line-3);
             border-radius: 6px; padding: 6px 10px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
             font-size: 11px; z-index: 5;
-            color: #2c8c7c; font-weight: 600;
+            color: var(--copper); font-weight: 600;
         }
         .map-legend .close {
             background: none; border: none; cursor: pointer;
-            color: #999; font-size: 14px; padding: 0 0 0 6px;
+            color: var(--t3); font-size: 14px; padding: 0 0 0 6px;
             vertical-align: middle;
         }
-        .map-legend .close:hover { color: #c0392b; }
+        .map-legend .close:hover { color: var(--down); }
         /* ═══════════════════════════════════════════════════════
            📱 نسخة الجوال — تنشط عند عرض شاشة أقل من 768 بكسل
            ═══════════════════════════════════════════════════════ */
         @media (max-width: 767px) {
             #container {
                 flex-direction: column;
-                height: 100vh;
+                height: calc(100vh - 42px);
                 overflow: hidden;
             }
 
@@ -546,8 +701,8 @@
                 height: 75vh;
                 max-height: 75vh;
                 width: 100%;
-                background: #fff;
-                box-shadow: 0 -4px 16px rgba(0,0,0,0.12);
+                background: var(--bg-1);
+                box-shadow: 0 -4px 16px rgba(0,0,0,0.4);
                 z-index: 20;
                 transform: translateY(100%);
                 transition: transform 0.3s ease, height 0.3s ease;
@@ -590,7 +745,7 @@
                 position: absolute;
                 top: 50%; left: 60px;
                 transform: translateY(-50%);
-                color: rgba(255,255,255,0.8);
+                color: rgba(9, 24, 34, 0.75);
                 font-size: 11px;
             }
             /* إخفاء زر × في الوضع المصغّر (يستبدل بفتح عند النقر) */
@@ -613,10 +768,10 @@
                 bottom: 0; left: 0; right: 0;
                 height: 48px;
                 display: flex;
-                background: white;
-                border-top: 1px solid #e0e0e0;
+                background: var(--bg-1);
+                border-top: 1px solid var(--line);
                 z-index: 35;
-                box-shadow: 0 -2px 8px rgba(0,0,0,0.08);
+                box-shadow: 0 -2px 8px rgba(0,0,0,0.3);
             }
             #mobile-tabs .tab {
                 flex: 1;
@@ -627,18 +782,18 @@
                 background: transparent;
                 border: none;
                 border-top: 3px solid transparent;
-                color: #666;
+                color: var(--t3);
                 cursor: pointer;
                 font-family: inherit;
                 transition: all 0.15s;
             }
             #mobile-tabs .tab.active {
-                color: #2c8c7c;
-                border-top-color: #2c8c7c;
-                background: #f8fbfa;
+                color: var(--copper);
+                border-top-color: var(--copper);
+                background: var(--bg-2);
             }
             #mobile-tabs .tab:active {
-                background: rgba(44,140,124,0.1);
+                background: rgba(181, 135, 99, 0.1);
             }
 
             /* التبويبات (styling مشترك) */
@@ -650,7 +805,7 @@
                 border-top: 3px solid transparent;
             }
             .tab.active {
-                border-top: 3px solid #2c8c7c !important;
+                border-top: 3px solid var(--copper) !important;
                 border-bottom: none !important;
             }
 
@@ -661,9 +816,9 @@
             .mobile-close-panel {
                 display: flex; align-items: center; justify-content: space-between;
                 padding: 14px 16px;
-                background: #2c8c7c;
-                color: white;
-                font-size: 15px;
+                background: var(--copper);
+                color: var(--bg);
+                font-size: 14px;
                 font-weight: 600;
                 cursor: grab;
                 flex-shrink: 0;
@@ -679,10 +834,10 @@
                 -webkit-user-select: none;
             }
             .mobile-close-panel:active { cursor: grabbing; }
-            .mobile-close-panel .title { display: flex; align-items: center; gap: 8px; font-size: 15px; }
+            .mobile-close-panel .title { display: flex; align-items: center; gap: 8px; font-size: 14px; }
             .mobile-close-panel .close-btn {
-                background: rgba(255,255,255,0.25);
-                color: white;
+                background: rgba(9, 24, 34, 0.25);
+                color: var(--bg);
                 border: none;
                 width: 36px; height: 36px;
                 border-radius: 50%;
@@ -696,7 +851,7 @@
                 touch-action: manipulation;
             }
             .mobile-close-panel .close-btn:active,
-            .mobile-close-panel .close-btn:hover { background: rgba(255,255,255,0.45); }
+            .mobile-close-panel .close-btn:hover { background: rgba(9, 24, 34, 0.45); }
 
             /* مقبض السحب أعلى اللوحة (إشارة بصرية) */
             .mobile-close-panel::before {
@@ -705,7 +860,7 @@
                 top: 5px; left: 50%;
                 transform: translateX(-50%);
                 width: 44px; height: 4px;
-                background: rgba(255,255,255,0.55);
+                background: rgba(9, 24, 34, 0.55);
                 border-radius: 2px;
                 pointer-events: none;  /* لا يلتقط الأحداث - تمر للرأس */
             }
@@ -713,14 +868,14 @@
             /* طبقة شفافة خلف اللوحة — نقرها يغلق */
             .mobile-backdrop {
                 position: fixed;
-                top: 0; left: 0; right: 0; bottom: 48px;
+                top: 42px; left: 0; right: 0; bottom: 48px;
                 background: rgba(0,0,0,0);
                 z-index: 19;
                 pointer-events: none;
                 transition: background 0.25s ease;
             }
             .mobile-backdrop.visible {
-                background: rgba(0,0,0,0.25);
+                background: rgba(0,0,0,0.4);
                 pointer-events: auto;
             }
             /* في الوضع النصفي: طبقة أخف حتى ترى الخريطة بوضوح */
@@ -766,15 +921,15 @@
             .mobile-fab-map {
                 position: fixed;
                 bottom: 60px; right: 14px;
-                background: #2c8c7c;
-                color: white;
+                background: var(--copper);
+                color: var(--bg);
                 border: none;
                 width: 48px; height: 48px;
                 border-radius: 50%;
                 font-size: 20px;
                 cursor: pointer;
                 z-index: 25;
-                box-shadow: 0 4px 12px rgba(44,140,124,0.4);
+                box-shadow: 0 4px 12px rgba(181, 135, 99, 0.45);
                 display: none;
             }
             #sidebar.expanded ~ .mobile-fab-map { display: none; }
@@ -797,45 +952,51 @@
         .desktop-share-btn {
             position: absolute;
             top: 16px; left: 16px;
-            background: rgba(255,255,255,0.22);
-            color: white;
-            border: none;
+            background: rgba(242, 238, 227, 0.1);
+            color: var(--t1);
+            border: 1px solid var(--line-2);
             width: 34px; height: 34px;
             border-radius: 50%;
-            font-size: 15px;
+            font-size: 14px;
             cursor: pointer;
-            transition: background 0.15s;
+            transition: background 0.15s, border-color 0.15s;
         }
-        .desktop-share-btn:hover { background: rgba(255,255,255,0.38); }
+        .desktop-share-btn:hover {
+            background: var(--teal-s);
+            border-color: var(--teal-b);
+        }
         .sidebar-header.empty .desktop-share-btn {
-            background: #f0f0f0;
-            color: #2c8c7c;
-            border: 1px solid #ddd;
+            background: var(--bg-2);
+            color: var(--copper);
+            border: 1px solid var(--line-2);
         }
         .sidebar-header.empty .desktop-share-btn:hover {
-            background: #e0f0ec;
+            background: var(--bg-3);
+            border-color: var(--copper-d);
         }
 
         /* نافذة المشاركة (Modal) */
         .share-modal-backdrop {
             position: fixed; inset: 0;
-            background: rgba(0,0,0,0.55);
-            z-index: 200;
+            background: rgba(0,0,0,0.7);
+            z-index: 2000;
             display: flex; align-items: center; justify-content: center;
             animation: fadeIn 0.2s ease;
+            backdrop-filter: blur(4px);
         }
         @keyframes fadeIn {
             from { opacity: 0; }
             to { opacity: 1; }
         }
         .share-modal {
-            background: white;
-            border-radius: 14px;
+            background: var(--bg-1);
+            border: 1px solid var(--line-3);
+            border-radius: 10px;
             padding: 20px 22px;
             width: 90%;
             max-width: 440px;
             direction: rtl;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
             animation: slideUp 0.25s ease;
         }
         @keyframes slideUp {
@@ -846,18 +1007,21 @@
             display: flex; justify-content: space-between; align-items: center;
             margin-bottom: 4px;
         }
-        .share-header h3 { margin: 0; color: #2c8c7c; font-size: 16px; }
+        .share-header h3 {
+            margin: 0; color: var(--copper); font-size: 15px;
+            font-family: var(--f-d); font-weight: 600;
+        }
         .share-close {
-            background: #f0f0f0; border: none;
+            background: var(--bg); border: 1px solid var(--line-2);
             width: 30px; height: 30px; border-radius: 50%;
-            font-size: 18px; cursor: pointer;
-            color: #666; line-height: 1;
+            font-size: 16px; cursor: pointer;
+            color: var(--t3); line-height: 1;
             font-family: inherit;
         }
-        .share-close:hover { background: #e0e0e0; color: #333; }
+        .share-close:hover { background: var(--bg-2); color: var(--t1); }
         .share-subtitle {
-            color: #666; margin: 6px 0 14px;
-            font-size: 13px;
+            color: var(--t3); margin: 6px 0 14px;
+            font-size: 12.5px;
         }
         .share-url-row {
             display: flex; gap: 6px; margin-bottom: 16px;
@@ -865,20 +1029,20 @@
         .share-url-input {
             flex: 1; min-width: 0;
             padding: 9px 10px;
-            border: 1px solid #d0d8d5;
+            border: 1px solid var(--line-2);
             border-radius: 6px;
             font-size: 11px;
             direction: ltr;
             text-align: left;
-            background: #f8fbfa;
-            color: #333;
-            font-family: monospace;
+            background: var(--bg);
+            color: var(--t2);
+            font-family: var(--f-m);
         }
         .share-url-input:focus {
-            outline: none; border-color: #2c8c7c;
+            outline: none; border-color: var(--copper);
         }
         .share-copy-btn {
-            background: #2c8c7c; color: white;
+            background: var(--copper); color: var(--bg);
             border: none;
             padding: 9px 14px; border-radius: 6px;
             cursor: pointer;
@@ -887,7 +1051,7 @@
             font-weight: 600;
             transition: background 0.15s;
         }
-        .share-copy-btn:hover { background: #1f6b5e; }
+        .share-copy-btn:hover { background: var(--pearl); }
         .share-options {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -898,26 +1062,27 @@
             align-items: center; justify-content: center;
             gap: 6px;
             padding: 12px 6px;
-            border: 1px solid #e6ecea;
+            border: 1px solid var(--line-2);
             border-radius: 8px;
             text-decoration: none;
-            color: #333;
+            color: var(--t2);
             font-size: 11px;
             font-weight: 600;
             transition: all 0.15s;
-            background: white;
+            background: var(--bg);
         }
         .share-opt:hover {
-            background: #f8fbfa;
-            border-color: #2c8c7c;
+            background: var(--bg-2);
+            border-color: var(--copper-d);
+            color: var(--t1);
             transform: translateY(-2px);
-            box-shadow: 0 3px 8px rgba(44,140,124,0.15);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.3);
         }
         .share-icon { font-size: 22px; }
         .share-native-btn {
             margin-top: 14px; width: 100%;
             padding: 11px;
-            background: #2c8c7c; color: white;
+            background: var(--copper); color: var(--bg);
             border: none;
             border-radius: 6px;
             cursor: pointer;
@@ -926,7 +1091,7 @@
             font-weight: 600;
             transition: background 0.15s;
         }
-        .share-native-btn:hover { background: #1f6b5e; }
+        .share-native-btn:hover { background: var(--pearl); }
 
         /* على الجوال: اجعل النافذة تستفيد من المساحة */
         @media (max-width: 767px) {
@@ -941,9 +1106,155 @@
             .share-opt { padding: 10px 4px; font-size: 10px; }
             .share-icon { font-size: 20px; }
         }
+
+        /* ═══ THEME SWITCHER — نفس النظام في index.html ═══ */
+        .theme-fab {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 1000;
+            background: var(--copper);
+            color: var(--bg);
+            border: none;
+            padding: 10px 16px;
+            border-radius: 100px;
+            font-family: var(--f-b);
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            box-shadow: 0 6px 24px rgba(0,0,0,0.4), 0 0 0 1px var(--line-3);
+            transition: transform .18s, box-shadow .18s;
+        }
+        .theme-fab:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 32px rgba(0,0,0,0.5), 0 0 0 1px var(--copper);
+        }
+        .theme-fab svg { width: 14px; height: 14px; fill: currentColor; }
+        .theme-fab .dot-preview { display: inline-flex; gap: 2px; margin-left: 4px; }
+        .theme-fab .dot-preview span {
+            width: 6px; height: 6px; border-radius: 50%;
+            display: inline-block; border: 1px solid rgba(0,0,0,0.15);
+        }
+
+        .theme-panel {
+            position: fixed;
+            bottom: 70px;
+            left: 20px;
+            width: 340px;
+            max-height: calc(100vh - 140px);
+            overflow-y: auto;
+            background: var(--bg-1);
+            border: 1px solid var(--line-3);
+            border-radius: 10px;
+            padding: 14px;
+            z-index: 999;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+            opacity: 0;
+            transform: translateY(10px) scale(0.98);
+            pointer-events: none;
+            transition: opacity .2s, transform .2s;
+        }
+        .theme-panel.on {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            pointer-events: auto;
+        }
+        .theme-panel-h {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 12px; padding-bottom: 10px;
+            border-bottom: 1px solid var(--line);
+        }
+        .theme-panel-t {
+            font-family: var(--f-d);
+            font-size: 13px; font-weight: 600; color: var(--t1);
+        }
+        .theme-panel-s { font-size: 10px; color: var(--t3); margin-top: 2px; }
+        .theme-close {
+            background: transparent; border: 1px solid var(--line-2);
+            color: var(--t2);
+            width: 24px; height: 24px; border-radius: 4px;
+            display: inline-flex; align-items: center; justify-content: center;
+            cursor: pointer; font-size: 14px;
+            transition: all .15s;
+        }
+        .theme-close:hover { color: var(--t1); border-color: var(--copper-d); }
+        .theme-options { display: flex; flex-direction: column; gap: 6px; }
+        .theme-opt {
+            display: flex; align-items: center; gap: 10px;
+            padding: 8px 10px;
+            background: var(--bg); border: 1px solid var(--line);
+            border-radius: 6px; cursor: pointer;
+            transition: border-color .15s, background .15s;
+            text-align: right; font-family: inherit; width: 100%;
+        }
+        .theme-opt:hover { border-color: var(--copper-d); background: var(--bg-2); }
+        .theme-opt.on { border-color: var(--copper); background: var(--bg-2); }
+        .theme-opt.on::after {
+            content: '✓'; color: var(--copper); font-size: 14px; font-weight: 700;
+            margin-right: auto; padding-left: 4px;
+        }
+        .theme-swatch {
+            display: inline-flex; gap: 2px; flex-shrink: 0;
+            border-radius: 3px; overflow: hidden;
+        }
+        .theme-swatch span { width: 14px; height: 26px; display: inline-block; }
+        .theme-opt-info { flex: 1; min-width: 0; }
+        .theme-opt-name {
+            font-size: 12px; color: var(--t1); font-weight: 600; line-height: 1.3;
+        }
+        .theme-opt-desc {
+            font-size: 10px; color: var(--t3); margin-top: 1px; line-height: 1.3;
+        }
+        .theme-panel-foot {
+            margin-top: 12px; padding-top: 10px;
+            border-top: 1px solid var(--line);
+            font-size: 10px; color: var(--t4); text-align: center; line-height: 1.5;
+        }
+        @media (max-width: 700px) {
+            .theme-fab { bottom: 64px; left: 12px; padding: 8px 12px; font-size: 11px; }
+            .theme-panel { bottom: 112px; width: calc(100vw - 24px); left: 12px; }
+        }
     </style>
 </head>
 <body>
+    <!-- ═══ HEADER الموقع ═══ -->
+    <div class="site-top">
+        <a class="site-brand" href="index.html">عقار <i>و</i> عُمار</a>
+        <nav class="site-nav">
+            <a href="index.html">الرئيسية</a>
+            <a class="on" href="map.html">الخريطة</a>
+            <a href="index.html#market">السوق</a>
+            <a href="index.html#projects">المشاريع</a>
+            <a href="index.html#news">الأخبار</a>
+            <a href="index.html#tools">الأدوات</a>
+        </nav>
+        <div class="site-right">
+            <a class="site-btn" href="index.html">← العودة للرئيسية</a>
+        </div>
+    </div>
+
+    <!-- ═══ THEME SWITCHER ═══ -->
+    <button class="theme-fab" onclick="toggleThemePanel()" title="تجربة الألوان">
+        <svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 100 18 1.5 1.5 0 001.5-1.5c0-.39-.15-.74-.39-1.01-.23-.26-.37-.61-.37-.99a1.5 1.5 0 011.5-1.5H16a5 5 0 005-5c0-4.42-4.03-8-9-8zm-5.5 9a1.5 1.5 0 110-3 1.5 1.5 0 010 3zm3-4a1.5 1.5 0 110-3 1.5 1.5 0 010 3zm5 0a1.5 1.5 0 110-3 1.5 1.5 0 010 3zm3 4a1.5 1.5 0 110-3 1.5 1.5 0 010 3z"/></svg>
+        الألوان
+        <span class="dot-preview" id="fab-preview"></span>
+    </button>
+
+    <div class="theme-panel" id="theme-panel">
+        <div class="theme-panel-h">
+            <div>
+                <div class="theme-panel-t">جرّب لوحات الألوان</div>
+                <div class="theme-panel-s">اضغط لتطبيق فوري</div>
+            </div>
+            <button class="theme-close" onclick="toggleThemePanel()">×</button>
+        </div>
+        <div class="theme-options" id="theme-options"></div>
+        <div class="theme-panel-foot">الاختيار يُحفظ تلقائياً ومشترك مع الصفحة الرئيسية</div>
+    </div>
+
     <div id="container">
         <div id="sidebar">
             <!-- رأس الجوال — العنوان + زر المشاركة + زر الإغلاق (يظهر فقط على الجوال) -->
@@ -3699,6 +4010,180 @@
                 '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
             })[c]);
         }
+
+        /* ═══════════════════════════════════════════════════════════
+           THEME SYSTEM — مشترك مع index.html عبر localStorage
+        ═══════════════════════════════════════════════════════════ */
+        const THEMES = {
+            'gulf-sea': {
+                name: 'الخليج البحري (الحالي)',
+                desc: 'Navy + نحاس + فيروزي',
+                swatch: ['#091822', '#B58763', '#4FC4B0'],
+                vars: {
+                    '--bg':'#091822','--bg-1':'#0D1E2A','--bg-2':'#112836','--bg-3':'#16344A',
+                    '--pearl':'#E8DCC2','--copper':'#B58763','--copper-d':'#8A6648',
+                    '--teal':'#2C8C7C','--teal-b':'#4FC4B0','--teal-s':'rgba(79, 196, 176, 0.12)',
+                    '--t1':'#F2EEE3','--t2':'#BDB8A8','--t3':'#8A8578','--t4':'#5A5548',
+                    '--up':'#5CCA8A','--up-bg':'rgba(92, 202, 138, 0.12)',
+                    '--down':'#E8876A','--down-bg':'rgba(232, 135, 106, 0.12)',
+                    '--line':'rgba(242, 238, 227, 0.07)','--line-2':'rgba(242, 238, 227, 0.12)','--line-3':'rgba(181, 135, 99, 0.25)'
+                }
+            },
+            'desert-gulf': {
+                name: 'الخليج الصحراوي',
+                desc: 'رمال نجدية + فخار + طين',
+                swatch: ['#1A1410', '#D4A574', '#E85D5D'],
+                vars: {
+                    '--bg':'#1A1410','--bg-1':'#24190F','--bg-2':'#2E1F13','--bg-3':'#3B2816',
+                    '--pearl':'#F5EDDB','--copper':'#D4A574','--copper-d':'#A17D4E',
+                    '--teal':'#B8554E','--teal-b':'#E85D5D','--teal-s':'rgba(232, 93, 93, 0.12)',
+                    '--t1':'#F5EDDB','--t2':'#C9BFA6','--t3':'#8A7F66','--t4':'#5C5444',
+                    '--up':'#8FC178','--up-bg':'rgba(143, 193, 120, 0.12)',
+                    '--down':'#E85D5D','--down-bg':'rgba(232, 93, 93, 0.12)',
+                    '--line':'rgba(245, 237, 219, 0.07)','--line-2':'rgba(245, 237, 219, 0.12)','--line-3':'rgba(212, 165, 116, 0.25)'
+                }
+            },
+            'deep-pearl': {
+                name: 'الخليج العميق',
+                desc: 'Navy عميق + لؤلؤ مشع + ذهبي',
+                swatch: ['#030E14', '#F4E7CA', '#D4A84B'],
+                vars: {
+                    '--bg':'#030E14','--bg-1':'#061821','--bg-2':'#0A2230','--bg-3':'#10324A',
+                    '--pearl':'#FFFCF0','--copper':'#D4A84B','--copper-d':'#9E7D2E',
+                    '--teal':'#3A9A8D','--teal-b':'#5DBFB1','--teal-s':'rgba(93, 191, 177, 0.12)',
+                    '--t1':'#FFFCF0','--t2':'#CCC0A8','--t3':'#7E7665','--t4':'#4A4536',
+                    '--up':'#5CCA8A','--up-bg':'rgba(92, 202, 138, 0.12)',
+                    '--down':'#E8876A','--down-bg':'rgba(232, 135, 106, 0.12)',
+                    '--line':'rgba(255, 252, 240, 0.07)','--line-2':'rgba(255, 252, 240, 0.12)','--line-3':'rgba(212, 168, 75, 0.28)'
+                }
+            },
+            'platinum': {
+                name: 'البلاتين المعاصر',
+                desc: 'رمادي + نحاس + أزرق كهربائي',
+                swatch: ['#0A0B0D', '#C08F5C', '#4A9FFF'],
+                vars: {
+                    '--bg':'#0A0B0D','--bg-1':'#101215','--bg-2':'#18191D','--bg-3':'#232529',
+                    '--pearl':'#F9FAFB','--copper':'#C08F5C','--copper-d':'#8F6A44',
+                    '--teal':'#2B7FD4','--teal-b':'#4A9FFF','--teal-s':'rgba(74, 159, 255, 0.12)',
+                    '--t1':'#F9FAFB','--t2':'#A1A5AC','--t3':'#6B6F75','--t4':'#3F4247',
+                    '--up':'#4ADE80','--up-bg':'rgba(74, 222, 128, 0.12)',
+                    '--down':'#F87171','--down-bg':'rgba(248, 113, 113, 0.12)',
+                    '--line':'rgba(249, 250, 251, 0.07)','--line-2':'rgba(249, 250, 251, 0.12)','--line-3':'rgba(192, 143, 92, 0.25)'
+                }
+            },
+            'oasis': {
+                name: 'الواحة',
+                desc: 'أخضر زيتوني + نحاس + نعناع',
+                swatch: ['#0F1814', '#C69861', '#7BC4A0'],
+                vars: {
+                    '--bg':'#0F1814','--bg-1':'#16241C','--bg-2':'#1E3027','--bg-3':'#2A4335',
+                    '--pearl':'#E8D9B8','--copper':'#C69861','--copper-d':'#997442',
+                    '--teal':'#4A9A7A','--teal-b':'#7BC4A0','--teal-s':'rgba(123, 196, 160, 0.12)',
+                    '--t1':'#F2EDD8','--t2':'#B8B39A','--t3':'#7A7560','--t4':'#4E4A3A',
+                    '--up':'#7BC4A0','--up-bg':'rgba(123, 196, 160, 0.12)',
+                    '--down':'#E89766','--down-bg':'rgba(232, 151, 102, 0.12)',
+                    '--line':'rgba(242, 237, 216, 0.07)','--line-2':'rgba(242, 237, 216, 0.12)','--line-3':'rgba(198, 152, 97, 0.25)'
+                }
+            },
+            'stone-copper': {
+                name: 'الحجر والنحاس (فاتح)',
+                desc: 'نهاري · حجر دافئ + نحاس محروق',
+                swatch: ['#F5F1E8', '#8B4F2C', '#1A4D47'],
+                vars: {
+                    '--bg':'#F5F1E8','--bg-1':'#EDE6D5','--bg-2':'#E2D9C3','--bg-3':'#D4C8AC',
+                    '--pearl':'#4A3F30','--copper':'#8B4F2C','--copper-d':'#6B3D21',
+                    '--teal':'#1A4D47','--teal-b':'#2E7A70','--teal-s':'rgba(46, 122, 112, 0.12)',
+                    '--t1':'#1A1511','--t2':'#4A3F30','--t3':'#7A6E5A','--t4':'#A59980',
+                    '--up':'#3A7A4E','--up-bg':'rgba(58, 122, 78, 0.14)',
+                    '--down':'#B0412B','--down-bg':'rgba(176, 65, 43, 0.14)',
+                    '--line':'rgba(26, 21, 17, 0.08)','--line-2':'rgba(26, 21, 17, 0.14)','--line-3':'rgba(139, 79, 44, 0.3)'
+                }
+            },
+            'twilight': {
+                name: 'الشفق',
+                desc: 'ليل بنفسجي + ذهبي شفقي + وردي',
+                swatch: ['#0E0B1F', '#E8A86C', '#E85D8A'],
+                vars: {
+                    '--bg':'#0E0B1F','--bg-1':'#161228','--bg-2':'#1E1934','--bg-3':'#2A2442',
+                    '--pearl':'#F7F2E8','--copper':'#E8A86C','--copper-d':'#B07D48',
+                    '--teal':'#B34A75','--teal-b':'#E85D8A','--teal-s':'rgba(232, 93, 138, 0.12)',
+                    '--t1':'#F7F2E8','--t2':'#BEB5A6','--t3':'#817866','--t4':'#524A3D',
+                    '--up':'#6CDB9C','--up-bg':'rgba(108, 219, 156, 0.12)',
+                    '--down':'#E85D8A','--down-bg':'rgba(232, 93, 138, 0.12)',
+                    '--line':'rgba(247, 242, 232, 0.07)','--line-2':'rgba(247, 242, 232, 0.12)','--line-3':'rgba(232, 168, 108, 0.26)'
+                }
+            }
+        };
+
+        let currentTheme = localStorage.getItem('aqaramar-theme') || 'gulf-sea';
+
+        function applyTheme(themeKey) {
+            const theme = THEMES[themeKey];
+            if (!theme) return;
+            const root = document.documentElement;
+            Object.entries(theme.vars).forEach(([k, v]) => root.style.setProperty(k, v));
+            currentTheme = themeKey;
+            try { localStorage.setItem('aqaramar-theme', themeKey); } catch(e) {}
+            const preview = document.getElementById('fab-preview');
+            if (preview) {
+                preview.innerHTML = theme.swatch.map(c => `<span style="background:${c}"></span>`).join('');
+            }
+            document.querySelectorAll('.theme-opt').forEach(el => {
+                el.classList.toggle('on', el.dataset.theme === themeKey);
+            });
+            // إعادة تصيير الأحياء المحلّلة بحيث تستخدم الألوان الجديدة
+            if (typeof map !== 'undefined' && map && map.data) {
+                try {
+                    if (typeof activeThematicKey !== 'undefined' && activeThematicKey && typeof renderThematicMap === 'function') {
+                        renderThematicMap();
+                    } else if (typeof styleDistrictFeature === 'function') {
+                        map.data.setStyle(styleDistrictFeature);
+                    }
+                } catch (e) { console.warn('تعذّر إعادة تصيير الأحياء بعد تبديل الثيم:', e); }
+            }
+        }
+
+        function buildThemeOptions() {
+            const wrap = document.getElementById('theme-options');
+            if (!wrap) return;
+            wrap.innerHTML = Object.entries(THEMES).map(([key, t]) => `
+                <button class="theme-opt ${key === currentTheme ? 'on' : ''}" data-theme="${key}" onclick="applyTheme('${key}')">
+                    <span class="theme-swatch">
+                        <span style="background:${t.swatch[0]}"></span>
+                        <span style="background:${t.swatch[1]}"></span>
+                        <span style="background:${t.swatch[2]}"></span>
+                    </span>
+                    <span class="theme-opt-info">
+                        <span class="theme-opt-name">${t.name}</span>
+                        <span class="theme-opt-desc">${t.desc}</span>
+                    </span>
+                </button>
+            `).join('');
+        }
+
+        function toggleThemePanel() {
+            document.getElementById('theme-panel').classList.toggle('on');
+        }
+
+        document.addEventListener('click', (e) => {
+            const panel = document.getElementById('theme-panel');
+            const fab = document.querySelector('.theme-fab');
+            if (panel && panel.classList.contains('on') &&
+                !panel.contains(e.target) && !fab.contains(e.target)) {
+                panel.classList.remove('on');
+            }
+        });
+
+        // الاستماع لتغيّر الثيم من tab آخر (index.html) أثناء فتح كلاهما
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'aqaramar-theme' && e.newValue && THEMES[e.newValue]) {
+                applyTheme(e.newValue);
+            }
+        });
+
+        // تطبيق فوري
+        applyTheme(currentTheme);
+        buildThemeOptions();
     </script>
 </body>
 </html>
