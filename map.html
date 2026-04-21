@@ -3,7 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>خريطة القطع العقارية</title>
+    <title>عقار وعُمار — خريطة العقارات السعودية</title>
+    <meta name="description" content="خريطة تفاعلية للعقارات والأحياء السعودية مع بيانات صفقات وزارة العدل ومعلومات البلديات.">
+
+    <!-- Open Graph (واتساب، تلغرام، Facebook) -->
+    <meta property="og:title" content="عقار وعُمار — خريطة العقارات السعودية">
+    <meta property="og:description" content="خريطة تفاعلية للأحياء والقطع السعودية مع بيانات وزارة العدل والبلديات.">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="ar_SA">
+    <meta property="og:site_name" content="عقار وعُمار">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="عقار وعُمار — خريطة العقارات السعودية">
+    <meta name="twitter:description" content="خريطة تفاعلية للأحياء والقطع السعودية مع بيانات وزارة العدل والبلديات.">
+
     <script>
       (g=>{var h,a,k,p="The Google Maps JavaScript API",c="google",l="importLibrary",q="__ib__",m=document,b=window;b=b[c]||(b[c]={});var d=b.maps||(b.maps={}),r=new Set,e=new URLSearchParams,u=()=>h||(h=new Promise(async(f,n)=>{await (a=m.createElement("script"));e.set("libraries",[...r]+"");for(k in g)e.set(k.replace(/[A-Z]/g,t=>"_"+t[0].toLowerCase()),g[k]);e.set("callback",c+".maps."+q);a.src=`https://maps.${c}apis.com/maps/api/js?`+e;d[q]=f;a.onerror=()=>h=n(Error(p+" could not load."));a.nonce=m.querySelector("script[nonce]")?.nonce||"";m.head.append(a)}));d[l]?console.warn(p+" only loads once. Ignoring:",g):d[l]=(f,...n)=>r.add(f)&&u().then(()=>d[l](f,...n))})({
         key: "AIzaSyDP3GJqgDmlto362n26Z3RnCIQS1J1Ctyc",
@@ -779,21 +793,173 @@
         @media (max-width: 767px) {
             .mobile-close-panel { display: flex; }
         }
+        /* زر المشاركة في الديسكتوب (رأس الشريط الجانبي) */
+        .desktop-share-btn {
+            position: absolute;
+            top: 16px; left: 16px;
+            background: rgba(255,255,255,0.22);
+            color: white;
+            border: none;
+            width: 34px; height: 34px;
+            border-radius: 50%;
+            font-size: 15px;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        .desktop-share-btn:hover { background: rgba(255,255,255,0.38); }
+        .sidebar-header.empty .desktop-share-btn {
+            background: #f0f0f0;
+            color: #2c8c7c;
+            border: 1px solid #ddd;
+        }
+        .sidebar-header.empty .desktop-share-btn:hover {
+            background: #e0f0ec;
+        }
+
+        /* نافذة المشاركة (Modal) */
+        .share-modal-backdrop {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.55);
+            z-index: 200;
+            display: flex; align-items: center; justify-content: center;
+            animation: fadeIn 0.2s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .share-modal {
+            background: white;
+            border-radius: 14px;
+            padding: 20px 22px;
+            width: 90%;
+            max-width: 440px;
+            direction: rtl;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            animation: slideUp 0.25s ease;
+        }
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .share-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 4px;
+        }
+        .share-header h3 { margin: 0; color: #2c8c7c; font-size: 16px; }
+        .share-close {
+            background: #f0f0f0; border: none;
+            width: 30px; height: 30px; border-radius: 50%;
+            font-size: 18px; cursor: pointer;
+            color: #666; line-height: 1;
+            font-family: inherit;
+        }
+        .share-close:hover { background: #e0e0e0; color: #333; }
+        .share-subtitle {
+            color: #666; margin: 6px 0 14px;
+            font-size: 13px;
+        }
+        .share-url-row {
+            display: flex; gap: 6px; margin-bottom: 16px;
+        }
+        .share-url-input {
+            flex: 1; min-width: 0;
+            padding: 9px 10px;
+            border: 1px solid #d0d8d5;
+            border-radius: 6px;
+            font-size: 11px;
+            direction: ltr;
+            text-align: left;
+            background: #f8fbfa;
+            color: #333;
+            font-family: monospace;
+        }
+        .share-url-input:focus {
+            outline: none; border-color: #2c8c7c;
+        }
+        .share-copy-btn {
+            background: #2c8c7c; color: white;
+            border: none;
+            padding: 9px 14px; border-radius: 6px;
+            cursor: pointer;
+            font-family: inherit; font-size: 12px;
+            white-space: nowrap;
+            font-weight: 600;
+            transition: background 0.15s;
+        }
+        .share-copy-btn:hover { background: #1f6b5e; }
+        .share-options {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+        }
+        .share-opt {
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            gap: 6px;
+            padding: 12px 6px;
+            border: 1px solid #e6ecea;
+            border-radius: 8px;
+            text-decoration: none;
+            color: #333;
+            font-size: 11px;
+            font-weight: 600;
+            transition: all 0.15s;
+            background: white;
+        }
+        .share-opt:hover {
+            background: #f8fbfa;
+            border-color: #2c8c7c;
+            transform: translateY(-2px);
+            box-shadow: 0 3px 8px rgba(44,140,124,0.15);
+        }
+        .share-icon { font-size: 22px; }
+        .share-native-btn {
+            margin-top: 14px; width: 100%;
+            padding: 11px;
+            background: #2c8c7c; color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 600;
+            transition: background 0.15s;
+        }
+        .share-native-btn:hover { background: #1f6b5e; }
+
+        /* على الجوال: اجعل النافذة تستفيد من المساحة */
+        @media (max-width: 767px) {
+            .share-modal {
+                width: 94%;
+                padding: 18px 16px;
+                border-radius: 12px;
+            }
+            .share-url-input { font-size: 10px; padding: 8px; }
+            .share-copy-btn { padding: 8px 10px; font-size: 11px; }
+            .share-options { gap: 6px; }
+            .share-opt { padding: 10px 4px; font-size: 10px; }
+            .share-icon { font-size: 20px; }
+        }
     </style>
 </head>
 <body>
     <div id="container">
         <div id="sidebar">
-            <!-- رأس الجوال — العنوان + زر الإغلاق (يظهر فقط على الجوال) -->
+            <!-- رأس الجوال — العنوان + زر المشاركة + زر الإغلاق (يظهر فقط على الجوال) -->
             <div class="mobile-close-panel" id="mobile-close-panel">
                 <div class="title">
                     <span id="mobile-panel-title">التفاصيل</span>
                 </div>
-                <button class="close-btn" onclick="collapseMobilePanel(); event.stopPropagation();" title="إغلاق والعودة للخريطة">×</button>
+                <div style="display:flex; gap:6px; align-items:center">
+                    <button class="close-btn share-btn-header" onclick="openShareSheet(); event.stopPropagation();" title="مشاركة">🔗</button>
+                    <button class="close-btn" onclick="collapseMobilePanel(); event.stopPropagation();" title="إغلاق والعودة للخريطة">×</button>
+                </div>
             </div>
 
             <!-- رأس الديسكتوب -->
             <div class="sidebar-header empty" id="sidebar-header">
+                <button class="desktop-share-btn" onclick="openShareSheet()" title="مشاركة الرابط">🔗</button>
                 <h2 id="sb-title">اختر قطعة أو حي من الخريطة</h2>
                 <p id="sb-subtitle">اضغط على أي موقع لعرض بياناته</p>
                 <span class="source-badge" id="sb-source" style="display:none"></span>
@@ -1171,6 +1337,13 @@
             // ارسم النجمات للقطع المحفوظة + الحالة الفارغة للأراضي
             renderSavedMarkers();
             renderLandsEmpty();
+
+            // اطبع حالة URL فوراً لو كان parcel فقط (لا يحتاج أحياء)
+            const urlParams = getURLParams();
+            if (urlParams.parcel && !urlParams.city && !urlParams.district) {
+                console.log('🔗 تطبيق رابط قطعة مباشرة (لا ينتظر الأحياء)');
+                applyURLState().catch(err => console.warn('applyURLState (parcel) failed:', err));
+            }
         }
 
         function updateZoomBadge() {
@@ -1249,6 +1422,293 @@
             rescanLoadedCities();
             console.log(`✓ حُمّل ${geojson.features.length} حياً (${source})`);
             console.log(`✓ المدن المحمّلة: ${[...loadedCities].join(', ') || 'لا شيء'}`);
+
+            // طبّق حالة URL إذا وُجدت (deep linking)
+            applyURLState().catch(err => console.warn('applyURLState failed:', err));
+        }
+
+        /* ═══════════════════════════════════════════════════════
+           🔗 نظام الروابط المباشرة (Deep Linking)
+           ═══════════════════════════════════════════════════════
+           ?city=riyadh          → يفتح مدينة
+           ?district=الملقا       → يفتح حياً (مع city إن وُجد)
+           ?parcel=RE_PARCELID   → يفتح قطعة محددة
+           ?thematic=price       → يفعّل خريطة تفاعلية
+        */
+
+        function getURLParams() {
+            const p = new URLSearchParams(window.location.search);
+            return {
+                city: p.get('city'),
+                district: p.get('district'),
+                parcel: p.get('parcel'),
+                thematic: p.get('thematic'),
+            };
+        }
+
+        function updateURL(state) {
+            // state مطلوب ويحدد بالضبط المعلمات النهائية.
+            // أي مفتاح غير موجود أو null سيُحذف من URL.
+            // استخدم state.auto = true إذا كنت تريد قراءة الحالة من lastData تلقائياً.
+            if (!state) state = {};
+
+            let city, district, parcel, thematic;
+
+            if (state.auto) {
+                // الوضع التلقائي: اقرأ الحالة الفعلية من lastData
+                // لكن بقواعد حصرية: القطعة تُستبعد وجود حي/مدينة،
+                // والمدينة/الحي يستبعدا وجود القطعة
+                if (lastData?.selected?.attributes?.RE_PARCELID) {
+                    parcel = lastData.selected.attributes.RE_PARCELID;
+                } else {
+                    city = lastData?.selectedCity || null;
+                    district = lastData?.district?.name || null;
+                    thematic = activeThematicKey || null;
+                }
+            } else {
+                city = state.city || null;
+                district = state.district || null;
+                parcel = state.parcel || null;
+                thematic = state.thematic || null;
+            }
+
+            const p = new URLSearchParams();
+            if (city)     p.set('city', city);
+            if (district) p.set('district', district);
+            if (parcel)   p.set('parcel', parcel);
+            if (thematic) p.set('thematic', thematic);
+
+            const query = p.toString();
+            const newURL = window.location.pathname + (query ? '?' + query : '');
+            history.replaceState(null, '', newURL);
+        }
+
+        // بعد تهيئة الخريطة وتحميل البيانات، طبّق حالة URL
+        async function applyURLState() {
+            const params = getURLParams();
+            if (!params.city && !params.district && !params.parcel) return;
+
+            console.log('🔗 تطبيق حالة URL:', params);
+
+            // القطعة لها الأولوية — تفتح مباشرة (لا تحتاج أحياء)
+            if (params.parcel) {
+                console.log('🔗 محاولة فتح القطعة:', params.parcel);
+                try {
+                    const url = `${PROXY_URL}/search?re_id=${encodeURIComponent(params.parcel)}`;
+                    console.log('🔗 URL:', url);
+                    const res = await fetch(url);
+                    const data = await res.json();
+                    console.log('🔗 استجابة Worker:', data);
+                    if (data.features && data.features.length > 0) {
+                        const f = data.features[0];
+                        if (f.geometry && f.geometry.rings && f.geometry.rings.length > 0) {
+                            const ring = f.geometry.rings[0];
+                            const cx = ring.reduce((s, p) => s + p[0], 0) / ring.length;
+                            const cy = ring.reduce((s, p) => s + p[1], 0) / ring.length;
+                            console.log('🔗 مركز القطعة:', { lat: cy, lng: cx });
+                            map.panTo({ lat: cy, lng: cx });
+                            map.setZoom(18);
+                            // انتقل لتبويب الأراضي
+                            activeTab = 'lands';
+                            document.querySelectorAll('.tab').forEach(t =>
+                                t.classList.toggle('active',
+                                    t.dataset.tab === 'lands' || t.dataset.mtab === 'lands'));
+                            document.querySelectorAll('.tab-content').forEach(c =>
+                                c.classList.toggle('active', c.id === 'tab-lands'));
+                            // استدع fetchParcel (ستفتح اللوحة تلقائياً على الجوال)
+                            await fetchParcel(cy, cx);
+                            return;
+                        } else {
+                            console.warn('🔗 القطعة لا تحتوي على إحداثيات');
+                            showWarn('القطعة موجودة لكن بدون إحداثيات', 5000);
+                        }
+                    } else {
+                        console.warn('🔗 لم يُرجع Worker أي features');
+                        showWarn('رقم الهوية العقارية غير موجود', 5000);
+                    }
+                } catch (err) {
+                    console.error('🔗 فشل فتح القطعة من URL:', err);
+                    showWarn('تعذّر جلب القطعة — ' + err.message, 5000);
+                }
+                return; // لا تطبّق city/district إذا طُلبت قطعة
+            }
+
+            // مدينة
+            if (params.city && CITY_BBOX[params.city]) {
+                // انتقل أولاً لتبويب المدينة قبل الاختيار
+                activeTab = 'city';
+                document.querySelectorAll('.tab').forEach(t =>
+                    t.classList.toggle('active',
+                        t.dataset.tab === 'city' || t.dataset.mtab === 'city'));
+                document.querySelectorAll('.tab-content').forEach(c =>
+                    c.classList.toggle('active', c.id === 'tab-city'));
+
+                await selectCityFromList(params.city);
+
+                // خريطة تفاعلية على مستوى المدينة
+                if (params.thematic && THEMATIC_METRICS[params.thematic]?.real) {
+                    // انتظر قليلاً حتى تتحمّل الصفقات
+                    setTimeout(() => applyThematicMap(params.thematic), 800);
+                }
+            }
+
+            // حي (قد يأتي بدون city)
+            if (params.district) {
+                // انتقل لتبويب الأحياء
+                activeTab = 'districts';
+                document.querySelectorAll('.tab').forEach(t =>
+                    t.classList.toggle('active',
+                        t.dataset.tab === 'districts' || t.dataset.mtab === 'districts'));
+                document.querySelectorAll('.tab-content').forEach(c =>
+                    c.classList.toggle('active', c.id === 'tab-districts'));
+
+                // انتظر تحميل الأحياء ثم ابحث عن الحي بالاسم
+                setTimeout(() => {
+                    const targetName = normalizeDistrictName(params.district);
+                    let found = null;
+                    map.data.forEach(f => {
+                        if (found) return;
+                        const name = f.getProperty('name:ar') || f.getProperty('name');
+                        if (name && normalizeDistrictName(name) === targetName) {
+                            found = f;
+                        }
+                    });
+                    if (found) {
+                        selectDistrictFromList({
+                            id: found.getId(),
+                            name: found.getProperty('name:ar') || found.getProperty('name'),
+                            feature: found,
+                            stats: getDistrictStats(found.getId(),
+                                found.getProperty('name:ar') || found.getProperty('name'),
+                                getCurrentMapCity()),
+                        });
+                    } else {
+                        showWarn(`الحي "${params.district}" غير موجود`, 4000);
+                    }
+                }, 1200);
+            }
+        }
+
+        /* ═══════ مشاركة الرابط ═══════ */
+        function getCurrentShareableURL() {
+            // بني URL من حالة التطبيق الحالية بقواعد حصرية
+            const state = {};
+            const parcelId = lastData?.selected?.attributes?.RE_PARCELID;
+            if (parcelId) {
+                // القطعة لها الأولوية — تجاهل المدينة والحي
+                state.parcel = parcelId;
+            } else {
+                if (lastData?.selectedCity) state.city = lastData.selectedCity;
+                if (lastData?.district?.name) state.district = lastData.district.name;
+                if (activeThematicKey) state.thematic = activeThematicKey;
+            }
+
+            const p = new URLSearchParams();
+            for (const [k, v] of Object.entries(state)) p.set(k, v);
+            const base = window.location.origin + window.location.pathname;
+            return base + '?' + p.toString();
+        }
+
+        function openShareSheet() {
+            const url = getCurrentShareableURL();
+            const title = buildShareTitle();
+            showShareModal(url, title);
+        }
+
+        function buildShareTitle() {
+            const parcelId = lastData?.selected?.attributes?.RE_PARCELID;
+            if (parcelId) {
+                return `قطعة: ${parcelId}`;
+            }
+            if (lastData?.district?.name) {
+                return `حي ${lastData.district.name}`;
+            }
+            if (lastData?.selectedCity) {
+                return `مدينة ${CITY_NAMES_AR[lastData.selectedCity] || lastData.selectedCity}`;
+            }
+            return 'عقار وعُمار — خريطة العقارات السعودية';
+        }
+
+        function showShareModal(url, title) {
+            // أزل أي modal قديم
+            document.querySelectorAll('.share-modal-backdrop').forEach(n => n.remove());
+
+            const backdrop = document.createElement('div');
+            backdrop.className = 'share-modal-backdrop';
+            backdrop.onclick = e => { if (e.target === backdrop) backdrop.remove(); };
+
+            const text = encodeURIComponent(`${title}\n${url}`);
+            const encodedUrl = encodeURIComponent(url);
+
+            backdrop.innerHTML = `
+                <div class="share-modal">
+                    <div class="share-header">
+                        <h3>مشاركة</h3>
+                        <button class="share-close" onclick="this.closest('.share-modal-backdrop').remove()">×</button>
+                    </div>
+                    <div class="share-subtitle">${escapeHtml(title)}</div>
+                    <div class="share-url-row">
+                        <input class="share-url-input" value="${escapeHtml(url)}" readonly onclick="this.select()" />
+                        <button class="share-copy-btn" onclick="copyShareURL(this, '${escapeHtml(url)}')">📋 نسخ</button>
+                    </div>
+                    <div class="share-options">
+                        <a class="share-opt wa" href="https://wa.me/?text=${text}" target="_blank" rel="noopener">
+                            <span class="share-icon">💬</span>
+                            <span>واتساب</span>
+                        </a>
+                        <a class="share-opt tg" href="https://t.me/share/url?url=${encodedUrl}&text=${encodeURIComponent(title)}" target="_blank" rel="noopener">
+                            <span class="share-icon">✈️</span>
+                            <span>تلغرام</span>
+                        </a>
+                        <a class="share-opt tw" href="https://twitter.com/intent/tweet?text=${text}" target="_blank" rel="noopener">
+                            <span class="share-icon">𝕏</span>
+                            <span>تويتر</span>
+                        </a>
+                        <a class="share-opt mail" href="mailto:?subject=${encodeURIComponent(title)}&body=${text}">
+                            <span class="share-icon">✉️</span>
+                            <span>بريد</span>
+                        </a>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(backdrop);
+
+            // إذا كان Web Share API مدعوماً (خصوصاً على iOS/Android)، أضف زراً للمشاركة الأصلية
+            if (navigator.share) {
+                const nativeBtn = document.createElement('button');
+                nativeBtn.className = 'share-native-btn';
+                nativeBtn.innerHTML = '📱 مشاركة عبر التطبيقات';
+                nativeBtn.onclick = async () => {
+                    try {
+                        await navigator.share({ title, url, text: title });
+                    } catch (e) { /* user cancelled */ }
+                };
+                backdrop.querySelector('.share-modal').appendChild(nativeBtn);
+            }
+        }
+
+        function copyShareURL(btn, url) {
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(url).then(() => {
+                    const old = btn.innerHTML;
+                    btn.innerHTML = '✓ تم النسخ';
+                    btn.style.background = '#1f6b5e';
+                    setTimeout(() => {
+                        btn.innerHTML = old;
+                        btn.style.background = '';
+                    }, 1500);
+                }).catch(() => fallbackCopy(url, btn));
+            } else {
+                fallbackCopy(url, btn);
+            }
+        }
+        function fallbackCopy(text, btn) {
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            document.body.appendChild(ta);
+            ta.select();
+            try { document.execCommand('copy'); btn.innerHTML = '✓ تم النسخ'; } catch (e) {}
+            document.body.removeChild(ta);
         }
 
         // بدء التهيئة
@@ -1411,8 +1871,16 @@
                     source: 'osm'
                 }
             };
-            // إذا كنا في تبويب الأحياء أصلاً، تجنّب switchTab (الذي قد يعيدنا للقائمة)
-            // وبدلاً منه ارسم التفاصيل مباشرة
+            // نظّف القطعة السابقة (نحن الآن على حي)
+            delete lastData.selected;
+            delete lastData.results;
+            // حدّث URL
+            updateURL({
+                city: lastData.selectedCity || getCurrentMapCity(),
+                district: nameAr,
+                thematic: activeThematicKey,
+            });
+            // إذا كنا في تبويب الأحياء أصلاً، تجنّب switchTab
             if (activeTab === 'districts') {
                 renderDistrictTab(lastData);
                 expandMobilePanel(nameAr);
@@ -1534,8 +2002,17 @@
                 if (data.results && data.results.length > 0) {
                     const selected = selectBestResult(data.results, lat, lng);
                     lastData = { ...(lastData || {}), results: data.results, selected, lat, lng };
+                    // نظّف اختيارات المدينة/الحي السابقة — القطعة مستقلة
+                    delete lastData.selectedCity;
+                    delete lastData.district;
+                    selectedDistrictId = null;
                     renderLandsTab(selected);
                     drawPolygon(selected);
+                    // حدّث URL — شارك رقم الهوية العقارية فقط
+                    const parcelId = selected?.attributes?.RE_PARCELID;
+                    if (parcelId) {
+                        updateURL({ city: null, district: null, parcel: parcelId, thematic: null });
+                    }
                 } else {
                     document.getElementById('sb-title').textContent = 'لا توجد بيانات';
                     document.getElementById('tab-lands').innerHTML = emptyTab('❓', 'لم يتم العثور على قطعة');
@@ -2099,6 +2576,14 @@
                 ...(lastData || {}),
                 district: { name: nameAr, nameEn, id: item.id, source: 'osm' }
             };
+            // نظّف القطعة السابقة
+            delete lastData.selected;
+            delete lastData.results;
+            updateURL({
+                city: lastData.selectedCity || getCurrentMapCity(),
+                district: nameAr,
+                thematic: activeThematicKey,
+            });
             renderDistrictTab(lastData);
             expandMobilePanel(nameAr);
         }
@@ -2344,12 +2829,19 @@
                 if (map.getZoom() > 12) map.setZoom(12);
             });
 
-            // نظّف اختيار الحي السابق والخريطة التفاعلية (مع حماية ضد عناصر مفقودة)
+            // نظّف اختيار الحي والقطعة السابقة والخريطة التفاعلية
             selectedDistrictId = null;
             activeThematicKey = null;
             const legend = document.getElementById('map-legend');
             if (legend) legend.style.display = 'none';
+            const topbar = document.getElementById('thematic-topbar');
+            if (topbar) topbar.classList.remove('visible');
             if (lastData?.district) delete lastData.district;
+            if (lastData?.selected) delete lastData.selected;
+            if (lastData?.results) delete lastData.results;
+            // أزل ماركر القطعة والمضلّع لو كانا على الخريطة
+            if (currentMarker) { currentMarker.setMap(null); currentMarker = null; }
+            if (currentPolygon) { currentPolygon.setMap(null); currentPolygon = null; }
             if (map.data) map.data.setStyle(styleDistrictFeature);
 
             lastData = { ...(lastData || {}), selectedCity: cityId };
@@ -2388,6 +2880,8 @@
             if (lastData?.selectedCity === cityId) {
                 try { renderCityDetail(cityId); } catch (e) { console.error(e); }
             }
+            // حدّث URL
+            updateURL({ city: cityId, thematic: activeThematicKey });
         }
 
         function renderCityDetail(cityId) {
@@ -2457,6 +2951,7 @@
             try {
                 if (lastData) delete lastData.selectedCity;
                 activeThematicKey = null;
+                updateURL({}); // URL نظيف
                 const legend = document.getElementById('map-legend');
                 if (legend) legend.style.display = 'none';
                 const topbar = document.getElementById('thematic-topbar');
@@ -2690,6 +3185,12 @@
             }
             activeThematicKey = key;
             renderThematicMap();
+            // حدّث URL — الخرائط التفاعلية تخص المدينة فقط
+            updateURL({
+                city: lastData?.selectedCity || getCurrentMapCity(),
+                district: lastData?.district?.name,
+                thematic: key,
+            });
 
             // على الجوال: صغّر اللوحة للرأس فقط — الخريطة التفاعلية تحتاج رؤية كاملة
             if (isMobile()) {
@@ -2725,6 +3226,11 @@
         function clearThematicMap() {
             activeThematicKey = null;
             window._lastLegend = null;
+            // حدّث URL — احتفظ بالمدينة/الحي (إن وُجدا) وأزل الخريطة التفاعلية
+            updateURL({
+                city: lastData?.selectedCity || getCurrentMapCity(),
+                district: lastData?.district?.name,
+            });
             if (map?.data) {
                 map.data.revertStyle();
                 map.data.setStyle(styleDistrictFeature);
