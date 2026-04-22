@@ -1,0 +1,1652 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>عروض التمويل العقاري · عَقار وعَمار</title>
+<meta name="description" content="قارن عروض التمويل العقاري من البنوك السعودية، واحسب قسطك الشهري، وتعرّف على برنامج سكني ومتطلّبات التأهّل.">
+
+<meta property="og:title" content="عروض التمويل العقاري · عَقار وعَمار">
+<meta property="og:type" content="website">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@300;400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root {
+    --bg:      #091822;
+    --bg-1:    #0D1E2A;
+    --bg-2:    #112836;
+    --bg-3:    #16344A;
+    --pearl:   #E8DCC2;
+    --copper:  #B58763;
+    --copper-d:#8A6648;
+    --teal:    #2C8C7C;
+    --teal-b:  #4FC4B0;
+    --teal-s:  rgba(79, 196, 176, 0.12);
+    --t1: #F2EEE3; --t2: #BDB8A8; --t3: #8A8578; --t4: #5A5548;
+    --up: #5CCA8A; --up-bg: rgba(92, 202, 138, 0.12);
+    --down: #E8876A; --down-bg: rgba(232, 135, 106, 0.12);
+    --line:   rgba(242, 238, 227, 0.07);
+    --line-2: rgba(242, 238, 227, 0.12);
+    --line-3: rgba(181, 135, 99, 0.25);
+    --f-d: 'Readex Pro', sans-serif;
+    --f-b: 'IBM Plex Sans Arabic', sans-serif;
+    --f-m: 'JetBrains Mono', monospace;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+    background: var(--bg);
+    color: var(--t1);
+    font-family: var(--f-b);
+    font-size: 13px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    background-image:
+        radial-gradient(circle at 10% 5%, rgba(44, 140, 124, 0.05), transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(181, 135, 99, 0.04), transparent 40%);
+    min-height: 100vh;
+}
+a { color: inherit; text-decoration: none; }
+button { font-family: inherit; cursor: pointer; }
+
+.app { max-width: 1280px; margin: 0 auto; padding: 0 18px; }
+
+/* ═══ HEADER ═══ */
+.top {
+    display: flex;
+    align-items: center;
+    padding: 14px 0;
+    gap: 20px;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 20px;
+}
+.brand {
+    display: flex;
+    align-items: baseline;
+    gap: 2px;
+    font-family: var(--f-d);
+    font-size: 17px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+.brand i {
+    color: var(--copper);
+    font-style: normal;
+    font-weight: 400;
+    font-size: 13px;
+    margin: 0 2px;
+}
+.nav { display: flex; gap: 18px; }
+.nav a {
+    font-size: 12.5px;
+    color: var(--t2);
+    padding: 4px 0;
+    border-bottom: 1.5px solid transparent;
+    font-weight: 500;
+    transition: color .15s, border-color .15s;
+}
+.nav a:hover { color: var(--t1); }
+.nav a.on { color: var(--copper); border-bottom-color: var(--copper); }
+.top-r { display: flex; gap: 8px; align-items: center; margin-right: auto; }
+.btn {
+    font-family: inherit;
+    padding: 6px 14px;
+    font-size: 12px;
+    font-weight: 500;
+    border-radius: 4px;
+    border: 1px solid transparent;
+    transition: all .15s;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+.btn-g { background: transparent; color: var(--t2); border-color: var(--line-3); }
+.btn-g:hover { color: var(--t1); border-color: var(--copper-d); }
+.btn-c { background: var(--copper); color: var(--bg); font-weight: 600; border-color: var(--copper); }
+.btn-c:hover { background: var(--pearl); border-color: var(--pearl); }
+
+/* ═══ PAGE HEADER ═══ */
+.page-h {
+    padding: 24px 0 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 24px;
+}
+.page-h-l { max-width: 700px; }
+.page-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 10px;
+    color: var(--teal-b);
+    font-weight: 600;
+    letter-spacing: 1.6px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+}
+.page-tag::before {
+    content: '';
+    width: 22px; height: 1.5px;
+    background: var(--teal-b);
+}
+.page-h h1 {
+    font-family: var(--f-d);
+    font-size: 32px;
+    font-weight: 400;
+    line-height: 1.2;
+    letter-spacing: -0.4px;
+    margin-bottom: 8px;
+}
+.page-h h1 b { color: var(--copper); font-weight: 600; }
+.page-h p {
+    font-size: 13.5px;
+    color: var(--t2);
+    line-height: 1.6;
+}
+.page-h-r {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+    text-align: left;
+    padding-bottom: 4px;
+}
+.repo-card {
+    background: var(--bg-1);
+    border: 1px solid var(--line-3);
+    border-radius: 6px;
+    padding: 10px 14px;
+    min-width: 180px;
+    text-align: left;
+}
+.repo-card-l {
+    font-size: 9.5px;
+    color: var(--t3);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+.repo-card-v {
+    font-family: var(--f-m);
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--copper);
+    line-height: 1.1;
+    margin: 3px 0 2px;
+}
+.repo-card-s {
+    font-size: 10px;
+    color: var(--t4);
+}
+
+/* ═══ LAYOUT ═══ */
+.grid {
+    display: grid;
+    grid-template-columns: 5fr 7fr;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+/* ═══ CALCULATOR ═══ */
+.calc {
+    background: linear-gradient(165deg, var(--bg-1), var(--bg-2));
+    border: 1px solid var(--line-3);
+    border-radius: 10px;
+    padding: 22px;
+    position: relative;
+    overflow: hidden;
+}
+.calc::before {
+    content: '';
+    position: absolute;
+    top: 0; right: 0; bottom: 0;
+    width: 3px;
+    background: linear-gradient(180deg, var(--copper), transparent);
+    opacity: 0.8;
+}
+.calc::after {
+    content: '';
+    position: absolute;
+    bottom: -40%; left: -15%;
+    width: 320px; height: 320px;
+    background: radial-gradient(circle, rgba(79, 196, 176, 0.08), transparent 60%);
+    pointer-events: none;
+}
+.calc-h {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 18px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--line);
+    position: relative;
+}
+.calc-title {
+    font-family: var(--f-d);
+    font-size: 17px;
+    font-weight: 500;
+    color: var(--t1);
+    letter-spacing: -0.2px;
+}
+.calc-subtitle {
+    font-size: 10.5px;
+    color: var(--t3);
+}
+
+.field {
+    margin-bottom: 18px;
+    position: relative;
+}
+.field-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 8px;
+}
+.field-label {
+    font-size: 12px;
+    color: var(--t2);
+    font-weight: 500;
+}
+.field-value {
+    font-family: var(--f-m);
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--copper);
+}
+.field-value i {
+    font-size: 10px;
+    color: var(--t3);
+    font-weight: 400;
+    margin-right: 3px;
+    font-style: normal;
+}
+
+/* Slider */
+.slider-wrap { position: relative; height: 28px; display: flex; align-items: center; }
+.slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 4px;
+    background: var(--bg-3);
+    border-radius: 2px;
+    outline: none;
+    cursor: pointer;
+}
+.slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    background: var(--copper);
+    border: 2px solid var(--bg-1);
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    transition: transform .15s;
+}
+.slider::-webkit-slider-thumb:hover { transform: scale(1.15); }
+.slider::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    background: var(--copper);
+    border: 2px solid var(--bg-1);
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    transition: transform .15s;
+}
+.slider-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 6px;
+    font-family: var(--f-m);
+    font-size: 9.5px;
+    color: var(--t4);
+}
+
+/* Tabs */
+.tabs {
+    display: flex;
+    gap: 2px;
+    padding: 3px;
+    background: var(--bg);
+    border-radius: 5px;
+    margin-bottom: 14px;
+    border: 1px solid var(--line);
+}
+.tab-btn {
+    flex: 1;
+    padding: 7px;
+    background: transparent;
+    border: none;
+    color: var(--t3);
+    font-family: inherit;
+    font-size: 11.5px;
+    border-radius: 3px;
+    transition: all .15s;
+}
+.tab-btn.on {
+    background: var(--copper);
+    color: var(--bg);
+    font-weight: 600;
+}
+.tab-btn:not(.on):hover { color: var(--t1); }
+
+/* Result */
+.result {
+    background: var(--bg);
+    border: 1px solid var(--copper-d);
+    border-radius: 8px;
+    padding: 16px 18px;
+    margin-top: 4px;
+    position: relative;
+}
+.result-h {
+    font-size: 10px;
+    color: var(--t3);
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+.result-v {
+    font-family: var(--f-m);
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--copper);
+    line-height: 1;
+    letter-spacing: -1px;
+}
+.result-v i {
+    font-size: 14px;
+    color: var(--t3);
+    font-weight: 400;
+    margin-right: 4px;
+    font-style: normal;
+}
+.result-breakdown {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid var(--line);
+}
+.breakdown-cell { }
+.breakdown-l {
+    font-size: 9.5px;
+    color: var(--t3);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin-bottom: 2px;
+}
+.breakdown-v {
+    font-family: var(--f-m);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--t1);
+}
+.breakdown-v i {
+    font-size: 9.5px;
+    color: var(--t3);
+    font-weight: 400;
+    margin-right: 2px;
+    font-style: normal;
+}
+
+.disclaimer {
+    font-size: 10.5px;
+    color: var(--t4);
+    line-height: 1.5;
+    margin-top: 12px;
+    padding: 10px 12px;
+    background: rgba(232, 135, 106, 0.06);
+    border-right: 2px solid var(--down);
+    border-radius: 4px;
+}
+
+/* ═══ BANKS TABLE ═══ */
+.banks {
+    background: var(--bg-1);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 22px;
+}
+.banks-h {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 14px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--line);
+}
+.banks-title {
+    font-family: var(--f-d);
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--t1);
+    letter-spacing: -0.1px;
+}
+.banks-meta {
+    font-size: 10px;
+    color: var(--t3);
+    font-family: var(--f-m);
+}
+.banks-meta b { color: var(--copper); font-weight: 600; }
+
+/* Filters */
+.bank-filters {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+}
+.filter-btn {
+    background: transparent;
+    border: 1px solid var(--line-2);
+    color: var(--t2);
+    font-family: inherit;
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 14px;
+    transition: all .15s;
+}
+.filter-btn:hover {
+    border-color: var(--copper-d);
+    color: var(--t1);
+}
+.filter-btn.on {
+    background: var(--copper);
+    color: var(--bg);
+    border-color: var(--copper);
+    font-weight: 600;
+}
+
+/* Bank rows */
+.bank-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.bank {
+    padding: 12px;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    display: grid;
+    grid-template-columns: 44px 1fr auto auto;
+    gap: 14px;
+    align-items: center;
+    transition: border-color .12s, transform .12s;
+}
+.bank:hover {
+    border-color: var(--copper-d);
+    transform: translateX(-2px);
+}
+.bank-logo {
+    width: 44px; height: 44px;
+    border-radius: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--f-d);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+    flex-shrink: 0;
+    border: 1px solid var(--line-2);
+    text-align: center;
+    line-height: 1.1;
+}
+.bank-logo.rajhi  { background: #003B7A; color: #FFF; }
+.bank-logo.snb    { background: #7BAE54; color: #FFF; }
+.bank-logo.sab    { background: #DB0011; color: #FFF; }
+.bank-logo.alinma { background: #AF3C44; color: #FFF; }
+.bank-logo.riyad  { background: #004C97; color: #FFF; }
+.bank-logo.bsf    { background: #00447C; color: #FFF; }
+.bank-logo.anb    { background: #7D1E20; color: #FFF; }
+.bank-logo.balad  { background: #E8B800; color: #000; }
+.bank-logo.jazira { background: #00A79D; color: #FFF; }
+.bank-logo.sakani { background: var(--copper); color: var(--bg); font-size: 11px; }
+.bank-logo.redf   { background: var(--teal); color: var(--bg); font-size: 10px; }
+.bank-logo.amlak  { background: #1C2A3A; color: var(--copper); font-size: 11px; }
+
+.bank-info { min-width: 0; }
+.bank-name-row {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin-bottom: 3px;
+}
+.bank-name {
+    font-size: 13px;
+    color: var(--t1);
+    font-weight: 600;
+}
+.bank-type {
+    font-size: 9px;
+    color: var(--t3);
+    font-family: var(--f-m);
+    font-weight: 500;
+    padding: 1px 5px;
+    background: var(--line-2);
+    border-radius: 2px;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+}
+.bank-type.islamic { color: var(--up); background: var(--up-bg); }
+.bank-type.gov     { color: var(--teal-b); background: var(--teal-s); }
+.bank-product {
+    font-size: 11px;
+    color: var(--t3);
+    line-height: 1.35;
+}
+.bank-features {
+    display: flex;
+    gap: 10px;
+    margin-top: 4px;
+    font-size: 9.5px;
+    color: var(--t4);
+    font-family: var(--f-m);
+}
+.bank-features span::before {
+    content: '· ';
+    margin-right: 2px;
+}
+.bank-features span:first-child::before { content: ''; margin: 0; }
+
+.bank-rate {
+    text-align: left;
+    flex-shrink: 0;
+}
+.bank-rate-v {
+    font-family: var(--f-m);
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--copper);
+    line-height: 1.1;
+}
+.bank-rate-v i {
+    font-size: 10px;
+    color: var(--t3);
+    font-weight: 400;
+    font-style: normal;
+}
+.bank-rate-l {
+    font-size: 9.5px;
+    color: var(--t4);
+    font-family: var(--f-m);
+    margin-top: 2px;
+    letter-spacing: 0.3px;
+}
+
+.bank-cta {
+    display: flex;
+    gap: 5px;
+}
+.bank-cta a {
+    padding: 6px 10px;
+    font-size: 10.5px;
+    border-radius: 4px;
+    transition: all .15s;
+}
+.bank-cta .primary {
+    background: var(--teal-b);
+    color: var(--bg);
+    font-weight: 600;
+    border: 1px solid var(--teal-b);
+}
+.bank-cta .primary:hover { filter: brightness(1.1); }
+.bank-cta .ghost {
+    background: transparent;
+    color: var(--t2);
+    border: 1px solid var(--line-3);
+}
+.bank-cta .ghost:hover { color: var(--t1); border-color: var(--copper-d); }
+
+.bank-note {
+    font-size: 9.5px;
+    color: var(--t4);
+    font-style: italic;
+    margin-top: 3px;
+}
+
+/* ═══ INFO STRIP ═══ */
+.info {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+}
+.info-card {
+    background: var(--bg-1);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 18px;
+    transition: border-color .15s;
+}
+.info-card:hover { border-color: var(--copper-d); }
+.info-card-h {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+.info-icon {
+    width: 34px; height: 34px;
+    background: var(--teal-s);
+    border: 1px solid rgba(79, 196, 176, 0.22);
+    border-radius: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.info-icon svg {
+    width: 17px; height: 17px;
+    stroke: var(--teal-b);
+    stroke-width: 1.8;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+.info-title {
+    font-family: var(--f-d);
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--t1);
+}
+.info-body {
+    font-size: 11.5px;
+    color: var(--t2);
+    line-height: 1.65;
+}
+.info-body ul {
+    list-style: none;
+    padding: 0;
+    margin: 6px 0 0;
+}
+.info-body li {
+    padding: 4px 0;
+    padding-right: 14px;
+    position: relative;
+}
+.info-body li::before {
+    content: '•';
+    position: absolute;
+    right: 0;
+    color: var(--copper);
+    font-weight: 700;
+}
+.info-body a {
+    color: var(--teal-b);
+    font-weight: 500;
+}
+.info-body a:hover { color: var(--pearl); }
+
+/* ═══ FAQ ═══ */
+.faq {
+    background: var(--bg-1);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 22px;
+    margin-bottom: 20px;
+}
+.faq-h {
+    font-family: var(--f-d);
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--t1);
+    margin-bottom: 14px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--line);
+}
+.faq-item {
+    border-bottom: 1px solid var(--line);
+    padding: 12px 0;
+}
+.faq-item:last-child { border-bottom: none; }
+.faq-q {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--t1);
+    font-weight: 600;
+    padding: 4px 0;
+    user-select: none;
+}
+.faq-q::after {
+    content: '+';
+    color: var(--copper);
+    font-size: 18px;
+    font-weight: 400;
+    transition: transform .2s;
+}
+.faq-item.on .faq-q::after {
+    content: '−';
+}
+.faq-a {
+    font-size: 12px;
+    color: var(--t2);
+    line-height: 1.75;
+    padding: 8px 0 4px;
+    display: none;
+}
+.faq-item.on .faq-a { display: block; }
+
+/* ═══ FOOTER ═══ */
+.foot {
+    margin-top: 24px;
+    padding: 16px 0;
+    border-top: 1px solid var(--line);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 10.5px;
+    color: var(--t4);
+    font-family: var(--f-m);
+    gap: 10px;
+}
+.foot-l { display: flex; gap: 16px; }
+.foot-l a { color: var(--t3); transition: color .12s; }
+.foot-l a:hover { color: var(--copper); }
+
+/* ═══ THEME SWITCHER ═══ */
+.theme-fab {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    z-index: 1000;
+    background: var(--copper);
+    color: var(--bg);
+    border: none;
+    padding: 10px 16px;
+    border-radius: 100px;
+    font-family: var(--f-b);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.4), 0 0 0 1px var(--line-3);
+    transition: transform .18s, box-shadow .18s;
+}
+.theme-fab:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 32px rgba(0,0,0,0.5), 0 0 0 1px var(--copper);
+}
+.theme-fab svg { width: 14px; height: 14px; fill: currentColor; }
+.theme-fab .dot-preview { display: inline-flex; gap: 2px; margin-left: 4px; }
+.theme-fab .dot-preview span {
+    width: 6px; height: 6px; border-radius: 50%;
+    display: inline-block; border: 1px solid rgba(0,0,0,0.15);
+}
+.theme-panel {
+    position: fixed;
+    bottom: 70px; left: 20px;
+    width: 340px;
+    max-height: calc(100vh - 100px);
+    overflow-y: auto;
+    background: var(--bg-1);
+    border: 1px solid var(--line-3);
+    border-radius: 10px;
+    padding: 14px;
+    z-index: 999;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+    pointer-events: none;
+    transition: opacity .2s, transform .2s;
+}
+.theme-panel.on {
+    opacity: 1; transform: translateY(0) scale(1); pointer-events: auto;
+}
+.theme-panel-h {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px solid var(--line);
+}
+.theme-panel-t { font-family: var(--f-d); font-size: 13px; font-weight: 600; color: var(--t1); }
+.theme-panel-s { font-size: 10px; color: var(--t3); margin-top: 2px; }
+.theme-close {
+    background: transparent; border: 1px solid var(--line-2); color: var(--t2);
+    width: 24px; height: 24px; border-radius: 4px;
+    display: inline-flex; align-items: center; justify-content: center;
+    cursor: pointer; font-size: 14px;
+}
+.theme-options { display: flex; flex-direction: column; gap: 6px; }
+.theme-opt {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 10px;
+    background: var(--bg); border: 1px solid var(--line);
+    border-radius: 6px; cursor: pointer;
+    text-align: right; font-family: inherit; width: 100%;
+}
+.theme-opt:hover { border-color: var(--copper-d); background: var(--bg-2); }
+.theme-opt.on { border-color: var(--copper); background: var(--bg-2); }
+.theme-opt.on::after {
+    content: '✓'; color: var(--copper); font-size: 14px; font-weight: 700;
+    margin-right: auto; padding-left: 4px;
+}
+.theme-swatch { display: inline-flex; gap: 2px; border-radius: 3px; overflow: hidden; }
+.theme-swatch span { width: 14px; height: 26px; display: inline-block; }
+.theme-opt-info { flex: 1; min-width: 0; }
+.theme-opt-name { font-size: 12px; color: var(--t1); font-weight: 600; }
+.theme-opt-desc { font-size: 10px; color: var(--t3); margin-top: 1px; }
+.theme-panel-foot {
+    margin-top: 12px; padding-top: 10px;
+    border-top: 1px solid var(--line);
+    font-size: 10px; color: var(--t4); text-align: center;
+}
+
+/* ═══ RESPONSIVE ═══ */
+@media (max-width: 1024px) {
+    .grid { grid-template-columns: 1fr; }
+    .info { grid-template-columns: 1fr; }
+}
+@media (max-width: 700px) {
+    .top { flex-wrap: wrap; gap: 10px; padding: 10px 0; }
+    .nav { order: 3; width: 100%; gap: 14px; overflow-x: auto; padding-bottom: 2px; }
+    .nav a { white-space: nowrap; font-size: 11.5px; }
+    .top-r { margin-right: auto; }
+    .page-h { flex-direction: column; align-items: flex-start; gap: 16px; }
+    .page-h h1 { font-size: 24px; }
+    .page-h-r { align-items: flex-start; }
+    .bank {
+        grid-template-columns: 40px 1fr;
+        row-gap: 10px;
+    }
+    .bank-rate, .bank-cta {
+        grid-column: 1 / 3;
+    }
+    .bank-cta { justify-content: flex-end; }
+    .app { padding: 0 12px; }
+    .foot { flex-direction: column; gap: 6px; }
+    .theme-fab { padding: 8px 12px; font-size: 11px; }
+    .theme-panel { width: calc(100vw - 28px); left: 14px; }
+    .result-v { font-size: 28px; }
+}
+
+::selection { background: var(--copper); color: var(--bg); }
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--bg-2); border-radius: 4px; }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+    <!-- HEADER -->
+    <div class="top">
+        <a class="brand" href="index.html">عَقار <i>و</i> عَمار</a>
+        <nav class="nav">
+            <a href="index.html">الرئيسية</a>
+            <a href="map.html">الخريطة</a>
+            <a href="index.html#market">السوق</a>
+            <a class="on" href="financing.html">التمويل</a>
+            <a href="index.html#projects">المشاريع</a>
+            <a href="about.html">من نحن</a>
+        </nav>
+        <div class="top-r">
+            <a class="btn btn-g" href="index.html">← الرئيسية</a>
+        </div>
+    </div>
+
+    <!-- PAGE HEADER -->
+    <div class="page-h">
+        <div class="page-h-l">
+            <div class="page-tag">التمويل العقاري</div>
+            <h1>قارن <b>عروض التمويل</b> · احسب قسطك الشهري</h1>
+            <p>نسب الربح من أكبر البنوك وشركات التمويل المرخّصة من البنك المركزي (ساما)، مع حاسبة تفاعلية وروابط مباشرة.</p>
+        </div>
+        <div class="page-h-r">
+            <div class="repo-card">
+                <div class="repo-card-l">سعر الريبو · ساما</div>
+                <div class="repo-card-v">4.25<i style="font-size:12px;color:var(--t3);font-weight:400;font-style:normal;margin-right:3px">%</i></div>
+                <div class="repo-card-s">آخر تغيير: ديسمبر 2025</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN GRID: CALCULATOR + BANKS -->
+    <div class="grid">
+
+        <!-- ═══ CALCULATOR ═══ -->
+        <section class="calc">
+            <div class="calc-h">
+                <div>
+                    <div class="calc-title">حاسبة القسط الشهري</div>
+                    <div class="calc-subtitle">مرّر لتحديث النتائج فوراً</div>
+                </div>
+            </div>
+
+            <!-- نوع التمويل -->
+            <div class="tabs">
+                <button class="tab-btn on" onclick="setFinanceType('citizen', this)">مواطن · مدعوم</button>
+                <button class="tab-btn" onclick="setFinanceType('commercial', this)">تمويل تجاري</button>
+            </div>
+
+            <!-- سعر العقار -->
+            <div class="field">
+                <div class="field-row">
+                    <span class="field-label">سعر العقار</span>
+                    <span class="field-value" id="price-v">1,500,000<i>ر</i></span>
+                </div>
+                <div class="slider-wrap">
+                    <input type="range" id="price" class="slider" min="300000" max="5000000" step="50000" value="1500000">
+                </div>
+                <div class="slider-labels">
+                    <span>300K</span>
+                    <span>5M</span>
+                </div>
+            </div>
+
+            <!-- الدفعة الأولى -->
+            <div class="field">
+                <div class="field-row">
+                    <span class="field-label">الدفعة الأولى</span>
+                    <span class="field-value"><span id="down-v">15</span>% · <span id="down-amount">225,000</span><i style="font-size:9.5px;color:var(--t3)"> ر</i></span>
+                </div>
+                <div class="slider-wrap">
+                    <input type="range" id="down" class="slider" min="5" max="50" step="1" value="15">
+                </div>
+                <div class="slider-labels">
+                    <span>5%</span>
+                    <span>50%</span>
+                </div>
+            </div>
+
+            <!-- المدة -->
+            <div class="field">
+                <div class="field-row">
+                    <span class="field-label">مدة التمويل</span>
+                    <span class="field-value"><span id="years-v">25</span><i>سنة</i></span>
+                </div>
+                <div class="slider-wrap">
+                    <input type="range" id="years" class="slider" min="5" max="30" step="1" value="25">
+                </div>
+                <div class="slider-labels">
+                    <span>5 سنوات</span>
+                    <span>30 سنة</span>
+                </div>
+            </div>
+
+            <!-- نسبة الربح -->
+            <div class="field">
+                <div class="field-row">
+                    <span class="field-label">نسبة الربح السنوية</span>
+                    <span class="field-value"><span id="rate-v">4.99</span><i>%</i></span>
+                </div>
+                <div class="slider-wrap">
+                    <input type="range" id="rate" class="slider" min="3" max="9" step="0.05" value="4.99">
+                </div>
+                <div class="slider-labels">
+                    <span>3%</span>
+                    <span>9%</span>
+                </div>
+            </div>
+
+            <!-- النتيجة -->
+            <div class="result">
+                <div class="result-h">القسط الشهري التقديري</div>
+                <div class="result-v" id="monthly-v">7,459<i>ر</i></div>
+                <div class="result-breakdown">
+                    <div class="breakdown-cell">
+                        <div class="breakdown-l">مبلغ التمويل</div>
+                        <div class="breakdown-v" id="loan-v">1,275,000<i>ر</i></div>
+                    </div>
+                    <div class="breakdown-cell">
+                        <div class="breakdown-l">إجمالي الربح</div>
+                        <div class="breakdown-v" id="total-profit-v">962,700<i>ر</i></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="disclaimer">
+                ⚠ <b>ملاحظة:</b> النتائج تقديرية للإرشاد فقط. السعر النهائي يعتمد على تقييم البنك لملفك المالي (الدخل، الدفعة الأولى، التاريخ الائتماني). اتصل بالبنك للعرض الرسمي.
+            </div>
+        </section>
+
+        <!-- ═══ BANKS ═══ -->
+        <section class="banks">
+            <div class="banks-h">
+                <div>
+                    <div class="banks-title">عروض التمويل من البنوك</div>
+                    <div class="banks-meta" style="margin-top:3px">آخر تحديث: <b>٢١ أبريل ٢٠٢٦</b></div>
+                </div>
+            </div>
+
+            <div class="bank-filters">
+                <button class="filter-btn on" data-f="all">الكل</button>
+                <button class="filter-btn" data-f="citizen">للمواطنين</button>
+                <button class="filter-btn" data-f="expat">للمقيمين</button>
+                <button class="filter-btn" data-f="islamic">متوافق شرعاً</button>
+                <button class="filter-btn" data-f="gov">حكومي</button>
+            </div>
+
+            <div class="bank-list" id="bank-list">
+                <!-- يُملأ من JavaScript -->
+            </div>
+        </section>
+
+    </div>
+
+    <!-- ═══ INFO STRIP ═══ -->
+    <div class="info">
+        <div class="info-card">
+            <div class="info-card-h">
+                <div class="info-icon">
+                    <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                </div>
+                <div class="info-title">برنامج سكني</div>
+            </div>
+            <div class="info-body">
+                البرنامج الوطني للإسكان. يوفّر حلولاً سكنية متنوعة للمواطنين مع دعم لنسبة الربح من صندوق التنمية العقاري.
+                <ul>
+                    <li>دعم حتى <b>500,000 ر</b> من كلفة التمويل</li>
+                    <li>الدفعة الأولى من <b>5%</b></li>
+                    <li>منتجات: وحدة جاهزة، بناء ذاتي، شراء أرض</li>
+                </ul>
+                <a href="https://sakani.sa" target="_blank" rel="noopener">sakani.sa ←</a>
+            </div>
+        </div>
+
+        <div class="info-card">
+            <div class="info-card-h">
+                <div class="info-icon">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="6" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                </div>
+                <div class="info-title">شروط التأهّل الأساسية</div>
+            </div>
+            <div class="info-body">
+                كل بنك يختلف، لكن الأساسيات مشتركة:
+                <ul>
+                    <li>العمر: <b>21–65</b> سنة</li>
+                    <li>دخل شهري ثابت <b>≥ 4,000 ر</b></li>
+                    <li>نسبة التحمّل <b>≤ 65%</b> من الدخل</li>
+                    <li>عقد عمل ≥ 3 أشهر + تحويل راتب</li>
+                    <li>سجل ائتماني نظيف (سمة)</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="info-card">
+            <div class="info-card-h">
+                <div class="info-icon">
+                    <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                </div>
+                <div class="info-title">الأوراق المطلوبة</div>
+            </div>
+            <div class="info-body">
+                عند التقديم لأي بنك:
+                <ul>
+                    <li>الهوية الوطنية / الإقامة</li>
+                    <li>تعريف راتب + كشف بنكي (3–6 أشهر)</li>
+                    <li>تقرير ائتماني من سمة</li>
+                    <li>صك العقار المُراد تمويله</li>
+                    <li>تقييم عقاري معتمد من البنك</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ FAQ ═══ -->
+    <div class="faq">
+        <h2 class="faq-h">أسئلة شائعة</h2>
+
+        <div class="faq-item" onclick="this.classList.toggle('on')">
+            <div class="faq-q">ما الفرق بين التمويل الثابت والمتغيّر؟</div>
+            <div class="faq-a">
+                <b>التمويل الثابت:</b> نسبة الربح ثابتة طوال مدة التمويل (أو لفترة مبدئية مثل 5 سنوات). القسط الشهري لا يتغيّر، ما يمنحك أمان التخطيط المالي — لكن النسبة الأولية عادة أعلى.<br><br>
+                <b>التمويل المتغيّر:</b> النسبة مرتبطة بـ SAIBOR (المعدّل المرجعي بين البنوك السعودية) + هامش ربح البنك. ترتفع وتنخفض دورياً. قد تبدأ بنسبة أقل، لكن قسطك قد يتغيّر كل 3–6 أشهر.
+            </div>
+        </div>
+
+        <div class="faq-item" onclick="this.classList.toggle('on')">
+            <div class="faq-q">ما هو التمويل المتوافق مع أحكام الشريعة؟</div>
+            <div class="faq-a">
+                معظم البنوك السعودية (الراجحي، الإنماء، البلاد، الجزيرة) تقدّم تمويلاً عقارياً متوافقاً مع الشريعة بصيغ:
+                <ul>
+                    <li><b>المرابحة:</b> البنك يشتري العقار ثم يبيعه لك بهامش ربح متفق عليه، مع أقساط شهرية ثابتة.</li>
+                    <li><b>الإجارة المنتهية بالتمليك:</b> أنت تستأجر العقار من البنك مع انتقال الملكية في نهاية المدة.</li>
+                </ul>
+                لا توجد فوائد مركّبة أو عقوبات على السداد المبكر بنفس طريقة التمويل التقليدي.
+            </div>
+        </div>
+
+        <div class="faq-item" onclick="this.classList.toggle('on')">
+            <div class="faq-q">كم الدفعة الأولى المطلوبة؟</div>
+            <div class="faq-a">
+                الحد الأدنى للدفعة الأولى مُنظَّم من قبل البنك المركزي السعودي (ساما):
+                <ul>
+                    <li><b>مواطن سعودي:</b> 5% كحد أدنى (مع دعم سكني)</li>
+                    <li><b>مواطن بدون دعم:</b> 10%</li>
+                    <li><b>مقيم:</b> 30% عادة، قد تصل إلى 50% في بعض البنوك</li>
+                </ul>
+                كلما زادت الدفعة الأولى، انخفضت نسبة التمويل (LTV) وعادة تحصل على نسبة ربح أفضل.
+            </div>
+        </div>
+
+        <div class="faq-item" onclick="this.classList.toggle('on')">
+            <div class="faq-q">هل يمكن السداد المبكر؟</div>
+            <div class="faq-a">
+                نعم، ساما تُلزم جميع البنوك بالسماح بالسداد المبكر. تختلف الرسوم:
+                <ul>
+                    <li><b>التمويل التقليدي:</b> عادة رسوم 1–2% من المبلغ المتبقي، أو بحد أقصى 3 أشهر من الأقساط المستقبلية.</li>
+                    <li><b>التمويل الإسلامي:</b> بعض البنوك لا تفرض رسوم سداد مبكر نهائياً (الراجحي، الإنماء).</li>
+                </ul>
+                اسأل عن هذا البند بوضوح قبل التوقيع على العقد.
+            </div>
+        </div>
+
+        <div class="faq-item" onclick="this.classList.toggle('on')">
+            <div class="faq-q">كيف يتم تقييم العقار؟</div>
+            <div class="faq-a">
+                البنك يُعيّن <b>مُقيّم معتمد من تقييم السعودية</b> (الهيئة السعودية للمقيمين المعتمدين) لزيارة العقار وإصدار تقرير رسمي خلال 3–7 أيام عمل. رسوم التقييم عادة 500–2,500 ر، يدفعها العميل. البنك يمنح التمويل بناءً على قيمة التقييم أو سعر البيع — <b>أيّهما أقل</b>.
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="foot">
+        <span>© 2026 عَقار وعَمار · aqaramar.com · البيانات: ساما · البنوك المعلنة</span>
+        <div class="foot-l">
+            <a href="index.html">الرئيسية</a>
+            <a href="map.html">الخريطة</a>
+            <a href="financing.html">التمويل</a>
+            <a href="about.html">من نحن</a>
+        </div>
+    </div>
+
+</div>
+
+<!-- THEME SWITCHER -->
+<button class="theme-fab" onclick="toggleThemePanel()" title="تجربة الألوان">
+    <svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 100 18 1.5 1.5 0 001.5-1.5c0-.39-.15-.74-.39-1.01-.23-.26-.37-.61-.37-.99a1.5 1.5 0 011.5-1.5H16a5 5 0 005-5c0-4.42-4.03-8-9-8zm-5.5 9a1.5 1.5 0 110-3 1.5 1.5 0 010 3zm3-4a1.5 1.5 0 110-3 1.5 1.5 0 010 3zm5 0a1.5 1.5 0 110-3 1.5 1.5 0 010 3zm3 4a1.5 1.5 0 110-3 1.5 1.5 0 010 3z"/></svg>
+    الألوان
+    <span class="dot-preview" id="fab-preview"></span>
+</button>
+<div class="theme-panel" id="theme-panel">
+    <div class="theme-panel-h">
+        <div>
+            <div class="theme-panel-t">جرّب لوحات الألوان</div>
+            <div class="theme-panel-s">اضغط لتطبيق فوري</div>
+        </div>
+        <button class="theme-close" onclick="toggleThemePanel()">×</button>
+    </div>
+    <div class="theme-options" id="theme-options"></div>
+    <div class="theme-panel-foot">الاختيار يُحفظ ومشترك مع بقية الصفحات</div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════
+   BANKS DATA — بيانات واقعية محدّثة أبريل 2026
+   المصدر: صفحات المنتجات الرسمية للبنوك + ساما
+   سيتم تحديثها دورياً في الملف نفسه
+═══════════════════════════════════════════════ */
+const BANKS = [
+    {
+        id: 'rajhi',
+        name: 'مصرف الراجحي',
+        type: 'إسلامي',
+        typeClass: 'islamic',
+        product: 'تمويل سكني · مرابحة',
+        rate: 4.99,
+        rateLabel: 'هامش ربح · ثابت',
+        features: ['حتى 25 سنة', 'دعم سكني', 'بدون رسوم سداد مبكر'],
+        tags: ['citizen', 'expat', 'islamic'],
+        url: 'https://www.alrajhibank.com.sa/ar/Personal/Finance/Real-Estate-Finance/Home-Finance',
+        logo: 'الراجحي',
+        note: ''
+    },
+    {
+        id: 'snb',
+        name: 'البنك الأهلي السعودي (SNB)',
+        type: 'تقليدي / إسلامي',
+        typeClass: '',
+        product: 'تمويل عقاري · خيارات متعددة',
+        rate: 5.25,
+        rateLabel: 'من · متغيّر',
+        features: ['حتى 30 سنة', 'للمواطنين والمقيمين', 'إمكانية دمج تمويل شخصي'],
+        tags: ['citizen', 'expat'],
+        url: 'https://www.alahli.com/ar/pages/personal-banking/finance/home-finance',
+        logo: 'SNB',
+        note: ''
+    },
+    {
+        id: 'sab',
+        name: 'ساب (SAB)',
+        type: 'تقليدي',
+        typeClass: '',
+        product: 'تمويل منزلي · APR من 4.94%',
+        rate: 4.94,
+        rateLabel: 'APR · من',
+        features: ['للمقيمين في السعودية', 'تمويل إعادة هيكلة', 'تمويل بدل إيجار'],
+        tags: ['citizen', 'expat'],
+        url: 'https://www.sab.com/ar/personal/finance/home-finance/',
+        logo: 'SAB',
+        note: ''
+    },
+    {
+        id: 'alinma',
+        name: 'مصرف الإنماء',
+        type: 'إسلامي',
+        typeClass: 'islamic',
+        product: 'تمويل عقاري · إجارة',
+        rate: 5.15,
+        rateLabel: 'هامش · من',
+        features: ['حتى 25 سنة', 'للوحدات الجاهزة والبناء', 'دعم سكني'],
+        tags: ['citizen', 'islamic'],
+        url: 'https://www.alinma.com/ar/personal/home-finance',
+        logo: 'الإنماء',
+        note: ''
+    },
+    {
+        id: 'riyad',
+        name: 'بنك الرياض',
+        type: 'تقليدي / إسلامي',
+        typeClass: '',
+        product: 'تمويل عقاري · رواد',
+        rate: 5.35,
+        rateLabel: 'من · ثابت',
+        features: ['حتى 25 سنة', 'للمواطنين والمقيمين', 'تقييم مجاني'],
+        tags: ['citizen', 'expat'],
+        url: 'https://www.riyadbank.com/ar/personal-banking/financing/real-estate',
+        logo: 'الرياض',
+        note: ''
+    },
+    {
+        id: 'bsf',
+        name: 'البنك السعودي الفرنسي',
+        type: 'تقليدي',
+        typeClass: '',
+        product: 'تمويل منزلي · خيارات متعددة',
+        rate: 5.45,
+        rateLabel: 'من · متغيّر',
+        features: ['حتى 25 سنة', 'تمويل البناء الذاتي', 'تمويل الإنجاز'],
+        tags: ['citizen', 'expat'],
+        url: 'https://bsf.sa/arabic/mortgageloancalculator',
+        logo: 'BSF',
+        note: ''
+    },
+    {
+        id: 'anb',
+        name: 'البنك العربي الوطني (ANB)',
+        type: 'تقليدي',
+        typeClass: '',
+        product: 'تمويل منزلي',
+        rate: 5.55,
+        rateLabel: 'من · متغيّر',
+        features: ['حتى 25 سنة', 'للمواطنين والمقيمين'],
+        tags: ['citizen', 'expat'],
+        url: 'https://anb.com.sa/ar/personal/home-loans',
+        logo: 'ANB',
+        note: ''
+    },
+    {
+        id: 'balad',
+        name: 'بنك البلاد',
+        type: 'إسلامي',
+        typeClass: 'islamic',
+        product: 'تمويل عقاري · مرابحة',
+        rate: 5.25,
+        rateLabel: 'هامش · من',
+        features: ['متوافق مع الشريعة', 'دعم سكني', 'حتى 25 سنة'],
+        tags: ['citizen', 'islamic'],
+        url: 'https://www.bankalbilad.com/ar/personal/financing/home-finance',
+        logo: 'البلاد',
+        note: ''
+    },
+    {
+        id: 'jazira',
+        name: 'بنك الجزيرة',
+        type: 'إسلامي',
+        typeClass: 'islamic',
+        product: 'تمويل منزلي إسلامي',
+        rate: 5.45,
+        rateLabel: 'هامش · من',
+        features: ['إجارة منتهية بالتمليك', 'للمواطنين والمقيمين'],
+        tags: ['citizen', 'expat', 'islamic'],
+        url: 'https://www.baj.com.sa/ar/personal/financing/real-estate-finance',
+        logo: 'الجزيرة',
+        note: ''
+    },
+    {
+        id: 'sakani',
+        name: 'برنامج سكني',
+        type: 'حكومي',
+        typeClass: 'gov',
+        product: 'التمويل العقاري المدعوم',
+        rate: 0,
+        rateLabel: 'دعم كلّي',
+        features: ['دعم حتى 500K ر', 'للمواطنين فقط', 'الدفعة الأولى من 5%'],
+        tags: ['citizen', 'gov'],
+        url: 'https://sakani.sa',
+        logo: 'سكني',
+        note: 'يُدمج مع أي بنك مرخّص'
+    },
+    {
+        id: 'redf',
+        name: 'صندوق التنمية العقاري',
+        type: 'حكومي',
+        typeClass: 'gov',
+        product: 'التمويل المُعان',
+        rate: 2.50,
+        rateLabel: 'فعلي · للمواطن',
+        features: ['دعم حكومي كامل', 'للمواطنين', 'عبر سكني'],
+        tags: ['citizen', 'gov'],
+        url: 'https://www.redf.gov.sa',
+        logo: 'صندوق التنمية',
+        note: ''
+    },
+    {
+        id: 'amlak',
+        name: 'أملاك الدولية للتمويل',
+        type: 'شركة تمويل',
+        typeClass: '',
+        product: 'تمويل عقاري · خيارات مرنة',
+        rate: 5.85,
+        rateLabel: 'من · متغيّر',
+        features: ['مرخّصة من ساما', 'للمواطنين والمقيمين', 'إجراءات أسرع'],
+        tags: ['citizen', 'expat'],
+        url: 'https://www.amlakinternational.com',
+        logo: 'أملاك',
+        note: ''
+    }
+];
+
+const LOGO_CLASS_MAP = {
+    rajhi: 'rajhi', snb: 'snb', sab: 'sab', alinma: 'alinma', riyad: 'riyad',
+    bsf: 'bsf', anb: 'anb', balad: 'balad', jazira: 'jazira', sakani: 'sakani',
+    redf: 'redf', amlak: 'amlak'
+};
+
+let currentFilter = 'all';
+
+function renderBanks() {
+    const list = document.getElementById('bank-list');
+    const filtered = currentFilter === 'all'
+        ? BANKS
+        : BANKS.filter(b => b.tags.includes(currentFilter));
+
+    list.innerHTML = filtered.map(b => {
+        const rateDisplay = b.rate === 0
+            ? `<div class="bank-rate-v">0<i>%</i></div>`
+            : `<div class="bank-rate-v">${b.rate.toFixed(2)}<i>%</i></div>`;
+        const typeCls = b.typeClass ? `bank-type ${b.typeClass}` : 'bank-type';
+
+        return `
+        <div class="bank">
+            <div class="bank-logo ${LOGO_CLASS_MAP[b.id] || ''}">${b.logo}</div>
+            <div class="bank-info">
+                <div class="bank-name-row">
+                    <span class="bank-name">${b.name}</span>
+                    <span class="${typeCls}">${b.type}</span>
+                </div>
+                <div class="bank-product">${b.product}</div>
+                <div class="bank-features">
+                    ${b.features.map(f => `<span>${f}</span>`).join('')}
+                </div>
+                ${b.note ? `<div class="bank-note">${b.note}</div>` : ''}
+            </div>
+            <div class="bank-rate">
+                ${rateDisplay}
+                <div class="bank-rate-l">${b.rateLabel}</div>
+            </div>
+            <div class="bank-cta">
+                <a class="ghost" href="#" onclick="applyRate(${b.rate}); return false;">جرّب</a>
+                <a class="primary" href="${b.url}" target="_blank" rel="noopener">الموقع ←</a>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+function applyRate(rate) {
+    if (rate === 0) rate = 2.5; // لـ سكني، استخدم نسبة صندوق التنمية
+    document.getElementById('rate').value = rate;
+    document.getElementById('rate-v').textContent = rate.toFixed(2);
+    calculate();
+    // Scroll to calculator
+    document.querySelector('.calc').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('on'));
+        btn.classList.add('on');
+        currentFilter = btn.dataset.f;
+        renderBanks();
+    });
+});
+
+/* ═══════════════════════════════════════════════
+   MORTGAGE CALCULATOR
+═══════════════════════════════════════════════ */
+let financeType = 'citizen';
+
+function fmt(n) {
+    return new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(Math.round(n));
+}
+
+function calculate() {
+    const price = +document.getElementById('price').value;
+    const downPct = +document.getElementById('down').value;
+    const years = +document.getElementById('years').value;
+    const rate = +document.getElementById('rate').value;
+
+    const downAmount = price * (downPct / 100);
+    const loan = price - downAmount;
+    const monthlyRate = (rate / 100) / 12;
+    const months = years * 12;
+
+    let monthly;
+    if (monthlyRate === 0) {
+        monthly = loan / months;
+    } else {
+        monthly = (loan * monthlyRate * Math.pow(1 + monthlyRate, months)) /
+                  (Math.pow(1 + monthlyRate, months) - 1);
+    }
+
+    const totalPayment = monthly * months;
+    const totalProfit = totalPayment - loan;
+
+    // Update UI
+    document.getElementById('price-v').innerHTML = fmt(price) + '<i>ر</i>';
+    document.getElementById('down-v').textContent = downPct;
+    document.getElementById('down-amount').textContent = fmt(downAmount);
+    document.getElementById('years-v').textContent = years;
+    document.getElementById('rate-v').textContent = rate.toFixed(2);
+    document.getElementById('loan-v').innerHTML = fmt(loan) + '<i>ر</i>';
+    document.getElementById('monthly-v').innerHTML = fmt(monthly) + '<i>ر</i>';
+    document.getElementById('total-profit-v').innerHTML = fmt(totalProfit) + '<i>ر</i>';
+}
+
+function setFinanceType(type, btnEl) {
+    financeType = type;
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('on'));
+    btnEl.classList.add('on');
+
+    // نسبة تقديرية حسب النوع
+    if (type === 'citizen') {
+        document.getElementById('rate').value = 4.99;
+    } else {
+        document.getElementById('rate').value = 5.85;
+    }
+    calculate();
+}
+
+['price', 'down', 'years', 'rate'].forEach(id => {
+    document.getElementById(id).addEventListener('input', calculate);
+});
+
+// Initial render
+renderBanks();
+calculate();
+
+/* ═══════════════════════════════════════════════
+   THEME SYSTEM
+═══════════════════════════════════════════════ */
+const THEMES = {
+    'gulf-sea': {
+        name: 'الخليج البحري (الحالي)', desc: 'Navy + نحاس + فيروزي',
+        swatch: ['#091822', '#B58763', '#4FC4B0'],
+        vars: {
+            '--bg':'#091822','--bg-1':'#0D1E2A','--bg-2':'#112836','--bg-3':'#16344A',
+            '--pearl':'#E8DCC2','--copper':'#B58763','--copper-d':'#8A6648',
+            '--teal':'#2C8C7C','--teal-b':'#4FC4B0','--teal-s':'rgba(79, 196, 176, 0.12)',
+            '--t1':'#F2EEE3','--t2':'#BDB8A8','--t3':'#8A8578','--t4':'#5A5548',
+            '--up':'#5CCA8A','--up-bg':'rgba(92, 202, 138, 0.12)',
+            '--down':'#E8876A','--down-bg':'rgba(232, 135, 106, 0.12)',
+            '--line':'rgba(242, 238, 227, 0.07)','--line-2':'rgba(242, 238, 227, 0.12)','--line-3':'rgba(181, 135, 99, 0.25)'
+        }
+    },
+    'desert-gulf': {
+        name: 'الخليج الصحراوي', desc: 'رمال نجدية + فخار + طين',
+        swatch: ['#1A1410', '#D4A574', '#E85D5D'],
+        vars: {
+            '--bg':'#1A1410','--bg-1':'#24190F','--bg-2':'#2E1F13','--bg-3':'#3B2816',
+            '--pearl':'#F5EDDB','--copper':'#D4A574','--copper-d':'#A17D4E',
+            '--teal':'#B8554E','--teal-b':'#E85D5D','--teal-s':'rgba(232, 93, 93, 0.12)',
+            '--t1':'#F5EDDB','--t2':'#C9BFA6','--t3':'#8A7F66','--t4':'#5C5444',
+            '--up':'#8FC178','--up-bg':'rgba(143, 193, 120, 0.12)',
+            '--down':'#E85D5D','--down-bg':'rgba(232, 93, 93, 0.12)',
+            '--line':'rgba(245, 237, 219, 0.07)','--line-2':'rgba(245, 237, 219, 0.12)','--line-3':'rgba(212, 165, 116, 0.25)'
+        }
+    },
+    'deep-pearl': {
+        name: 'الخليج العميق', desc: 'Navy عميق + لؤلؤ مشع + ذهبي',
+        swatch: ['#030E14', '#F4E7CA', '#D4A84B'],
+        vars: {
+            '--bg':'#030E14','--bg-1':'#061821','--bg-2':'#0A2230','--bg-3':'#10324A',
+            '--pearl':'#FFFCF0','--copper':'#D4A84B','--copper-d':'#9E7D2E',
+            '--teal':'#3A9A8D','--teal-b':'#5DBFB1','--teal-s':'rgba(93, 191, 177, 0.12)',
+            '--t1':'#FFFCF0','--t2':'#CCC0A8','--t3':'#7E7665','--t4':'#4A4536',
+            '--up':'#5CCA8A','--up-bg':'rgba(92, 202, 138, 0.12)',
+            '--down':'#E8876A','--down-bg':'rgba(232, 135, 106, 0.12)',
+            '--line':'rgba(255, 252, 240, 0.07)','--line-2':'rgba(255, 252, 240, 0.12)','--line-3':'rgba(212, 168, 75, 0.28)'
+        }
+    },
+    'platinum': {
+        name: 'البلاتين المعاصر', desc: 'رمادي + نحاس + أزرق كهربائي',
+        swatch: ['#0A0B0D', '#C08F5C', '#4A9FFF'],
+        vars: {
+            '--bg':'#0A0B0D','--bg-1':'#101215','--bg-2':'#18191D','--bg-3':'#232529',
+            '--pearl':'#F9FAFB','--copper':'#C08F5C','--copper-d':'#8F6A44',
+            '--teal':'#2B7FD4','--teal-b':'#4A9FFF','--teal-s':'rgba(74, 159, 255, 0.12)',
+            '--t1':'#F9FAFB','--t2':'#A1A5AC','--t3':'#6B6F75','--t4':'#3F4247',
+            '--up':'#4ADE80','--up-bg':'rgba(74, 222, 128, 0.12)',
+            '--down':'#F87171','--down-bg':'rgba(248, 113, 113, 0.12)',
+            '--line':'rgba(249, 250, 251, 0.07)','--line-2':'rgba(249, 250, 251, 0.12)','--line-3':'rgba(192, 143, 92, 0.25)'
+        }
+    },
+    'oasis': {
+        name: 'الواحة', desc: 'أخضر زيتوني + نحاس + نعناع',
+        swatch: ['#0F1814', '#C69861', '#7BC4A0'],
+        vars: {
+            '--bg':'#0F1814','--bg-1':'#16241C','--bg-2':'#1E3027','--bg-3':'#2A4335',
+            '--pearl':'#E8D9B8','--copper':'#C69861','--copper-d':'#997442',
+            '--teal':'#4A9A7A','--teal-b':'#7BC4A0','--teal-s':'rgba(123, 196, 160, 0.12)',
+            '--t1':'#F2EDD8','--t2':'#B8B39A','--t3':'#7A7560','--t4':'#4E4A3A',
+            '--up':'#7BC4A0','--up-bg':'rgba(123, 196, 160, 0.12)',
+            '--down':'#E89766','--down-bg':'rgba(232, 151, 102, 0.12)',
+            '--line':'rgba(242, 237, 216, 0.07)','--line-2':'rgba(242, 237, 216, 0.12)','--line-3':'rgba(198, 152, 97, 0.25)'
+        }
+    },
+    'stone-copper': {
+        name: 'الحجر والنحاس (فاتح)', desc: 'نهاري · حجر دافئ + نحاس محروق',
+        swatch: ['#F5F1E8', '#8B4F2C', '#1A4D47'],
+        vars: {
+            '--bg':'#F5F1E8','--bg-1':'#EDE6D5','--bg-2':'#E2D9C3','--bg-3':'#D4C8AC',
+            '--pearl':'#4A3F30','--copper':'#8B4F2C','--copper-d':'#6B3D21',
+            '--teal':'#1A4D47','--teal-b':'#2E7A70','--teal-s':'rgba(46, 122, 112, 0.12)',
+            '--t1':'#1A1511','--t2':'#4A3F30','--t3':'#7A6E5A','--t4':'#A59980',
+            '--up':'#3A7A4E','--up-bg':'rgba(58, 122, 78, 0.14)',
+            '--down':'#B0412B','--down-bg':'rgba(176, 65, 43, 0.14)',
+            '--line':'rgba(26, 21, 17, 0.08)','--line-2':'rgba(26, 21, 17, 0.14)','--line-3':'rgba(139, 79, 44, 0.3)'
+        }
+    },
+    'twilight': {
+        name: 'الشفق', desc: 'ليل بنفسجي + ذهبي شفقي + وردي',
+        swatch: ['#0E0B1F', '#E8A86C', '#E85D8A'],
+        vars: {
+            '--bg':'#0E0B1F','--bg-1':'#161228','--bg-2':'#1E1934','--bg-3':'#2A2442',
+            '--pearl':'#F7F2E8','--copper':'#E8A86C','--copper-d':'#B07D48',
+            '--teal':'#B34A75','--teal-b':'#E85D8A','--teal-s':'rgba(232, 93, 138, 0.12)',
+            '--t1':'#F7F2E8','--t2':'#BEB5A6','--t3':'#817866','--t4':'#524A3D',
+            '--up':'#6CDB9C','--up-bg':'rgba(108, 219, 156, 0.12)',
+            '--down':'#E85D8A','--down-bg':'rgba(232, 93, 138, 0.12)',
+            '--line':'rgba(247, 242, 232, 0.07)','--line-2':'rgba(247, 242, 232, 0.12)','--line-3':'rgba(232, 168, 108, 0.26)'
+        }
+    }
+};
+
+let currentTheme = localStorage.getItem('aqaramar-theme') || 'gulf-sea';
+
+function applyTheme(themeKey) {
+    const theme = THEMES[themeKey];
+    if (!theme) return;
+    const root = document.documentElement;
+    Object.entries(theme.vars).forEach(([k, v]) => root.style.setProperty(k, v));
+    currentTheme = themeKey;
+    try { localStorage.setItem('aqaramar-theme', themeKey); } catch(e) {}
+    const preview = document.getElementById('fab-preview');
+    if (preview) {
+        preview.innerHTML = theme.swatch.map(c => `<span style="background:${c}"></span>`).join('');
+    }
+    document.querySelectorAll('.theme-opt').forEach(el => {
+        el.classList.toggle('on', el.dataset.theme === themeKey);
+    });
+}
+
+function buildThemeOptions() {
+    const wrap = document.getElementById('theme-options');
+    if (!wrap) return;
+    wrap.innerHTML = Object.entries(THEMES).map(([key, t]) => `
+        <button class="theme-opt ${key === currentTheme ? 'on' : ''}" data-theme="${key}" onclick="applyTheme('${key}')">
+            <span class="theme-swatch">
+                <span style="background:${t.swatch[0]}"></span>
+                <span style="background:${t.swatch[1]}"></span>
+                <span style="background:${t.swatch[2]}"></span>
+            </span>
+            <span class="theme-opt-info">
+                <span class="theme-opt-name">${t.name}</span>
+                <span class="theme-opt-desc">${t.desc}</span>
+            </span>
+        </button>
+    `).join('');
+}
+
+function toggleThemePanel() {
+    document.getElementById('theme-panel').classList.toggle('on');
+}
+
+document.addEventListener('click', (e) => {
+    const panel = document.getElementById('theme-panel');
+    const fab = document.querySelector('.theme-fab');
+    if (panel && panel.classList.contains('on') &&
+        !panel.contains(e.target) && !fab.contains(e.target)) {
+        panel.classList.remove('on');
+    }
+});
+
+window.addEventListener('storage', (e) => {
+    if (e.key === 'aqaramar-theme' && e.newValue && THEMES[e.newValue]) {
+        applyTheme(e.newValue);
+    }
+});
+
+applyTheme(currentTheme);
+buildThemeOptions();
+</script>
+
+</body>
+</html>
