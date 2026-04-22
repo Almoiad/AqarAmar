@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>عقار وعُمار · منصة العمران والعقار الخليجية</title>
+<title>عَقار وعَمار · منصة العمران والعقار الخليجية</title>
 <meta name="description" content="منصة معلوماتية عن العقار والبناء في دول الخليج العربي.">
 
-<meta property="og:title" content="عقار وعُمار · منصة العمران والعقار الخليجية">
+<meta property="og:title" content="عَقار وعَمار · منصة العمران والعقار الخليجية">
 <meta property="og:type" content="website">
 
 <script>
@@ -207,12 +207,26 @@ button { font-family: inherit; cursor: pointer; }
     gap: 5px;
     clip-path: polygon(0 0, 100% 0, calc(100% - 7px) 100%, 0 100%);
     flex-shrink: 0;
+    transition: background .3s;
+    cursor: help;
+}
+.tk-l.closed {
+    background: var(--bg-3);
+    color: var(--t2);
+}
+.tk-l.closed #tk-status-text {
+    letter-spacing: 0.8px;
 }
 .tk-dot {
     width: 5px; height: 5px;
     background: var(--bg);
     border-radius: 50%;
     animation: pulse 1.8s infinite;
+}
+.tk-l.closed .tk-dot {
+    animation: none;
+    background: var(--t3);
+    opacity: 0.5;
 }
 @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
 
@@ -223,7 +237,7 @@ button { font-family: inherit; cursor: pointer; }
     align-items: center;
     height: 100%;
     white-space: nowrap;
-    animation: slide 55s linear infinite;
+    animation: slide 90s linear infinite;
 }
 @keyframes slide { 0%{transform:translateX(0)} 100%{transform:translateX(50%)} }
 .ticker:hover .tk-i { animation-play-state: paused; }
@@ -1580,14 +1594,15 @@ button { font-family: inherit; cursor: pointer; }
 
     <!-- HEADER -->
     <div class="top">
-        <div class="brand">عقار <i>و</i> عُمار</div>
+        <div class="brand">عَقار <i>و</i> عَمار</div>
         <nav class="nav">
             <a class="on" href="#">الرئيسية</a>
             <a href="map.html">الخريطة<span class="new">جديد</span></a>
-            <a href="/market">السوق</a>
-            <a href="/projects">المشاريع</a>
-            <a href="/news">الأخبار</a>
-            <a href="/tools">الأدوات</a>
+            <a href="#market">السوق</a>
+            <a href="financing.html">التمويل</a>
+            <a href="#projects">المشاريع</a>
+            <a href="#tools">الأدوات</a>
+            <a href="about.html">من نحن</a>
         </nav>
         <div class="top-r">
             <div class="cp">
@@ -1603,29 +1618,16 @@ button { font-family: inherit; cursor: pointer; }
         </div>
     </div>
 
-    <!-- TICKER -->
+    <!-- TICKER · أسعار أسهم تداول للشركات العقارية والإنشائية وصناديق الريت -->
     <div class="ticker">
-        <div class="tk-l">
+        <div class="tk-l" id="tk-label" title="سوق تداول السعودية · أحد-خميس 10ص-3م (بتوقيت الرياض)">
             <span class="tk-dot"></span>
-            LIVE
+            <span id="tk-status-text">جارٍ التحميل…</span>
         </div>
         <div class="tk-t">
-            <div class="tk-i">
-                <span class="ti"><span class="ti-n">الرياض</span><span class="ti-v">4,583</span><span class="ti-u">▲3.6%</span></span>
-                <span class="ti"><span class="ti-n">جدة</span><span class="ti-v">3,240</span><span class="ti-u">▲2.1%</span></span>
-                <span class="ti"><span class="ti-n">الدمام</span><span class="ti-v">2,180</span><span class="ti-d">▼0.8%</span></span>
-                <span class="ti"><span class="ti-n">مكة</span><span class="ti-v">5,120</span><span class="ti-u">▲4.2%</span></span>
-                <span class="ti"><span class="ti-n">المدينة</span><span class="ti-v">2,895</span><span class="ti-u">▲1.5%</span></span>
-                <span class="ti"><span class="ti-n">الطائف</span><span class="ti-v">1,640</span><span class="ti-u">▲0.9%</span></span>
-                <span class="ti"><span class="ti-n">الخبر</span><span class="ti-v">2,640</span><span class="ti-u">▲1.8%</span></span>
-                <span class="ti"><span class="ti-n">بريدة</span><span class="ti-v">1,380</span><span class="ti-u">▲2.8%</span></span>
-                <span class="ti"><span class="ti-n">تبوك</span><span class="ti-v">1,620</span><span class="ti-u">▲1.4%</span></span>
-                <span class="ti"><span class="ti-n">أبها</span><span class="ti-v">1,450</span><span class="ti-d">▼1.2%</span></span>
-                <span class="ti"><span class="ti-n">الجبيل</span><span class="ti-v">1,920</span><span class="ti-u">▲0.6%</span></span>
-                <span class="ti"><span class="ti-n">ينبع</span><span class="ti-v">1,580</span><span class="ti-u">▲2.2%</span></span>
-                <span class="ti"><span class="ti-n">الأحساء</span><span class="ti-v">1,340</span><span class="ti-u">▲1.1%</span></span>
-                <span class="ti"><span class="ti-n">حائل</span><span class="ti-v">1,290</span><span class="ti-d">▼0.3%</span></span>
-                <span class="ti"><span class="ti-n">خميس مشيط</span><span class="ti-v">1,480</span><span class="ti-d">▼0.5%</span></span>
+            <div class="tk-i" id="tk-items">
+                <!-- يُملأ ديناميكياً من stocksUpdate() -->
+                <span class="ti" style="color:var(--t3)">جارٍ جلب أسعار الأسهم من تداول…</span>
             </div>
         </div>
     </div>
@@ -1634,13 +1636,13 @@ button { font-family: inherit; cursor: pointer; }
     <div class="bento">
 
         <!-- ═══ INDICATORS DASHBOARD (6 × 2) ═══ -->
-        <section class="ind" onclick="window.location.href='/indicators'">
+        <section class="ind" onclick="window.location.href='#market'">
             <div class="ind-h">
                 <div class="ind-h-l">
                     <span class="ind-title">مؤشرات العقار</span>
                     <span class="ind-sub">لوحتك المخصّصة</span>
                 </div>
-                <button class="ind-cust" onclick="event.stopPropagation(); window.location.href='/indicators/customize'">
+                <button class="ind-cust" onclick="event.stopPropagation();" title="قريباً · تخصيص المؤشرات">
                     <svg viewBox="0 0 24 24" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09a1.65 1.65 0 001.51-1 1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
                     تخصيص
                 </button>
@@ -1881,17 +1883,17 @@ button { font-family: inherit; cursor: pointer; }
                 </div>
 
                 <div class="da-btn-row">
-                    <a class="btn btn-c" href="/projects/roshn-sedra">
+                    <a class="btn btn-c" href="#projects">
                         استعرض المشروع
                         <svg class="ar" viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
                     </a>
-                    <a class="btn btn-g" href="/projects/roshn-sedra/register">سجّل اهتمامك</a>
+                    <a class="btn btn-g" href="about.html#contact">سجّل اهتمامك</a>
                 </div>
             </div>
         </section>
 
         <!-- ═══ MAP CARD (8 × 3) ═══ -->
-        <section class="map-card">
+        <section class="map-card" id="map-section">
             <div class="mc-text">
                 <div class="mc-tag">المنتج المحوري</div>
                 <h2>خريطة <b>تفاعلية</b> لكل قطعة في الخليج</h2>
@@ -1931,13 +1933,13 @@ button { font-family: inherit; cursor: pointer; }
         </section>
 
         <!-- ═══ BANK FINANCING (4 × 3) — بديل أحدث الصفقات ═══ -->
-        <section class="fin-card">
+        <section class="fin-card" id="financing-section">
             <div class="card-h">
                 <span class="card-t">عروض التمويل العقاري</span>
-                <a class="card-l" href="/financing">الكل ←</a>
+                <a class="card-l" href="financing.html">الكل ←</a>
             </div>
             <div class="fin-list">
-                <div class="fin" onclick="window.location.href='/financing/rajhi'">
+                <div class="fin" onclick="window.location.href='financing.html'">
                     <div class="fin-logo rajhi">الراجحي</div>
                     <div class="fin-mid">
                         <div class="fin-top">
@@ -1952,7 +1954,7 @@ button { font-family: inherit; cursor: pointer; }
                     </div>
                 </div>
 
-                <div class="fin" onclick="window.location.href='/financing/snb'">
+                <div class="fin" onclick="window.location.href='financing.html'">
                     <div class="fin-logo snb">SNB</div>
                     <div class="fin-mid">
                         <div class="fin-top">
@@ -1966,7 +1968,7 @@ button { font-family: inherit; cursor: pointer; }
                     </div>
                 </div>
 
-                <div class="fin" onclick="window.location.href='/financing/sab'">
+                <div class="fin" onclick="window.location.href='financing.html'">
                     <div class="fin-logo sab">SAB</div>
                     <div class="fin-mid">
                         <div class="fin-top">
@@ -1981,7 +1983,7 @@ button { font-family: inherit; cursor: pointer; }
                     </div>
                 </div>
 
-                <div class="fin" onclick="window.location.href='/financing/alinma'">
+                <div class="fin" onclick="window.location.href='financing.html'">
                     <div class="fin-logo alinma">الإنماء</div>
                     <div class="fin-mid">
                         <div class="fin-top">
@@ -1995,7 +1997,7 @@ button { font-family: inherit; cursor: pointer; }
                     </div>
                 </div>
 
-                <div class="fin" onclick="window.location.href='/financing/sakani'">
+                <div class="fin" onclick="window.location.href='financing.html'">
                     <div class="fin-logo sakani">سكني</div>
                     <div class="fin-mid">
                         <div class="fin-top">
@@ -2011,7 +2013,7 @@ button { font-family: inherit; cursor: pointer; }
                 </div>
             </div>
 
-            <div class="fin-cta" onclick="window.location.href='/tools/mortgage'">
+            <div class="fin-cta" onclick="window.location.href='financing.html'">
                 <div class="fin-cta-l">
                     <div class="fin-cta-t">احسب قسطك الشهري</div>
                     <div class="fin-cta-s">قارن بين 5 بنوك في ثوان</div>
@@ -2023,14 +2025,14 @@ button { font-family: inherit; cursor: pointer; }
         </section>
 
         <!-- ═══ ARCH TOOLS STRIP (8 × 1) ═══ -->
-        <section class="tools">
+        <section class="tools" id="tools">
             <div class="tools-title">
                 <div class="tools-tag">الأدوات المعمارية</div>
                 <div class="tools-h">صمّم ببيانات</div>
                 <div class="tools-s">قرّر قبل البناء</div>
             </div>
 
-            <a class="tool" href="/tools/style-quiz">
+            <a class="tool" href="#tools">
                 <div class="tool-icon">
                     <svg viewBox="0 0 24 24"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg>
                 </div>
@@ -2042,7 +2044,7 @@ button { font-family: inherit; cursor: pointer; }
                 </span>
             </a>
 
-            <a class="tool" href="/tools/cost">
+            <a class="tool" href="#tools">
                 <div class="tool-icon">
                     <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
                 </div>
@@ -2054,7 +2056,7 @@ button { font-family: inherit; cursor: pointer; }
                 </span>
             </a>
 
-            <a class="tool" href="/tools/boq">
+            <a class="tool" href="#tools">
                 <div class="tool-icon">
                     <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
                 </div>
@@ -2066,7 +2068,7 @@ button { font-family: inherit; cursor: pointer; }
                 </span>
             </a>
 
-            <a class="tool" href="/tools/code">
+            <a class="tool" href="#tools">
                 <div class="tool-icon">
                     <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>
                 </div>
@@ -2080,10 +2082,10 @@ button { font-family: inherit; cursor: pointer; }
         </section>
 
         <!-- NEWS -->
-        <section class="card news-card">
+        <section class="card news-card" id="news">
             <div class="card-h">
                 <span class="card-t">آخر الأخبار</span>
-                <a class="card-l" href="/news">الكل ←</a>
+                <a class="card-l" href="#news">الكل ←</a>
             </div>
             <div class="news-list">
                 <div class="nw">
@@ -2122,10 +2124,10 @@ button { font-family: inherit; cursor: pointer; }
         </section>
 
         <!-- PROJECTS -->
-        <section class="card proj-card">
+        <section class="card proj-card" id="projects">
             <div class="card-h">
                 <span class="card-t">مشاريع بارزة</span>
-                <a class="card-l" href="/projects">الكل ←</a>
+                <a class="card-l" href="#projects">الكل ←</a>
             </div>
             <div class="proj-list">
                 <div class="pr">
@@ -2156,10 +2158,10 @@ button { font-family: inherit; cursor: pointer; }
         </section>
 
         <!-- MATERIALS -->
-        <section class="card mat-card">
+        <section class="card mat-card" id="market">
             <div class="card-h">
                 <span class="card-t">مواد البناء</span>
-                <a class="card-l" href="/market/materials">الكل ←</a>
+                <a class="card-l" href="#market">الكل ←</a>
             </div>
             <div class="mat-list">
                 <div class="mat">
@@ -2226,12 +2228,12 @@ button { font-family: inherit; cursor: pointer; }
 
     <!-- FOOTER -->
     <div class="foot">
-        <span>© 2026 عقار وعُمار · aqaramar.com · البيانات: وزارة العدل · البلديات الخليجية</span>
+        <span>© 2026 عَقار وعَمار · aqaramar.com · البيانات: وزارة العدل · البلديات الخليجية</span>
         <div class="foot-l">
-            <a href="/about">من نحن</a>
-            <a href="/api">API</a>
-            <a href="/contact">تواصل</a>
-            <a href="/privacy">الخصوصية</a>
+            <a href="about.html">من نحن</a>
+            <a href="map.html">الخريطة</a>
+            <a href="financing.html">التمويل</a>
+            <a href="about.html#contact">تواصل</a>
         </div>
     </div>
 
@@ -2269,6 +2271,227 @@ document.querySelectorAll('.cp button').forEach(btn => {
         btn.classList.add('on');
     });
 });
+
+/* ═══════════════════════════════════════════════════════════
+   STOCKS TICKER — أسهم تداول العقارية الحقيقية
+   المصدر: Cloudflare Worker → Yahoo Finance
+   ═══════════════════════════════════════════════════════════ */
+
+// ضع هنا رابط الـ Worker الخاص بك بعد النشر:
+// مثال: 'https://aqaramar-stocks.your-name.workers.dev'
+const STOCKS_API = 'https://aqaramar-stocks.almoiad-alkadam.workers.dev';
+
+// 25 شركة منتقاة (أقوى صلة بالعقار والعمران)
+const STOCKS = [
+    // تطوير عقاري
+    { sym: '4300.SR', ar: 'دار الأركان',       cat: 'dev' },
+    { sym: '4250.SR', ar: 'جبل عمر',          cat: 'dev' },
+    { sym: '4020.SR', ar: 'العقارية السعودية', cat: 'dev' },
+    { sym: '4322.SR', ar: 'ريتال',            cat: 'dev' },
+    { sym: '4321.SR', ar: 'سينومي سنترز',     cat: 'dev' },
+    { sym: '4230.SR', ar: 'البحر الأحمر',      cat: 'dev' },
+    { sym: '4100.SR', ar: 'مكة للإنشاء',       cat: 'dev' },
+    { sym: '4090.SR', ar: 'طيبة',             cat: 'dev' },
+    { sym: '4150.SR', ar: 'تطوير الرياض',      cat: 'dev' },
+    { sym: '4323.SR', ar: 'سمو',              cat: 'dev' },
+    { sym: '4320.SR', ar: 'الأندلس',           cat: 'dev' },
+    { sym: '4325.SR', ar: 'مسار',             cat: 'dev' },
+    // أسمنت ومواد بناء
+    { sym: '3030.SR', ar: 'الأسمنت السعودية',  cat: 'mat' },
+    { sym: '3020.SR', ar: 'أسمنت اليمامة',     cat: 'mat' },
+    { sym: '3010.SR', ar: 'الأسمنت العربية',   cat: 'mat' },
+    { sym: '3040.SR', ar: 'أسمنت القصيم',      cat: 'mat' },
+    { sym: '3060.SR', ar: 'أسمنت ينبع',        cat: 'mat' },
+    { sym: '1210.SR', ar: 'اليمامة للحديد',    cat: 'mat' },
+    { sym: '2320.SR', ar: 'صناعات البناء',     cat: 'mat' },
+    // ريت
+    { sym: '4330.SR', ar: 'ريت الرياض',         cat: 'reit' },
+    { sym: '4340.SR', ar: 'ريت الراجحي',        cat: 'reit' },
+    { sym: '4338.SR', ar: 'الأهلي ريت 1',       cat: 'reit' },
+    { sym: '4345.SR', ar: 'الإنماء ريت',        cat: 'reit' },
+    { sym: '4347.SR', ar: 'بنيان ريت',          cat: 'reit' },
+    { sym: '4332.SR', ar: 'جدوى ريت الحرمين',   cat: 'reit' },
+];
+
+let stockCache = {};
+let stockFailCount = 0;
+const STOCK_FAIL_THRESHOLD = 3;
+
+function fmtNum(n) {
+    if (n === null || n === undefined || isNaN(n)) return '—';
+    return new Intl.NumberFormat('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    }).format(n);
+}
+
+function fmtPct(p) {
+    if (p === null || p === undefined || isNaN(p)) return '';
+    const sign = p >= 0 ? '▲' : '▼';
+    return `${sign}${Math.abs(p).toFixed(2)}%`;
+}
+
+function renderTicker(quotes, marketStatus) {
+    const container = document.getElementById('tk-items');
+    if (!container) return;
+
+    const items = STOCKS.map(s => {
+        const q = quotes[s.sym] || stockCache[s.sym];
+        if (!q || q.price === null) {
+            return `<span class="ti"><span class="ti-n">${s.ar}</span><span class="ti-v" style="color:var(--t4)">—</span></span>`;
+        }
+        const pct = q.pct;
+        const cls = pct >= 0 ? 'ti-u' : 'ti-d';
+        return `<span class="ti">
+            <span class="ti-n">${s.ar}</span>
+            <span class="ti-v">${fmtNum(q.price)}</span>
+            <span class="${cls}">${fmtPct(pct)}</span>
+        </span>`;
+    }).join('');
+
+    // نسخة مضاعفة للحلقة اللانهائية السلسة
+    container.innerHTML = items + items;
+}
+
+function renderTickerOffline(msg) {
+    const container = document.getElementById('tk-items');
+    if (!container) return;
+    container.innerHTML = `<span class="ti" style="color:var(--t3)">${msg}</span>`;
+}
+
+function updateMarketLabel(status) {
+    const label = document.getElementById('tk-label');
+    const txt = document.getElementById('tk-status-text');
+    if (!label || !txt) return;
+
+    if (status === 'live') {
+        txt.textContent = 'مباشر';
+        label.classList.remove('closed');
+        label.setAttribute('title', 'سوق تداول مفتوح · يُغلق 3:00م بتوقيت الرياض');
+    } else {
+        txt.textContent = 'السوق مغلق';
+        label.classList.add('closed');
+        label.setAttribute('title', getClosedTitle());
+    }
+}
+
+// استخراج آمن لوقت الرياض — لا يعتمد على تنسيق toLocaleString
+function getRiyadhTime() {
+    const parts = new Intl.DateTimeFormat('en-US', {
+        timeZone: 'Asia/Riyadh',
+        hour12: false,
+        weekday: 'short',
+        hour: '2-digit',
+        minute: '2-digit'
+    }).formatToParts(new Date());
+
+    const find = type => {
+        const p = parts.find(p => p.type === type);
+        return p ? p.value : '';
+    };
+
+    let hh = parseInt(find('hour'), 10);
+    if (hh === 24) hh = 0;  // بعض المتصفحات تعيد "24" بدل "00"
+
+    return {
+        wday: find('weekday'),                // Sun/Mon/.../Sat
+        hh: isNaN(hh) ? 0 : hh,
+        mm: parseInt(find('minute'), 10) || 0
+    };
+}
+
+function getClosedTitle() {
+    const { wday, hh } = getRiyadhTime();
+
+    if (['Sun','Mon','Tue','Wed','Thu'].includes(wday) && hh < 10) {
+        return 'سوق تداول · يفتح اليوم 10:00ص';
+    }
+    if (['Sun','Mon','Tue','Wed','Thu'].includes(wday) && hh >= 15) {
+        if (wday === 'Thu') return 'سوق تداول · يفتح الأحد 10:00ص';
+        return 'سوق تداول · يفتح غداً 10:00ص';
+    }
+    if (wday === 'Fri' || wday === 'Sat') {
+        return 'سوق تداول · عطلة · يفتح الأحد 10:00ص';
+    }
+    return 'سوق تداول · خارج ساعات التداول';
+}
+
+// تحديد حالة السوق محلياً كـ fallback سريع (يُستخدم قبل وصول بيانات الـ Worker)
+function localMarketStatus() {
+    const { wday, hh, mm } = getRiyadhTime();
+    const mins = hh * 60 + mm;
+
+    if (['Fri','Sat'].includes(wday)) return 'closed';
+    if (['Sun','Mon','Tue','Wed','Thu'].includes(wday) && mins >= 600 && mins < 900) return 'live';
+    return 'closed';
+}
+
+async function fetchStocks() {
+    // اعرض الحالة المحلية فوراً
+    updateMarketLabel(localMarketStatus());
+
+    if (!STOCKS_API || STOCKS_API.includes('your-name')) {
+        renderTickerOffline('لم يُضبط رابط جلب الأسعار بعد · راجع STOCKS_API');
+        return;
+    }
+
+    const symbols = STOCKS.map(s => s.sym).join(',');
+    const url = `${STOCKS_API}/quotes?symbols=${encodeURIComponent(symbols)}`;
+
+    try {
+        console.log('[stocks] fetching:', url);
+        const res = await fetch(url, { cache: 'no-store' });
+        console.log('[stocks] response status:', res.status);
+
+        if (!res.ok) {
+            const text = await res.text().catch(() => '');
+            throw new Error(`HTTP ${res.status} · ${text.substring(0, 100)}`);
+        }
+
+        const data = await res.json();
+        console.log('[stocks] data received:', data);
+
+        if (!data) {
+            throw new Error('استجابة فارغة');
+        }
+        if (data.error) {
+            throw new Error(data.error);
+        }
+        if (!data.quotes || Object.keys(data.quotes).length === 0) {
+            const warn = data.warning ? ` · ${data.warning}` : '';
+            throw new Error('لا توجد أسعار في الاستجابة' + warn);
+        }
+
+        stockCache = { ...stockCache, ...data.quotes };
+        stockFailCount = 0;
+        renderTicker(data.quotes, data.status);
+        updateMarketLabel(data.status);
+    } catch (err) {
+        stockFailCount++;
+        console.error('[stocks] fetch failed:', err);
+
+        // لو لدينا بيانات كاش قديمة، استخدمها
+        if (Object.keys(stockCache).length > 0) {
+            renderTicker(stockCache, localMarketStatus());
+        } else {
+            // اعرض رسالة الخطأ الفعلية ليسهل تشخيصها
+            renderTickerOffline(`تعذّر جلب الأسعار: ${err.message || err}`);
+        }
+    }
+}
+
+// تشغيل أولي + تحديث دوري
+fetchStocks();
+// تحديث أكثر تواتراً حين السوق مفتوح (كل دقيقة)، أقل حين مغلق (كل 10 دقائق)
+function scheduleNextFetch() {
+    const status = localMarketStatus();
+    const delay = status === 'live' ? 60 * 1000 : 10 * 60 * 1000;
+    setTimeout(async () => {
+        await fetchStocks();
+        scheduleNextFetch();
+    }, delay);
+}
+scheduleNextFetch();
 
 /* ═══════════════════════════════════════════════════════════
    THEME SYSTEM — 7 palettes with live switching
